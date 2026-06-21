@@ -1,15 +1,28 @@
+from flask_login import UserMixin
 from models import db
 
-class User(db.Model):
+class User(UserMixin,db.Model):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(db.String(100), nullable=False)
 
-    email = db.Column(db.String(120), unique=True, nullable=False)
+    username = db.Column(
+        db.String(50),
+        unique=True,
+        nullable=False
+    )
 
-    password = db.Column(db.String(255), nullable=False)
+    email = db.Column(
+        db.String(120),
+        unique=True
+    )
+
+    password = db.Column(
+        db.String(255),
+        nullable=False
+    )
 
     role = db.Column(
         db.Enum("admin", "teacher"),
@@ -22,4 +35,4 @@ class User(db.Model):
     )
 
     def __repr__(self):
-        return f"<User {self.name}>"
+        return f"<User {self.username}>"

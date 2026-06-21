@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AMIS Login</title>
+</head>
+<body>
+
+    <h1>Abhyasika Management Information System</h1>
+
+    <h2>Login</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+
+        <p>
+            <label>Username:</label>
+            <input
+                type="text"
+                name="username"
+                required
+            >
+        </p>
+
+        <p>
+            <label>Password:</label>
+            <input
+                type="password"
+                name="password"
+                required
+            >
+        </p>
+
+        <button type="submit">
+            Login
+        </button>
+
+    </form>
+
+</body>
+</html>
