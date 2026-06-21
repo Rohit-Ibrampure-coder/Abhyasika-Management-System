@@ -6,6 +6,8 @@ from flask_login import LoginManager
 from models.user import User
 from routes.admin import admin_bp
 from routes.teacher import teacher_bp
+from routes.teacher_management import teacher_management_bp
+from routes.teacher_assignment import teacher_assignment_bp
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -27,6 +29,9 @@ def load_user(user_id):
 app.register_blueprint(auth_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(teacher_bp)
+app.register_blueprint(teacher_management_bp)
+app.register_blueprint(teacher_assignment_bp)
+
 
 @app.route("/")
 def home():

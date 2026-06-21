@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Teacher</title>
+</head>
+<body>
+
+<h1>Add Teacher</h1>
+
+<form method="POST">
+
+    <p>
+        Name:
+        <input type="text" name="name" required>
+    </p>
+
+    <p>
+        Mobile:
+        <input type="tel" name="mobile" pattern="[0-9]{10}" maxlength="10" required>
+    </p>
+
+    <p>
+        Email:
+        <input type="email" name="email">
+    </p>
+
+    <p>
+        Username:
+        <input type="text" name="username" required>
+    </p>
+
+    <p>
+        Password:
+        <input type="password" name="password" required>
+    </p>
+
+    <button type="submit">
+        Save Teacher
+    </button>
+
+</form>
+
+</body>
+</html>

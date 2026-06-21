@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Abhyasikas</title>
+</head>
+<body>
+
+<h1>Abhyasikas</h1>
+
+<a href="/admin/abhyasika/add">
+    Add New Abhyasika
+</a>
+
+<hr>
+
+{% for abhyasika in abhyasikas %}
+
+<p>
+    {{ abhyasika.name }}
+    -
+    {{ abhyasika.location }}
+    -
+    {{ abhyasika.type }}
+
+    <a href="/admin/abhyasika/edit/{{ abhyasika.id }}">
+        Edit
+    </a>
+
+    <a href="/admin/abhyasika/delete/{{ abhyasika.id }}">
+        Delete
+    </a>
+</p>
+
+{% endfor %}
+
+</body>
+</html>

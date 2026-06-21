@@ -8,11 +8,16 @@ class User(UserMixin,db.Model):
 
     name = db.Column(db.String(100), nullable=False)
 
+    mobile = db.Column(
+    db.String(15)
+    )
+    
     username = db.Column(
         db.String(50),
         unique=True,
         nullable=False
     )
+    
 
     email = db.Column(
         db.String(120),
@@ -23,6 +28,7 @@ class User(UserMixin,db.Model):
         db.String(255),
         nullable=False
     )
+
 
     role = db.Column(
         db.Enum("admin", "teacher"),

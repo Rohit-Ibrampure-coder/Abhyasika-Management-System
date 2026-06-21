@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teacher Assignments</title>
+</head>
+<body>
+
+<h1>Teacher Assignments</h1>
+
+<a href="/admin/teacher/assign">
+    New Assignment
+</a>
+
+<hr>
+
+{% for assignment in assignments %}
+
+<p>
+
+    Teacher:
+    {{ assignment.teacher.name }}
+
+    →
+
+    Abhyasika:
+    {{ assignment.abhyasika.name }}
+
+    <a href="/admin/teacher/assignment/delete/{{ assignment.id }}">
+        Remove
+    </a>
+
+</p>
+
+{% endfor %}
+
+</body>
+</html>

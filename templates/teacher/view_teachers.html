@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teachers</title>
+</head>
+<body>
+
+<h1>Teachers</h1>
+
+<a href="/admin/teacher/add">
+    Add Teacher
+</a>
+
+<hr>
+
+{% for teacher in teachers %}
+
+<p>
+
+    {{ teacher.name }}
+
+    -
+
+    {{ teacher.mobile }}
+
+    -
+
+    {{ teacher.username }}
+
+    -
+
+    {{ teacher.email }}
+
+    -
+
+    <a href="/admin/teacher/edit/{{ teacher.id }}">
+        Edit
+    </a>
+
+    <a href="/admin/teacher/delete/{{ teacher.id }}">
+        Delete
+    </a>
+
+</p>
+
+{% endfor %}
+
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Assign Teacher</title>
+</head>
+<body>
+
+<h1>Assign Teacher To Abhyasika</h1>
+
+<form method="POST">
+
+    <p>
+        Teacher:
+    </p>
+
+    <select name="teacher_id">
+
+        {% for teacher in teachers %}
+
+        <option value="{{ teacher.id }}">
+            {{ teacher.name }}
+        </option>
+
+        {% endfor %}
+
+    </select>
+
+    <hr>
+
+    <h3>Select Abhyasikas</h3>
+
+    {% for abhyasika in abhyasikas %}
+
+    <p>
+
+        <input
+            type="checkbox"
+            name="abhyasikas"
+            value="{{ abhyasika.id }}"
+        >
+
+        {{ abhyasika.name }}
+
+    </p>
+
+    {% endfor %}
+
+    <button type="submit">
+        Save Assignment
+    </button>
+
+</form>
+
+</body>
+</html>

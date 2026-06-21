@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Select Abhyasika</title>
+</head>
+<body>
+
+<h1>Select Abhyasika</h1>
+
+<form method="POST">
+
+{% for assignment in assignments %}
+
+<p>
+
+    <input
+        type="radio"
+        name="abhyasika_id"
+        value="{{ assignment.abhyasika_id }}"
+        required
+    >
+
+    {{ assignment.abhyasika.name }}
+
+</p>
+
+{% endfor %}
+
+<button type="submit">
+    Continue
+</button>
+
+</form>
+
+</body>
+</html>

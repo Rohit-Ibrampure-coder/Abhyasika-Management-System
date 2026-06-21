@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Assignment</title>
+</head>
+<body>
+
+<h1>
+Edit Assignment
+</h1>
+
+<h3>
+{{ teacher.name }}
+</h3>
+
+<form method="POST">
+
+{% for abhyasika in abhyasikas %}
+
+<p>
+
+    <input
+        type="checkbox"
+        name="abhyasikas"
+        value="{{ abhyasika.id }}"
+
+        {% if abhyasika.id in assigned_ids %}
+        checked
+        {% endif %}
+    >
+
+    {{ abhyasika.name }}
+
+</p>
+
+{% endfor %}
+
+<button type="submit">
+    Update Assignment
+</button>
+
+</form>
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Teacher</title>
+</head>
+<body>
+
+<h1>Edit Teacher</h1>
+
+<form method="POST">
+
+    <p>
+        Name:
+        <input
+            type="text"
+            name="name"
+            value="{{ teacher.name }}"
+            required
+        >
+    </p>
+
+    <p>
+        Mobile:
+        <input
+            type="tel" name="mobile" pattern="[0-9]{10}" maxlength="10" required
+
+            value="{{ teacher.mobile }}"
+            required
+        >
+    </p>
+
+    <p>
+        Email:
+        <input
+            type="email"
+            name="email"
+            value="{{ teacher.email }}"
+        >
+    </p>
+
+    <p>
+        Username:
+        <input
+            type="text"
+            name="username"
+            value="{{ teacher.username }}"
+            required
+        >
+    </p>
+
+    <button type="submit">
+        Update Teacher
+    </button>
+
+</form>
+
+</body>
+</html>

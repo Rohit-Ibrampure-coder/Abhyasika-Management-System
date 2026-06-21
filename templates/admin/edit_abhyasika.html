@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Abhyasika</title>
+</head>
+<body>
+
+<h1>Edit Abhyasika</h1>
+
+<form method="POST">
+
+    <p>
+        Name:
+        <input
+            type="text"
+            name="name"
+            value="{{ abhyasika.name }}"
+            required
+        >
+    </p>
+
+    <p>
+        Location:
+        <input
+            type="text"
+            name="location"
+            value="{{ abhyasika.location }}"
+        >
+    </p>
+
+    <p>
+        Type:
+
+        <select name="type">
+
+            <option value="daily"
+            {% if abhyasika.type == 'daily' %}
+            selected
+            {% endif %}>
+            Daily
+            </option>
+
+            <option value="weekly"
+            {% if abhyasika.type == 'weekly' %}
+            selected
+            {% endif %}>
+            Weekly
+            </option>
+
+        </select>
+
+    </p>
+
+    <button type="submit">
+        Update
+    </button>
+
+</form>
+
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teacher Assignments</title>
+</head>
+<body>
+
+<h1>Teacher Assignments</h1>
+
+{% for teacher, abhyasikas in grouped.items() %}
+
+<h3>
+    {{ teacher }}
+</h3>
+
+<ul>
+
+{% for abhyasika in abhyasikas %}
+
+<li>
+    {{ abhyasika }}
+</li>
+
+{% endfor %}
+
+</ul>
+
+<a href="/admin/teacher/assignment/edit/{{ teacher_ids[teacher] }}">
+    Edit Assignment
+</a>
+
+<hr>
+
+{% endfor %}
+
+</body>
+</html>

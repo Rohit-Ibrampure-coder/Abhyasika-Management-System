@@ -8,6 +8,7 @@ from models.student import Student
 from models.attendance import Attendance
 from models.remark import Remark
 from models.achievement import Achievement
+from models.teacher_abhyasika import TeacherAbhyasika
 
 with app.app_context():
     db.create_all()
