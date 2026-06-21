@@ -1,0 +1,31 @@
+from models import db
+
+class Attendance(db.Model):
+    __tablename__ = "attendance"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    student_id = db.Column(
+        db.Integer,
+        db.ForeignKey("students.id")
+    )
+
+    attendance_date = db.Column(
+        db.Date,
+        nullable=False
+    )
+
+    status = db.Column(
+        db.Enum("Present", "Absent"),
+        nullable=False
+    )
+
+    marked_by = db.Column(
+        db.Integer,
+        db.ForeignKey("users.id")
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        server_default=db.func.now()
+    )
