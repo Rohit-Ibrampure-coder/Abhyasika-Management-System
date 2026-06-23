@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Student</title>
+</head>
+<body>
+
+<h1>Add Student</h1>
+
+<form method="POST">
+
+    <p>
+        Student Name
+        <input
+            type="text"
+            name="student_name"
+            required
+        >
+    </p>
+
+    <p>
+        Gender
+
+        <select name="gender">
+
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
+
+        </select>
+
+    </p>
+
+    <p>
+        Standard
+        <input
+            type="text"
+            name="standard"
+            required
+        >
+    </p>
+
+    <p>
+        Parent Name
+        <input
+            type="text"
+            name="parent_name"
+        >
+    </p>
+
+    <p>
+        Parent Mobile
+        <input type="tel" name="mobile" pattern="[0-9]{10}" maxlength="10" required>
+    </p>
+
+    <p>
+
+        Abhyasika
+
+        <select name="abhyasika_id">
+
+            {% for abhyasika in abhyasikas %}
+
+            <option
+                value="{{ abhyasika.id }}"
+            >
+                {{ abhyasika.name }}
+            </option>
+
+            {% endfor %}
+
+        </select>
+
+    </p>
+
+    <button type="submit">
+        Save Student
+    </button>
+
+</form>
+
+</body>
+</html>

@@ -8,6 +8,7 @@ from routes.admin import admin_bp
 from routes.teacher import teacher_bp
 from routes.teacher_management import teacher_management_bp
 from routes.teacher_assignment import teacher_assignment_bp
+from routes.student_management import student_management_bp
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -31,6 +32,7 @@ app.register_blueprint(admin_bp)
 app.register_blueprint(teacher_bp)
 app.register_blueprint(teacher_management_bp)
 app.register_blueprint(teacher_assignment_bp)
+app.register_blueprint(student_management_bp)
 
 
 @app.route("/")

@@ -24,6 +24,12 @@ class Abhyasika(db.Model):
         db.ForeignKey("users.id")
     )
 
+    students = db.relationship(
+        "Student",
+        backref="abhyasika",
+        lazy=True
+    )
+
     created_at = db.Column(
         db.DateTime,
         server_default=db.func.now()

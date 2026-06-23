@@ -3,30 +3,66 @@ from models import db
 class Student(db.Model):
     __tablename__ = "students"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
     student_name = db.Column(
         db.String(100),
         nullable=False
     )
 
-    gender = db.Column(db.String(10))
+    gender = db.Column(
+        db.Enum(
+            "Male",
+            "Female",
+            "Other"
+        ),
+        nullable=False
+    )
 
-    dob = db.Column(db.Date)
+    date_of_birth = db.Column(
+        db.Date
+    )
 
-    school_name = db.Column(db.String(150))
+    school_college_name = db.Column(
+        db.String(200)
+    )
 
-    standard = db.Column(db.String(50))
+    standard = db.Column(
+        db.String(50),
+        nullable=False
+    )
 
-    parent_name = db.Column(db.String(100))
+    parent_name = db.Column(
+        db.String(100)
+    )
 
-    parent_mobile = db.Column(db.String(15))
+    parent_mobile = db.Column(
+        db.String(10)
+    )
 
-    address = db.Column(db.Text)
+    address = db.Column(
+        db.Text
+    )
 
-    admission_date = db.Column(db.Date)
+    # Student Photo
+    photo = db.Column(
+        db.String(255)
+    )
 
-    photo = db.Column(db.String(255))
+    abhyasika_id = db.Column(
+        db.Integer,
+        db.ForeignKey(
+            "abhyasikas.id"
+        ),
+        nullable=False
+    )
+
+    admission_date = db.Column(
+        db.Date
+    )
 
     status = db.Column(
         db.Enum(
@@ -36,11 +72,6 @@ class Student(db.Model):
             "Completed"
         ),
         default="Active"
-    )
-
-    abhyasika_id = db.Column(
-        db.Integer,
-        db.ForeignKey("abhyasikas.id")
     )
 
     created_at = db.Column(

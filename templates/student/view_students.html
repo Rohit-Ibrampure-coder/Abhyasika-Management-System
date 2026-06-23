@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Students</title>
+</head>
+<body>
+
+<h1>Students</h1>
+
+<a href="/students/add">
+    Add Student
+</a>
+
+<hr>
+
+{% for student in students %}
+
+<p>
+
+    {{ student.student_name }}
+
+    -
+
+    {{ student.standard }}
+
+    -
+
+    {{ student.abhyasika.name }}
+
+</p>
+
+{% endfor %}
+
+</body>
+</html>
