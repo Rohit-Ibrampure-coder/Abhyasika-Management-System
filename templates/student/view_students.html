@@ -1,35 +1,196 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Students</title>
 </head>
+
 <body>
 
-<h1>Students</h1>
+    <h1>Students</h1>
 
-<a href="/students/add">
-    Add Student
-</a>
+    <h3>
 
-<hr>
+        Total Students :
 
-{% for student in students %}
+        {{ student_count }}
 
-<p>
+    </h3>
 
-    {{ student.student_name }}
+    <hr>
 
-    -
+    <a href="{{ url_for('student.add_student') }}">
+        Add Student
+    </a>
 
-    {{ student.standard }}
+    <hr>
 
-    -
+    <form method="GET">
 
-    {{ student.abhyasika.name }}
+        <input
+            type="text"
+            name="search"
+            placeholder="Search Student..."
+            value="{{ search }}"
+        >
 
-</p>
+        <p>
 
-{% endfor %}
+            Status
+
+            <select name="status">
+
+                <option value="">
+                    All Status
+                </option>
+
+                {% for item in student_status %}
+
+                <option
+                    value="{{ item }}"
+                    {% if status == item %}
+                    selected
+                    {% endif %}
+                >
+
+                    {{ item }}
+
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+        </p>
+
+        <p>
+
+            Standard
+
+            <select name="standard">
+
+                <option value="">
+                    All Standards
+                </option>
+
+                {% for item in standards %}
+
+                <option
+                    value="{{ item }}"
+                    {% if standard == item %}
+                    selected
+                    {% endif %}
+                >
+
+                    {{ item }}
+
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+        </p>
+
+        {% if current_user.role == "admin" %}
+
+        <p>
+
+            Abhyasika
+
+            <select name="abhyasika">
+
+                <option value="">
+                    All Abhyasikas
+                </option>
+
+                {% for item in abhyasikas %}
+
+                <option
+                    value="{{ item.id }}"
+                    {% if abhyasika == item.id|string %}
+                    selected
+                    {% endif %}
+                >
+
+                    {{ item.name }}
+
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+        </p>
+
+        {% endif %}
+
+        <button type="submit">
+            Search
+        </button>
+
+        <a href="{{ url_for('student.view_students') }}">
+            Reset
+        </a>
+
+    </form>
+
+    <br>
+
+    <br>
+
+    <table border="1" cellpadding="8">
+
+        <tr>
+
+            <th>Student Name</th>
+            <th>Standard</th>
+            <th>Abhyasika</th>
+            <th>Status</th>
+            <th>Action</th>
+
+        </tr>
+
+        {% for student in students %}
+
+        <tr>
+
+            <td>{{ student.student_name }}</td>
+
+            <td>{{ student.standard }}</td>
+
+            <td>{{ student.abhyasika.name }}</td>
+
+            <td>{{ student.status }}</td>
+
+            <td>
+
+                <a href="{{ url_for('student.student_profile', student_id=student.id) }}">
+                    View Profile
+                </a>
+
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+    {% if students|length == 0 %}
+
+    <tr>
+
+        <td colspan="5">
+
+            No students found.
+
+        </td>
+
+    </tr>
+
+    {% endif %}
 
 </body>
+
 </html>

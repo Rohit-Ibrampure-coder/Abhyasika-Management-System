@@ -10,7 +10,7 @@
 <form method="POST">
 
     <p>
-        Student Name
+        Student Full Name
         <input
             type="text"
             name="student_name"
@@ -19,26 +19,132 @@
     </p>
 
     <p>
+
         Gender
 
-        <select name="gender">
+        <select
+            name="gender"
+            required
+        >
 
-            <option>Male</option>
-            <option>Female</option>
-            <option>Other</option>
+            <option value="">-- Select Gender --</option>
+
+            {% for gender in genders %}
+
+            <option value="{{ gender }}">
+
+                {{ gender }}
+
+            </option>
+
+            {% endfor %}
 
         </select>
 
     </p>
 
     <p>
-        Standard
+        Date of Birth
+
         <input
-            type="text"
-            name="standard"
+            type="date"
+            name="date_of_birth"
             required
         >
+
     </p>
+
+    <p>
+
+        School / College Name
+
+        <input
+            type="text"
+            name="school_college_name"
+            required
+        >
+
+    </p>
+
+   <p>
+
+        Standard
+
+        <select
+            name="standard"
+            id="standard"
+            required
+            onchange="toggleStream()"
+        >
+
+            <option value="">
+                -- Select Standard --
+            </option>
+
+            {% for standard in standards %}
+
+            <option value="{{ standard }}">
+
+                {{ standard }}
+
+            </option>
+
+            {% endfor %}
+
+        </select>
+
+    </p>
+
+    <div
+        id="stream_div"
+        style="display:none;"
+    >
+
+        <p>
+
+            Stream
+
+            <select
+                name="stream"
+                id="stream"
+                onchange="toggleOtherStream()"
+            >
+
+                <option value="">
+                    -- Select Stream --
+                </option>
+
+                {% for stream in streams %}
+
+                <option value="{{ stream }}">
+
+                    {{ stream }}
+
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+        </p>
+
+    </div>
+
+    <div id="other_stream_div" style="display:none;">
+
+        <p>
+
+            Specify Stream
+
+            <input
+                type="text"
+                name="other_stream"
+                id="other_stream"
+            >
+
+        </p>
+
+    </div>
 
     <p>
         Parent Name
@@ -50,20 +156,58 @@
 
     <p>
         Parent Mobile
-        <input type="tel" name="mobile" pattern="[0-9]{10}" maxlength="10" required>
+        <input
+            type="tel"
+            name="parent_mobile"
+            pattern="[0-9]{10}"
+            maxlength="10"
+            required
+        >
     </p>
 
     <p>
 
-        Abhyasika
+        Residential Address
 
-        <select name="abhyasika_id">
+        <br>
+
+        <textarea
+            name="address"
+            rows="4"
+            cols="40"
+            required
+        ></textarea>
+
+    </p>
+
+    <p>
+
+        Admission Date
+
+        <input
+            type="date"
+            name="admission_date"
+            required
+        >
+
+    </p>
+
+    {% if current_user.role == "admin" %}
+
+    <p>
+
+        <label>
+            Abhyasika
+        </label>
+
+        <select
+            name="abhyasika_id"
+            required
+        >
 
             {% for abhyasika in abhyasikas %}
 
-            <option
-                value="{{ abhyasika.id }}"
-            >
+            <option value="{{ abhyasika.id }}">
                 {{ abhyasika.name }}
             </option>
 
@@ -73,11 +217,31 @@
 
     </p>
 
+    {% else %}
+
+    <p>
+
+        <label>
+            Current Abhyasika
+        </label>
+
+        <input
+            type="text"
+            value="{{ selected_abhyasika.name }}"
+            readonly
+        >
+
+    </p>
+
+    {% endif %}
+
     <button type="submit">
         Save Student
     </button>
 
 </form>
+
+<script src="{{ url_for('static', filename='js/student.js') }}"></script>
 
 </body>
 </html>

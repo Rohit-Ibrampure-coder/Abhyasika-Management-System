@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Edit Student</title>
+</head>
+
+<body>
+
+    <h1>Edit Student</h1>
+
+    <form method="POST">
+
+        <p>
+            Student Full Name
+
+            <input
+                type="text"
+                name="student_name"
+                value="{{ student.student_name }}"
+                required
+            >
+        </p>
+
+        <p>
+
+            Gender
+
+            <select
+                name="gender"
+                required
+            >
+
+                <option value="">
+                    -- Select Gender --
+                </option>
+
+                {% for gender in genders %}
+
+                <option
+                    value="{{ gender }}"
+                    {% if student.gender == gender %}
+                    selected
+                    {% endif %}
+                >
+
+                    {{ gender }}
+
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+        </p>
+
+        <p>
+
+            Date of Birth
+
+            <input
+                type="date"
+                name="date_of_birth"
+                value="{{ student.date_of_birth }}"
+                required
+            >
+
+        </p>
+
+        <p>
+
+            School / College Name
+
+            <input
+                type="text"
+                name="school_college_name"
+                value="{{ student.school_college_name }}"
+                required
+            >
+
+        </p>
+
+        <p>
+
+            Standard
+
+            <select
+                name="standard"
+                id="standard"
+                required
+                onchange="toggleStream()"
+            >
+
+                <option value="">
+                    -- Select Standard --
+                </option>
+
+                {% for standard in standards %}
+
+                <option
+                    value="{{ standard }}"
+                    {% if student.standard == standard %}
+                    selected
+                    {% endif %}
+                >
+
+                    {{ standard }}
+
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+        </p>
+
+        <div id="stream_div" style="display:none;">
+
+            <p>
+
+                Stream
+
+                <select
+                    name="stream"
+                    id="stream"
+                    onchange="toggleOtherStream()"
+                >
+
+                    <option value="">
+                        -- Select Stream --
+                    </option>
+
+                    {% for stream in streams %}
+
+                    <option
+                        value="{{ stream }}"
+                        {% if student.stream == stream %}
+                        selected
+                        {% endif %}
+                    >
+
+                        {{ stream }}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </p>
+
+        </div>
+
+        <div id="other_stream_div" style="display:none;">
+
+            <p>
+
+                Specify Stream
+
+                <input
+                    type="text"
+                    name="other_stream"
+                    id="other_stream"
+                    value="{{ student.other_stream or '' }}"
+                >
+
+            </p>
+
+        </div>
+
+        <p>
+
+            Parent Name
+
+            <input
+                type="text"
+                name="parent_name"
+                value="{{ student.parent_name }}"
+                required
+            >
+
+        </p>
+
+        <p>
+
+            Parent Mobile
+
+            <input
+                type="tel"
+                name="parent_mobile"
+                value="{{ student.parent_mobile }}"
+                pattern="[0-9]{10}"
+                maxlength="10"
+                required
+            >
+
+        </p>
+
+        <p>
+
+            Residential Address
+
+            <br>
+
+            <textarea
+                name="address"
+                rows="4"
+                cols="40"
+                required>{{ student.address }}</textarea>
+
+        </p>
+
+        <p>
+
+            Admission Date
+
+            <input
+                type="date"
+                name="admission_date"
+                value="{{ student.admission_date }}"
+                required
+            >
+
+        </p>
+
+        <p>
+
+            Status
+
+            <select
+                name="status"
+                required
+            >
+
+                {% for item in student_status %}
+
+                <option
+                    value="{{ item }}"
+                    {% if student.status == item %}
+                    selected
+                    {% endif %}
+                >
+
+                    {{ item }}
+
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+        </p>
+
+        {% if current_user.role == "admin" %}
+
+        <p>
+
+            Abhyasika
+
+            <select name="abhyasika_id">
+
+                {% for abhyasika in abhyasikas %}
+
+                <option
+                    value="{{ abhyasika.id }}"
+                    {% if student.abhyasika_id==abhyasika.id %}selected{% endif %}>
+                    {{ abhyasika.name }}
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+        </p>
+
+        {% else %}
+
+        <p>
+
+            Current Abhyasika
+
+            <input
+                type="text"
+                value="{{ student.abhyasika.name }}"
+                readonly
+            >
+
+        </p>
+
+        {% endif %}
+
+        <button type="submit">
+            Update Student
+        </button>
+
+        <a href="{{ url_for('student.student_profile', student_id=student.id) }}">
+            Cancel
+        </a>
+
+    </form>
+
+<script src="{{ url_for('static', filename='js/student.js') }}"></script>
+
+</body>
+
+</html>

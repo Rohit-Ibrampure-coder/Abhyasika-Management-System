@@ -35,6 +35,21 @@ class Student(db.Model):
         nullable=False
     )
 
+    stream = db.Column(
+        db.Enum(
+            "Science",
+            "Commerce",
+            "Arts",
+            "Other"
+        ),
+        nullable=True
+    )
+
+    other_stream = db.Column(
+        db.String(100),
+        nullable=True
+    )
+
     parent_name = db.Column(
         db.String(100)
     )
@@ -44,7 +59,8 @@ class Student(db.Model):
     )
 
     address = db.Column(
-        db.Text
+        db.Text,
+        nullable=False
     )
 
     # Student Photo
@@ -81,3 +97,5 @@ class Student(db.Model):
 
     def __repr__(self):
         return f"<Student {self.student_name}>"
+    
+    

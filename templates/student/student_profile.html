@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Student Profile</title>
+</head>
+
+<body>
+
+    <h1>Student Profile</h1>
+
+    <hr>
+
+    <p>
+        <strong>Student Full Name:</strong>
+        {{ student.student_name }}
+    </p>
+
+    <p>
+        <strong>Gender:</strong>
+        {{ student.gender }}
+    </p>
+
+    <p>
+        <strong>Date of Birth:</strong>
+        {{ student.date_of_birth }}
+    </p>
+
+    <p>
+        <strong>School / College:</strong>
+        {{ student.school_college_name }}
+    </p>
+
+    <p>
+        <strong>Standard:</strong>
+        {{ student.standard }}
+    </p>
+
+    {% if student.stream %}
+
+    <p>
+
+        <strong>Stream:</strong>
+
+        {% if student.stream == "Other" %}
+
+            {{ student.other_stream }}
+
+        {% else %}
+
+            {{ student.stream }}
+
+        {% endif %}
+
+    </p>
+
+    {% endif %}
+
+    <p>
+        <strong>Parent Name:</strong>
+        {{ student.parent_name }}
+    </p>
+    
+    <p>
+        <strong>Parent Mobile:</strong>
+        {{ student.parent_mobile }}
+    </p>
+
+    <p>
+        <strong>Residential Address:</strong>
+        {{ student.address }}
+    </p>
+
+    <p>
+        <strong>Admission Date:</strong>
+        {{ student.admission_date }}
+    </p>
+
+    <p>
+        <strong>Status:</strong>
+        {{ student.status }}
+    </p>
+
+    <p>
+        <strong>Abhyasika:</strong>
+        {{ student.abhyasika.name }}
+    </p>
+
+    <hr>
+
+    <h2>Attendance</h2>
+
+    <p>No attendance records available.</p>
+
+    <hr>
+
+    <h2>Teacher Remarks</h2>
+
+    <p>No remarks available.</p>
+
+    <hr>
+
+    <h2>Achievements</h2>
+
+    <p>No achievements available.</p>
+
+    <hr>
+
+    <p>
+
+        <a href="{{ url_for('student.edit_student', student_id=student.id) }}">
+            Edit Student
+        </a>
+
+    </p>
+
+    <a href="{{ url_for('student.view_students') }}">
+        Back to Students
+    </a>
+
+</body>
+
+</html>
