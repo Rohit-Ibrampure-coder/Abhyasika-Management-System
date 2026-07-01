@@ -45,7 +45,7 @@ def select_abhyasika():
 
         return redirect(
             url_for(
-                "teacher.dashboard"
+                "teacher.teacher_dashboard"
             )
         )
 
@@ -57,7 +57,7 @@ def select_abhyasika():
 
 @teacher_bp.route("/teacher/dashboard")
 @login_required
-def dashboard():
+def teacher_dashboard():
 
     abhyasika_id = session.get(
         "abhyasika_id"
@@ -74,9 +74,10 @@ def dashboard():
         abhyasika_id
     )
 
-    return f"""
-    Teacher Dashboard
+    return render_template(
 
-    Current Abhyasika:
-    {abhyasika.name}
-    """
+    "dashboard/dashboard.html",
+
+    abhyasika=abhyasika
+
+)

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Edit Attendance</title>
+
+</head>
+
+<body>
+
+    <h1>Edit Attendance</h1>
+
+    <p>
+
+        Attendance Date :
+
+        <b>
+
+            {{ attendance_date }}
+
+        </b>
+
+    </p>
+
+    <form method="POST" action="{{ url_for('attendance.update_attendance') }}">
+
+        <input type="hidden" name="attendance_date" value="{{ attendance_date }}">
+
+        <input type="hidden" name="abhyasika_id" value="{{ abhyasika_id }}">
+
+        <table border="1" cellpadding="8">
+
+            <tr>
+
+                <th>
+
+                    Student Name
+
+                </th>
+
+                <th>
+
+                    Standard
+
+                </th>
+
+                <th>
+
+                    Present
+
+                </th>
+
+                <th>
+
+                    Absent
+
+                </th>
+
+            </tr>
+
+            {% for attendance, student in attendance_list %}
+
+            <tr>
+
+                <td>
+
+                    {{ student.student_name }}
+
+                </td>
+
+                <td>
+
+                    {{ student.standard }}
+
+                </td>
+
+                <td align="center">
+
+                    <input type="radio" name="attendance_{{ attendance.id }}" value="Present" {% if
+                        attendance.status=="Present" %} checked {% endif %}>
+
+                </td>
+
+                <td align="center">
+
+                    <input type="radio" name="attendance_{{ attendance.id }}" value="Absent" {% if
+                        attendance.status=="Absent" %} checked {% endif %}>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </table>
+
+        <br>
+
+        <button type="submit">
+
+            Update Attendance
+
+        </button>
+
+    </form>
+
+</body>
+
+</html>

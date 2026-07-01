@@ -1,0 +1,1081 @@
+/* ===========================
+   GOOGLE FONT
+=========================== */
+
+*{
+
+    font-family: "Poppins", sans-serif;
+
+}
+
+/* ===========================
+   COLOR VARIABLES
+=========================== */
+
+:root{
+
+    --primary:#2563EB;
+
+    --primary-dark:#1D4ED8;
+
+    --success:#10B981;
+
+    --warning:#F59E0B;
+
+    --danger:#EF4444;
+
+    --background:#F8FAFC;
+
+    --card:#FFFFFF;
+
+    --text:#1E293B;
+
+    --text-light:#64748B;
+
+    --border:#E2E8F0;
+
+    --sidebar:#FFFFFF;
+
+}
+
+/* ===========================
+   DARK MODE
+=========================== */
+
+[data-bs-theme="dark"]{
+
+    --background:#0F172A;
+
+    --card:#1E293B;
+
+    --text:#F8FAFC;
+
+    --text-light:#CBD5E1;
+
+    --border:#334155;
+
+    --sidebar:#1E293B;
+
+}
+
+/* ===========================
+   BODY
+=========================== */
+
+body{
+
+    background:var(--background);
+
+    color:var(--text);
+
+    min-height:100vh;
+
+    transition:.3s;
+
+}
+
+/* ===========================
+   NAVBAR
+=========================== */
+
+.navbar{
+
+    background:white !important;
+
+    border-bottom:1px solid var(--border);
+
+    height:70px;
+
+    z-index:1030;
+
+}
+
+[data-bs-theme="dark"] .navbar{
+
+    background:#1E293B !important;
+
+}
+
+/* =====================================================
+   SIDEBAR
+===================================================== */
+
+.sidebar{
+
+    width:280px;
+
+    min-height:100vh;
+
+    background:#FFFFFF;
+
+    border-right:1px solid #E5E7EB;
+
+    padding:24px 18px;
+
+    transition:all .3s ease;
+
+    overflow-y:auto;
+
+}
+
+/* Logo */
+
+.sidebar-brand{
+
+    text-align:center;
+
+    margin-bottom:10px;
+
+}
+
+.brand-logo{
+
+    width:72px;
+
+    height:72px;
+
+    margin:auto;
+
+    border-radius:20px;
+
+    background:linear-gradient(
+        135deg,
+        #2563EB,
+        #3B82F6
+    );
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    color:white;
+
+    font-size:34px;
+
+    box-shadow:0 12px 30px rgba(37,99,235,.25);
+
+}
+
+.sidebar-brand h4{
+
+    font-weight:700;
+
+    margin-top:15px;
+
+    margin-bottom:4px;
+
+}
+
+.sidebar-brand small{
+
+    color:#64748B;
+
+}
+
+/* Section Heading */
+
+.sidebar-heading{
+
+    list-style:none;
+
+    font-size:12px;
+
+    font-weight:700;
+
+    color:#94A3B8;
+
+    letter-spacing:1px;
+
+    margin-bottom:10px;
+
+}
+
+/* Menu */
+
+.sidebar .nav-link{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    padding:13px 16px;
+
+    margin-bottom:8px;
+
+    border-radius:14px;
+
+    color:#475569;
+
+    font-weight:500;
+
+    transition:.25s;
+
+}
+
+.sidebar .nav-link i{
+
+    font-size:18px;
+
+    width:24px;
+
+    text-align:center;
+
+}
+
+/* Hover */
+
+.sidebar .nav-link:hover{
+
+    background:#EEF4FF;
+
+    color:#2563EB;
+
+    transform:translateX(4px);
+
+}
+
+/* Active */
+
+.sidebar .nav-link.active{
+
+    background:linear-gradient(
+        90deg,
+        #2563EB,
+        #3B82F6
+    );
+
+    color:#FFFFFF;
+
+    box-shadow:0 10px 25px rgba(37,99,235,.25);
+
+}
+
+/* Logout */
+
+.sidebar .text-danger{
+
+    color:#DC2626 !important;
+
+}
+
+.sidebar .text-danger:hover{
+
+    background:#FEE2E2;
+
+}
+
+/* Scrollbar */
+
+.sidebar::-webkit-scrollbar{
+
+    width:6px;
+
+}
+
+.sidebar::-webkit-scrollbar-thumb{
+
+    background:#CBD5E1;
+
+    border-radius:20px;
+
+}
+
+/* =====================================================
+   DARK SIDEBAR
+===================================================== */
+
+[data-bs-theme="dark"] .sidebar{
+
+    background:#0F172A;
+
+    border-right:1px solid #1E293B;
+
+}
+
+[data-bs-theme="dark"] .sidebar-brand small{
+
+    color:#94A3B8;
+
+}
+
+[data-bs-theme="dark"] .sidebar-heading{
+
+    color:#64748B;
+
+}
+
+[data-bs-theme="dark"] .sidebar .nav-link{
+
+    color:#CBD5E1;
+
+}
+
+[data-bs-theme="dark"] .sidebar .nav-link:hover{
+
+    background:#1E293B;
+
+    color:#FFFFFF;
+
+}
+
+[data-bs-theme="dark"] .sidebar .nav-link.active{
+
+    background:linear-gradient(
+
+        90deg,
+
+        #2563EB,
+
+        #3B82F6
+
+    );
+
+    color:#FFFFFF;
+
+}
+
+[data-bs-theme="dark"] .sidebar hr{
+
+    border-color:#334155;
+
+}
+
+[data-bs-theme="dark"] .sidebar .text-danger:hover{
+
+    background:#7F1D1D;
+
+}
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+.offcanvas.sidebar{
+
+    width:280px;
+
+}
+
+/* ===========================
+   CARDS
+=========================== */
+
+.card{
+
+    border:none;
+
+    border-radius:18px;
+
+    box-shadow:
+
+    0 10px 30px rgba(0,0,0,.05);
+
+    transition:.3s;
+
+}
+
+.card:hover{
+
+    transform:translateY(-5px);
+
+}
+
+/* ===========================
+   BUTTONS
+=========================== */
+
+.btn{
+
+    border-radius:12px;
+
+    transition:.3s;
+
+}
+
+.btn-primary{
+
+    background:var(--primary);
+
+    border:none;
+
+}
+
+.btn-primary:hover{
+
+    background:var(--primary-dark);
+
+}
+
+/* ===========================
+   TABLES
+=========================== */
+
+.table{
+
+    border-radius:15px;
+
+    overflow:hidden;
+
+}
+
+.table thead{
+
+    background:var(--primary);
+
+    color:white;
+
+}
+
+.table tbody tr:hover{
+
+    background:#EFF6FF;
+
+}
+
+[data-bs-theme="dark"] .table tbody tr:hover{
+
+    background:#334155;
+
+}
+
+/* ===========================
+   FORM
+=========================== */
+
+.form-control,
+
+.form-select{
+
+    border-radius:12px;
+
+    padding:12px;
+
+}
+
+.form-control:focus,
+
+.form-select:focus{
+
+    border-color:var(--primary);
+
+    box-shadow:0 0 0 .2rem rgba(37,99,235,.15);
+
+}
+
+/* ===========================
+   ALERT
+=========================== */
+
+.alert{
+
+    border:none;
+
+    border-radius:14px;
+
+}
+
+/* ===========================
+   FOOTER
+=========================== */
+
+footer{
+
+    background:white;
+
+    border-top:1px solid var(--border);
+
+}
+
+[data-bs-theme="dark"] footer{
+
+    background:#1E293B;
+
+}
+
+/* ===========================
+   SCROLLBAR
+=========================== */
+
+::-webkit-scrollbar{
+
+    width:10px;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:var(--primary);
+
+    border-radius:20px;
+
+}
+
+/* ===========================
+   ANIMATIONS
+=========================== */
+
+main{
+
+    animation:fade .5s;
+
+}
+
+@keyframes fade{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(15px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+/* ===========================
+   MOBILE
+=========================== */
+
+@media(max-width:992px){
+
+.sidebar{
+
+    min-height:auto;
+
+}
+
+main{
+
+    padding:20px !important;
+
+}
+
+.navbar-brand{
+
+    font-size:18px;
+
+}
+
+}
+
+/* =====================================================
+   LOGIN PAGE
+===================================================== */
+
+.login-page{
+
+    background:linear-gradient(
+        135deg,
+        #2563EB,
+        #1D4ED8
+    );
+
+    overflow:hidden;
+
+}
+
+/* Left Section */
+
+.login-left{
+
+    color:white;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    padding:80px;
+
+}
+
+.login-content{
+
+    max-width:500px;
+
+    animation:fadeLeft .8s ease;
+
+}
+
+.login-content h1{
+
+    font-size:42px;
+
+    font-weight:700;
+
+}
+
+.login-content .lead{
+
+    font-size:24px;
+
+    font-weight:500;
+
+}
+
+/* Login Card */
+
+.login-card{
+
+    width:100%;
+
+    max-width:480px;
+
+    background:rgba(255,255,255,.95);
+
+    backdrop-filter:blur(20px);
+
+    border-radius:24px;
+
+    padding:45px;
+
+    box-shadow:
+
+    0 25px 60px rgba(0,0,0,.18);
+
+    animation:fadeRight .8s ease;
+
+}
+
+/* Dark Theme */
+
+[data-bs-theme="dark"] .login-card{
+
+    background:#1E293B;
+
+    color:#F8FAFC;
+
+}
+
+[data-bs-theme="dark"] .login-page{
+
+    background:linear-gradient(
+
+        135deg,
+
+        #0F172A,
+
+        #1E293B
+
+    );
+
+}
+
+/* Input Group */
+
+.input-group-text{
+
+    background:white;
+
+    border-right:none;
+
+}
+
+.form-control{
+
+    border-left:none;
+
+}
+
+.form-control:focus{
+
+    box-shadow:none;
+
+}
+
+/* Login Button */
+
+.login-card .btn-primary{
+
+    border-radius:14px;
+
+    font-weight:600;
+
+    font-size:17px;
+
+    transition:.3s;
+
+}
+
+.login-card .btn-primary:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:
+
+    0 15px 30px rgba(37,99,235,.35);
+
+}
+
+/* Icon */
+
+.login-content i{
+
+    font-size:90px;
+
+}
+
+/* Animations */
+
+@keyframes fadeLeft{
+
+    from{
+
+        opacity:0;
+
+        transform:translateX(-60px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateX(0);
+
+    }
+
+}
+
+@keyframes fadeRight{
+
+    from{
+
+        opacity:0;
+
+        transform:translateX(60px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateX(0);
+
+    }
+
+}
+
+/* Mobile */
+
+@media(max-width:992px){
+
+.login-page{
+
+    background:#F8FAFC;
+
+}
+
+.login-card{
+
+    margin:20px;
+
+    box-shadow:
+
+    0 15px 40px rgba(0,0,0,.08);
+
+    border-radius:20px;
+
+    padding:35px;
+
+}
+
+}
+
+/* ==========================================
+   LOGO PLACEHOLDER
+========================================== */
+
+.logo-circle{
+
+    width:110px;
+
+    height:110px;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.18);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    margin-bottom:30px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.15);
+
+}
+
+.logo-circle i{
+
+    font-size:52px;
+
+    color:#FFFFFF;
+
+}
+
+/* ==========================================
+   Dashboard Welcome Card
+========================================== */
+
+.welcome-card{
+
+    border-radius:20px;
+
+    background:linear-gradient(
+        135deg,
+        #ffffff,
+        #f8fbff
+    );
+
+    transition:.3s;
+
+}
+
+.welcome-card:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:0 20px 40px rgba(0,0,0,.08);
+
+}
+
+[data-bs-theme="dark"] .welcome-card{
+
+    background:#1E293B;
+
+}
+
+.welcome-card h2{
+
+    color:var(--primary);
+
+}
+
+.welcome-card .badge{
+
+    font-size:14px;
+
+    padding:8px 16px;
+
+    border-radius:30px;
+
+}
+
+/* ==========================================
+   Dashboard Statistics Cards
+========================================== */
+
+.stats-card{
+
+    border-radius:20px;
+
+    background:#ffffff;
+
+    transition:all .3s ease;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.05);
+
+    height:100%;
+
+}
+
+.stats-card:hover{
+
+    transform:translateY(-6px);
+
+    box-shadow:0 20px 40px rgba(0,0,0,.12);
+
+}
+
+.stats-top{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:20px;
+
+}
+
+.stats-icon{
+
+    width:60px;
+
+    height:60px;
+
+    border-radius:18px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    color:white;
+
+    font-size:26px;
+
+}
+
+.stats-title{
+
+    color:#6B7280;
+
+    font-weight:600;
+
+    margin-bottom:10px;
+
+}
+
+.stats-number{
+
+    font-size:42px;
+
+    font-weight:700;
+
+    margin-bottom:8px;
+
+}
+
+[data-bs-theme="dark"] .stats-card{
+
+    background:#1E293B;
+
+    color:#ffffff;
+
+}
+
+[data-bs-theme="dark"] .stats-title{
+
+    color:#CBD5E1;
+
+}
+
+[data-bs-theme="dark"] .text-muted{
+
+    color:#94A3B8 !important;
+
+}
+
+/* ==========================================
+   Sidebar Collapse
+========================================== */
+
+.sidebar{
+
+    width:280px;
+
+}
+
+.sidebar.collapsed{
+
+    width:90px;
+
+}
+
+.sidebar.collapsed .menu-text{
+
+    display:none;
+
+}
+
+.sidebar.collapsed .menu-heading{
+
+    display:none;
+
+}
+
+.sidebar.collapsed .sidebar-brand h4{
+
+    display:none;
+
+}
+
+.sidebar.collapsed .sidebar-brand small{
+
+    display:none;
+
+}
+
+.sidebar.collapsed .nav-link{
+
+    justify-content:center;
+
+}
+
+.sidebar.collapsed .nav-link i{
+
+    margin-right:0;
+
+    font-size:22px;
+
+}
+
+.sidebar{
+
+    transition:all .3s ease;
+
+}
+
+/* ==========================================
+   Premium Navbar
+========================================== */
+
+.navbar-glass{
+
+    background:rgba(255,255,255,.85);
+
+    backdrop-filter:blur(12px);
+
+    border-bottom:1px solid #E5E7EB;
+
+    position:sticky;
+
+    top:0;
+
+    z-index:1000;
+
+}
+
+[data-bs-theme="dark"] .navbar-glass{
+
+    background:rgba(15,23,42,.85);
+
+    border-bottom:1px solid #334155;
+
+}
+
+.navbar-glass .btn{
+
+    border-radius:12px;
+
+}
+
+.navbar-glass .dropdown-menu{
+
+    border:none;
+
+    border-radius:16px;
+
+    box-shadow:0 15px 40px rgba(0,0,0,.12);
+
+}

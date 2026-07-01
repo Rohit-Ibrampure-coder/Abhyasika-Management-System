@@ -33,7 +33,7 @@ def login():
             if user.role == "admin":
 
                 return redirect(
-                    url_for("admin.dashboard")
+                    url_for("admin.admin_dashboard")
                 )
 
             # Teacher Login
@@ -46,7 +46,7 @@ def login():
                 if len(assignments) == 1:
 
                     return redirect(
-                        url_for("teacher.dashboard")
+                        url_for("teacher.teacher_dashboard")
                     )
 
                 elif len(assignments) > 1:

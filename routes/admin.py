@@ -14,6 +14,13 @@ from flask_login import (
 
 from models import db
 from models.abhyasika import Abhyasika
+from datetime import date
+from sqlalchemy import func
+from models.student import Student
+from models.user import User
+from models.abhyasika import Abhyasika
+from models.attendance import Attendance
+
 
 admin_bp = Blueprint(
     "admin",
@@ -22,12 +29,53 @@ admin_bp = Blueprint(
 
 @admin_bp.route("/admin/dashboard")
 @login_required
-def dashboard():
+def admin_dashboard():
 
     if current_user.role != "admin":
-        abort(403)
 
-    return "Admin Dashboard"
+        return "Unauthorized", 403
+
+    # ==========================================
+    # Dashboard Statistics
+    # ==========================================
+
+    total_students = Student.query.filter_by(
+        status="Active"
+    ).count()
+
+    total_teachers = User.query.filter_by(
+        role="teacher"
+    ).count()
+
+    total_abhyasikas = Abhyasika.query.count()
+
+    today = date.today()
+
+    present_today = Attendance.query.filter_by(
+        attendance_date=today,
+        status="Present"
+    ).count()
+
+    absent_today = Attendance.query.filter_by(
+        attendance_date=today,
+        status="Absent"
+    ).count()
+
+    return render_template(
+
+        "dashboard/dashboard.html",
+
+        total_students=total_students,
+
+        total_teachers=total_teachers,
+
+        total_abhyasikas=total_abhyasikas,
+
+        present_today=present_today,
+
+        absent_today=absent_today
+
+    )
 
 @admin_bp.route(
     "/admin/abhyasika/add",

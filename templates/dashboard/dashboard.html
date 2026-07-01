@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+Dashboard
+
+{% endblock %}
+
+{% block content %}
+
+{% include "dashboard/welcome_card.html" %}
+
+{% if current_user.role == "admin" %}
+
+    {% include "dashboard/admin_stats.html" %}
+
+{% endif %}
+
+{% if current_user.role == "teacher" %}
+
+    {% include "dashboard/teacher_stats.html" %}
+
+{% endif %}
+
+{% include "dashboard/quick_actions.html" %}
+
+{% include "dashboard/attendance_chart.html" %}
+
+{% include "dashboard/recent_activity.html" %}
+
+{% endblock %}

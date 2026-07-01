@@ -1,0 +1,175 @@
+<div class="row g-4 mb-4">
+
+    <!-- Students -->
+
+    <div class="col-12 col-sm-6 col-xl-3">
+
+        <div class="card stats-card border-0">
+
+            <div class="card-body">
+
+                <div class="stats-top">
+
+                    <div class="stats-icon bg-primary">
+
+                        <i class="bi bi-mortarboard-fill"></i>
+
+                    </div>
+
+                </div>
+
+                <h6 class="stats-title">
+
+                    Total Students
+
+                </h6>
+
+                <h2 class="stats-number">
+
+                    {{ total_students }}
+
+                </h2>
+
+                <small class="text-muted">
+
+                    Active Students
+
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Teachers -->
+
+    <div class="col-12 col-sm-6 col-xl-3">
+
+        <div class="card stats-card border-0">
+
+            <div class="card-body">
+
+                <div class="stats-top">
+
+                    <div class="stats-icon bg-success">
+
+                        <i class="bi bi-person-workspace"></i>
+
+                    </div>
+
+                </div>
+
+                <h6 class="stats-title">
+
+                    Teachers
+
+                </h6>
+
+                <h2 class="stats-number">
+
+                    {{ total_teachers }}
+
+                </h2>
+
+                <small class="text-muted">
+
+                    Registered Teachers
+
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Abhyasikas -->
+
+    <div class="col-12 col-sm-6 col-xl-3">
+
+        <div class="card stats-card border-0">
+
+            <div class="card-body">
+
+                <div class="stats-top">
+
+                    <div class="stats-icon bg-warning">
+
+                        <i class="bi bi-building"></i>
+
+                    </div>
+
+                </div>
+
+                <h6 class="stats-title">
+
+                    Abhyasikas
+
+                </h6>
+
+                <h2 class="stats-number">
+
+                    {{ total_abhyasikas }}
+
+                </h2>
+
+                <small class="text-muted">
+
+                    Active Centers
+
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Attendance -->
+
+    <div class="col-12 col-sm-6 col-xl-3">
+
+        <div class="card stats-card border-0">
+
+            <div class="card-body">
+
+                <div class="stats-top">
+
+                    <div class="stats-icon bg-danger">
+
+                        <i class="bi bi-calendar-check-fill"></i>
+
+                    </div>
+
+                </div>
+
+                <h6 class="stats-title">
+
+                    Today's Attendance
+
+                </h6>
+
+                <div class="mt-3">
+
+                    <span class="badge bg-success">
+
+                        Present {{ present_today }}
+
+                    </span>
+
+                    <span class="badge bg-danger ms-2">
+
+                        Absent {{ absent_today }}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
