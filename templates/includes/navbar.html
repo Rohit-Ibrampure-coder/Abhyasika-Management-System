@@ -1,87 +1,111 @@
-<nav class="navbar navbar-expand-lg navbar-glass px-4">
+<nav class="navbar">
 
-    <div class="d-flex align-items-center">
+    <!-- Left -->
 
-        <!-- Sidebar Toggle -->
+    <div class="navbar-left">
+
+        <!-- Mobile Toggle -->
 
         <button
-            class="btn btn-outline-primary me-3"
-            id="sidebarToggle"
+            class="icon-btn d-lg-none"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#sidebarMenu"
         >
 
-            <i class="bi bi-list fs-5"></i>
+            <i class="bi bi-list"></i>
 
         </button>
 
+        <!-- Page Title -->
+
         <div>
 
-            <h4 class="mb-0 fw-bold">
+            <h1 class="navbar-title">
 
+                {% block page_title %}
                 Dashboard
+                {% endblock %}
 
-            </h4>
-
-            <small class="text-muted">
-
-                Welcome back,
-                {{ current_user.name }}
-
-            </small>
+            </h1>
 
         </div>
 
     </div>
 
-    <div class="d-flex align-items-center ms-auto gap-3">
+    <!-- Right -->
 
-        <!-- Notification -->
+    <div class="navbar-right">
 
-        <button
-            class="btn btn-light position-relative rounded-circle"
-        >
+        <!-- Current Date -->
 
-            <i class="bi bi-bell fs-5"></i>
+        <div class="navbar-date d-none d-md-flex">
 
-            <span
-                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-            >
+            <i class="bi bi-calendar3"></i>
 
-                0
+            <span id="currentDate"></span>
 
-            </span>
-
-        </button>
-
-        <!-- Theme -->
-
-        <button
-            class="btn btn-light rounded-circle"
-            id="theme-toggle"
-        >
-
-            <i
-                class="bi bi-moon-stars-fill"
-                id="theme-icon"
-            ></i>
-
-        </button>
+        </div>
 
         <!-- User -->
 
         <div class="dropdown">
 
             <button
-                class="btn btn-light dropdown-toggle"
+                class="user-dropdown"
+                type="button"
                 data-bs-toggle="dropdown"
             >
 
-                <i class="bi bi-person-circle me-2"></i>
+                <div class="user-avatar">
 
-                {{ current_user.name }}
+                    {{ current_user.name[0]|upper }}
+
+                </div>
+
+                <div class="user-details">
+
+                    <span class="user-name">
+
+                        {{ current_user.name }}
+
+                    </span>
+
+                    <small>
+
+                        {{ current_user.role|title }}
+
+                    </small>
+
+                </div>
+
+                <i class="bi bi-chevron-down"></i>
 
             </button>
 
             <ul class="dropdown-menu dropdown-menu-end">
+
+                <li>
+
+                    <h6 class="dropdown-header">
+
+                        {{ current_user.name }}
+
+                    </h6>
+
+                </li>
+
+                <li>
+
+                    <span class="dropdown-item-text">
+
+                        {{ current_user.role|title }}
+
+                    </span>
+
+                </li>
+
+                <li><hr class="dropdown-divider"></li>
 
                 <li>
 
@@ -107,11 +131,7 @@
 
                 </li>
 
-                <li>
-
-                    <hr class="dropdown-divider">
-
-                </li>
+                <li><hr class="dropdown-divider"></li>
 
                 <li>
 

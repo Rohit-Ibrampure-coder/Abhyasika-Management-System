@@ -1,142 +1,362 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
-    <title>Edit Student</title>
-</head>
+{% block title %}
 
-<body>
+Edit Student
 
-    <h1>Edit Student</h1>
+{% endblock %}
 
-    <form method="POST">
+{% block content %}
 
-        <p>
-            Student Full Name
+<!-- ===========================
+     PAGE HEADER
+============================ -->
 
-            <input
-                type="text"
-                name="student_name"
-                value="{{ student.student_name }}"
-                required
-            >
-        </p>
+<div class="page-header">
 
-        <p>
+    <div class="page-header-content">
 
-            Gender
+        <div class="page-icon">
 
-            <select
-                name="gender"
-                required
-            >
+            <i class="bi bi-person-plus-fill"></i>
 
-                <option value="">
-                    -- Select Gender --
-                </option>
+        </div>
 
-                {% for gender in genders %}
+        <div>
 
-                <option
-                    value="{{ gender }}"
-                    {% if student.gender == gender %}
-                    selected
-                    {% endif %}
+            <h1 class="page-title">
+
+                Edit Student
+
+            </h1>
+
+            <p class="page-description">
+
+                Update the student's information and save the changes.
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="page-header-actions">
+
+        <a
+            href="{{ url_for('student.student_profile', student_id=student.id) }}"
+            class="btn btn-outline"
+        >
+
+            <i class="bi bi-arrow-left"></i>
+
+            Back to Profile
+
+        </a>
+
+    </div>
+
+</div>
+
+<!--=========================================================
+    PAGE INFO
+==========================================================-->
+
+<div class="info-banner">
+
+    <i class="bi bi-info-circle-fill"></i>
+
+    <span>
+
+        Update the required information and click "Update Student" to save the changes.
+
+    </span>
+
+</div>
+
+<form method="POST">
+
+<!-- ==========================================================
+     PERSONAL INFORMATION
+=========================================================== -->
+
+<div class="card form-card section-card mb-4">
+
+    <div class="section-header">
+
+        <div class="section-icon">
+
+            <i class="bi bi-person-vcard-fill"></i>
+
+        </div>
+
+        <div>
+
+            <h3 class="section-title">
+
+                Personal Information
+
+            </h3>
+
+            <p class="section-description">
+
+                Enter the student's basic personal details.
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="row g-4">
+
+            <!-- Student Name -->
+
+            <div class="col-lg-6">
+
+                <label class="form-label">
+
+                    Student Full Name
+
+                    <span class="required">*</span>
+
+                </label>
+
+                <input
+                    type="text"
+                    name="student_name"
+                    class="form-control"
+                    value="{{ student.student_name }}"
+                    required
                 >
 
-                    {{ gender }}
+            </div>
 
-                </option>
+            <!-- Gender -->
 
-                {% endfor %}
+            <div class="col-lg-3">
 
-            </select>
+                <label class="form-label">
 
-        </p>
+                    Gender
 
-        <p>
+                    <span class="required">*</span>
 
-            Date of Birth
+                </label>
 
-            <input
-                type="date"
-                name="date_of_birth"
-                value="{{ student.date_of_birth }}"
-                required
-            >
-
-        </p>
-
-        <p>
-
-            School / College Name
-
-            <input
-                type="text"
-                name="school_college_name"
-                value="{{ student.school_college_name }}"
-                required
-            >
-
-        </p>
-
-        <p>
-
-            Standard
-
-            <select
-                name="standard"
-                id="standard"
-                required
-                onchange="toggleStream()"
-            >
-
-                <option value="">
-                    -- Select Standard --
-                </option>
-
-                {% for standard in standards %}
-
-                <option
-                    value="{{ standard }}"
-                    {% if student.standard == standard %}
-                    selected
-                    {% endif %}
+                <select
+                    name="gender"
+                    class="form-select"
+                    required
                 >
 
-                    {{ standard }}
+                    <option value="">
 
-                </option>
+                        Select Gender
 
-                {% endfor %}
+                    </option>
 
-            </select>
+                    {% for gender in genders %}
 
-        </p>
+                    <option
+                        value="{{ gender }}"
+                        {% if student.gender == gender %}selected{% endif %}
+                    >
 
-        <div id="stream_div" style="display:none;">
+                        {{ gender }}
 
-            <p>
+                    </option>
 
-                Stream
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+            <!-- Date of Birth -->
+
+            <div class="col-lg-3">
+
+                <label class="form-label">
+
+                    Date of Birth
+
+                    <span class="required">*</span>
+
+                </label>
+
+                <input
+                    type="date"
+                    name="date_of_birth"
+                    class="form-control"
+                    value="{{ student.date_of_birth }}"
+                >
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ==========================================================
+     ACADEMIC INFORMATION
+=========================================================== -->
+
+<div class="card form-card section-card mb-4">
+
+    <div class="section-header">
+
+        <div class="section-icon">
+
+            <i class="bi bi-mortarboard-fill"></i>
+
+        </div>
+
+        <div>
+
+            <h3 class="section-title">
+
+                Academic Information
+
+            </h3>
+
+            <p class="section-description">
+
+                School, standard and admission details.
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="row g-4">
+
+            <!-- School / College -->
+
+            <div class="col-lg-6">
+
+                <label class="form-label">
+
+                    School / College Name
+
+                    <span class="required">*</span>
+
+                </label>
+
+                <input
+                    type="text"
+                    name="school_college_name"
+                    class="form-control"
+                    value="{{ student.school_college_name }}"
+                    required
+                >
+
+            </div>
+
+            <!-- Standard -->
+
+            <div class="col-lg-3">
+
+                <label class="form-label">
+
+                    Standard
+
+                    <span class="required">*</span>
+
+                </label>
+
+                <select
+                    name="standard"
+                    id="standard"
+                    class="form-select"
+                    onchange="toggleStream()"
+                    required
+                >
+
+                    <option value="">
+
+                        Select Standard
+
+                    </option>
+
+                    {% for standard in standards %}
+
+                    <option
+                        value="{{ standard }}"
+                        {% if student.standard == standard %}selected{% endif %}
+                    >
+
+                        {{ standard }}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+            <!-- Admission Date -->
+
+            <div class="col-lg-3">
+
+                <label class="form-label">
+
+                    Admission Date
+
+                    <span class="required">*</span>
+
+                </label>
+
+                <input
+                    type="date"
+                    name="admission_date"
+                    class="form-control"
+                    value="{{ student.admission_date }}"
+                    required
+                >
+
+            </div>
+
+            <!-- Stream -->
+
+            <div
+                class="col-lg-6"
+                id="stream_div"
+                style="display:none;"
+            >
+
+                <label class="form-label">
+
+                    Stream
+
+                </label>
 
                 <select
                     name="stream"
                     id="stream"
+                    class="form-select"
                     onchange="toggleOtherStream()"
                 >
 
                     <option value="">
-                        -- Select Stream --
+
+                        Select Stream
+
                     </option>
 
                     {% for stream in streams %}
 
                     <option
                         value="{{ stream }}"
-                        {% if student.stream == stream %}
-                        selected
-                        {% endif %}
+                        {% if student.stream == stream %}selected{% endif %}
                     >
 
                         {{ stream }}
@@ -147,160 +367,484 @@
 
                 </select>
 
-            </p>
+            </div>
 
-        </div>
+            <!-- Other Stream -->
 
-        <div id="other_stream_div" style="display:none;">
+            <div
+                class="col-lg-6"
+                id="other_stream_div"
+                style="display:none;"
+            >
 
-            <p>
+                <label class="form-label">
 
-                Specify Stream
+                    Specify Stream
+
+                </label>
 
                 <input
                     type="text"
                     name="other_stream"
                     id="other_stream"
+                    class="form-control"
                     value="{{ student.other_stream or '' }}"
                 >
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ==========================================================
+     PARENT INFORMATION
+=========================================================== -->
+
+<div class="card form-card section-card mb-4">
+
+    <div class="section-header">
+
+        <div class="section-icon">
+
+            <i class="bi bi-people-fill"></i>
+
+        </div>
+
+        <div>
+
+            <h3 class="section-title">
+
+                Parent Information
+
+            </h3>
+
+            <p class="section-description">
+
+                Enter the parent or guardian contact details.
 
             </p>
 
         </div>
 
-        <p>
+    </div>
 
-            Parent Name
+    <div class="card-body">
 
-            <input
-                type="text"
-                name="parent_name"
-                value="{{ student.parent_name }}"
-                required
-            >
+        <div class="row g-4">
 
-        </p>
+            <!-- Parent Name -->
 
-        <p>
+            <div class="col-lg-6">
 
-            Parent Mobile
+                <label class="form-label">
 
-            <input
-                type="tel"
-                name="parent_mobile"
-                value="{{ student.parent_mobile }}"
-                pattern="[0-9]{10}"
-                maxlength="10"
-                required
-            >
+                    Parent / Guardian Name
 
-        </p>
+                    <span class="required">*</span>
 
-        <p>
+                </label>
 
-            Residential Address
-
-            <br>
-
-            <textarea
-                name="address"
-                rows="4"
-                cols="40"
-                required>{{ student.address }}</textarea>
-
-        </p>
-
-        <p>
-
-            Admission Date
-
-            <input
-                type="date"
-                name="admission_date"
-                value="{{ student.admission_date }}"
-                required
-            >
-
-        </p>
-
-        <p>
-
-            Status
-
-            <select
-                name="status"
-                required
-            >
-
-                {% for item in student_status %}
-
-                <option
-                    value="{{ item }}"
-                    {% if student.status == item %}
-                    selected
-                    {% endif %}
+                <input
+                    type="text"
+                    name="parent_name"
+                    class="form-control"
+                    value="{{ student.parent_name }}"
+                    required
                 >
 
-                    {{ item }}
+            </div>
 
-                </option>
+            <!-- Parent Mobile -->
 
-                {% endfor %}
+            <div class="col-lg-6">
 
-            </select>
+                <label class="form-label">
 
-        </p>
+                    Mobile Number
 
-        {% if current_user.role == "admin" %}
+                    <span class="required">*</span>
 
-        <p>
+                </label>
 
-            Abhyasika
+                <input
+                    type="tel"
+                    name="parent_mobile"
+                    class="form-control"
+                    value="{{ student.parent_mobile }}"
+                    pattern="[0-9]{10}"
+                    maxlength="10"
+                    minlength="10"
+                    inputmode="numeric"
+                    required
+                >
 
-            <select name="abhyasika_id">
+                <div class="form-text">
 
-                {% for abhyasika in abhyasikas %}
+                    Enter a valid 10-digit mobile number.
 
-                <option
-                    value="{{ abhyasika.id }}"
-                    {% if student.abhyasika_id==abhyasika.id %}selected{% endif %}>
-                    {{ abhyasika.name }}
-                </option>
+                </div>
 
-                {% endfor %}
+            </div>
 
-            </select>
+        </div>
 
-        </p>
+    </div>
 
-        {% else %}
+</div>
 
-        <p>
+<!-- ==========================================================
+     ADDRESS INFORMATION
+=========================================================== -->
 
-            Current Abhyasika
+<div class="card form-card section-card mb-4">
 
-            <input
-                type="text"
-                value="{{ student.abhyasika.name }}"
-                readonly
-            >
+    <div class="section-header">
 
-        </p>
+        <div class="section-icon">
 
-        {% endif %}
+            <i class="bi bi-geo-alt-fill"></i>
 
-        <button type="submit">
-            Update Student
-        </button>
+        </div>
 
-        <a href="{{ url_for('student.student_profile', student_id=student.id) }}">
-            Cancel
-        </a>
+        <div>
 
-    </form>
+            <h3 class="section-title">
+
+                Address Information
+
+            </h3>
+
+            <p class="section-description">
+
+                Enter the student's complete residential address.
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="row g-4">
+
+            <div class="col-12">
+
+                <label class="form-label">
+
+                    Residential Address
+
+                    <span class="required">*</span>
+
+                </label>
+
+                <textarea
+                    name="address"
+                    class="form-control"
+                >{{ student.address }}</textarea>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ==========================================================
+     ADMISSION DETAILS
+=========================================================== -->
+
+<div class="card form-card section-card mb-4">
+
+    <div class="section-header">
+
+        <div class="section-icon">
+
+            <i class="bi bi-building-fill"></i>
+
+        </div>
+
+        <div>
+
+            <h3 class="section-title">
+
+                Admission Details
+
+            </h3>
+
+            <p class="section-description">
+
+                Select the student's Abhyasika and current admission status.
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="row g-4">
+
+            <!-- Admin -->
+
+            {% if current_user.role == "admin" %}
+
+            <div class="col-lg-6">
+
+                <label class="form-label">
+
+                    Abhyasika
+
+                    <span class="required">*</span>
+
+                </label>
+
+                <select
+                    name="abhyasika_id"
+                    class="form-select"
+                    required
+                >
+
+                    <option value="">
+
+                        Select Abhyasika
+
+                    </option>
+
+                    {% for abhyasika in abhyasikas %}
+
+                    <option
+                        value="{{ abhyasika.id }}"
+                        {% if student.abhyasika_id == abhyasika.id %}selected{% endif %}
+                    >
+
+                        {{ abhyasika.name }}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+                <div class="form-text">
+
+                    Choose the study centre where the student is enrolled.
+
+                </div>
+
+            </div>
+
+            {% else %}
+
+            <!-- Teacher -->
+
+            <div class="col-lg-6">
+
+                <label class="form-label">
+
+                    Assigned Abhyasika
+
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    value="{{ student.abhyasika.name }}"
+                    readonly
+                >
+
+                <div class="form-text">
+
+                    This student will be assigned to your Abhyasika.
+
+                </div>
+
+            </div>
+
+            {% endif %}
+
+            <!-- Status -->
+
+            <div class="col-lg-6">
+
+                <label class="form-label">
+
+                    Student Status
+
+                </label>
+
+                <select
+                    name="status"
+                    class="form-select"
+                >
+
+                    {% for item in student_status %}
+
+                    <option
+                        value="{{ item }}"
+                        {% if student.status == item %}selected{% endif %}
+                    >
+
+                        {{ item }}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+                <div class="form-text">
+
+                    Active students will appear in attendance and reports.
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ==========================================================
+     FORM ACTIONS
+=========================================================== -->
+
+<div class="card action-card mb-5">
+
+    <div class="card-body">
+
+        <div class="action-bar">
+
+            <div class="action-info">
+
+                <i class="bi bi-info-circle-fill"></i>
+
+                <span>
+
+                    Review all information before updating the student record.
+
+                </span>
+
+            </div>
+
+            <div class="action-buttons">
+
+                <a
+                    href="{{ url_for('student.student_profile', student_id=student.id) }}"
+                    class="btn btn-outline"
+                >
+
+                    <i class="bi bi-arrow-left"></i>
+
+                    Back
+
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+
+                    <i class="bi bi-check-circle-fill"></i>
+
+                    Update Student
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ===========================
+     STUDENT JAVASCRIPT
+============================ -->
 
 <script src="{{ url_for('static', filename='js/student.js') }}"></script>
 
-</body>
+<script>
 
-</html>
+/* ==========================================
+   Auto Capitalize Student Name
+========================================== */
+
+const studentName = document.querySelector(
+    'input[name="student_name"]'
+);
+
+if(studentName){
+
+    studentName.addEventListener("input", function(){
+
+        this.value = this.value.replace(
+            /\b\w/g,
+            letter => letter.toUpperCase()
+        );
+
+    });
+
+}
+
+/* ==========================================
+   Auto Capitalize Parent Name
+========================================== */
+
+const parentName = document.querySelector(
+    'input[name="parent_name"]'
+);
+
+if(parentName){
+
+    parentName.addEventListener("input", function(){
+
+        this.value = this.value.replace(
+            /\b\w/g,
+            letter => letter.toUpperCase()
+        );
+
+    });
+
+}
+
+/* ==========================================
+   Mobile Number Validation
+========================================== */
+
+const mobileInput = document.querySelector(
+    'input[name="parent_mobile"]'
+);
+
+if(mobileInput){
+
+    mobileInput.addEventListener("input", function(){
+
+        this.value = this.value.replace(
+            /\D/g,
+            ""
+        );
+
+        if(this.value.length > 10){
+
+            this.value = this.value.slice(0,10);
+
+        }
+
+    });
+
+}
+
+</script>
+
+{% endblock %}

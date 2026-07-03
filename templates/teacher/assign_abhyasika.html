@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+Assign Abhyasika
+
+{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+
+        <h2 class="fw-bold">
+
+            <i class="bi bi-building-add text-primary"></i>
+
+            Assign Abhyasikas
+
+        </h2>
+
+        <p class="text-muted mb-0">
+
+            Select one or more Abhyasikas for
+            <strong>{{ teacher.name }}</strong>
+
+        </p>
+
+    </div>
+
+    <a
+        href="{{ url_for('teacher_management.view_teacher', id=teacher.id) }}"
+        class="btn btn-outline-secondary"
+    >
+
+        <i class="bi bi-arrow-left"></i>
+
+        Back
+
+    </a>
+
+</div>
+
+<form method="POST">
+
+    <div class="card border-0 shadow-sm rounded-4">
+
+        <div class="card-body">
+
+            <div class="row">
+
+                {% for abhyasika in abhyasikas %}
+
+                <div class="col-md-6 mb-3">
+
+                    <div class="assignment-card">
+
+                        <input
+                            class="form-check-input assignment-checkbox"
+                            type="checkbox"
+                            name="abhyasikas"
+                            value="{{ abhyasika.id }}"
+                            id="abhyasika{{ abhyasika.id }}"
+                            {% if abhyasika.id in assigned %}
+                                checked
+                            {% endif %}
+                        >
+
+                        <label
+                            class="assignment-label"
+                            for="abhyasika{{ abhyasika.id }}"
+                        >
+
+                            <div class="assignment-icon">
+
+                                <i class="bi bi-building-fill"></i>
+
+                            </div>
+
+                            <div class="assignment-content">
+
+                                <h5>
+
+                                    {{ abhyasika.name }}
+
+                                </h5>
+
+                                <p>
+
+                                    <i class="bi bi-geo-alt"></i>
+
+                                    {{ abhyasika.location }}
+
+                                </p>
+
+                                <span class="badge bg-primary">
+
+                                    {{ abhyasika.type|capitalize }}
+
+                                </span>
+
+                            </div>
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="mt-4">
+
+        <button
+            type="submit"
+            class="btn btn-primary"
+        >
+
+            <i class="bi bi-check-circle me-2"></i>
+
+            Save Assignments
+
+        </button>
+
+        <a
+            href="{{ url_for('teacher_management.view_teacher', id=teacher.id) }}"
+            class="btn btn-outline-secondary"
+        >
+
+            Cancel
+
+        </a>
+
+    </div>
+
+</form>
+
+{% endblock %}

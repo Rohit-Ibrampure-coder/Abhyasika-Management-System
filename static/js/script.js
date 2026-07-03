@@ -5,55 +5,6 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    /* ==========================================
-       LIGHT / DARK MODE
-    ========================================== */
-
-    const html = document.documentElement;
-
-    const themeToggle = document.getElementById("theme-toggle");
-
-    const themeIcon = document.getElementById("theme-icon");
-
-    let savedTheme = localStorage.getItem("theme") || "light";
-
-    html.setAttribute("data-bs-theme", savedTheme);
-
-    updateThemeIcon();
-
-    if (themeToggle) {
-
-        themeToggle.addEventListener("click", function () {
-
-            let currentTheme = html.getAttribute("data-bs-theme");
-
-            let newTheme = currentTheme === "light" ? "dark" : "light";
-
-            html.setAttribute("data-bs-theme", newTheme);
-
-            localStorage.setItem("theme", newTheme);
-
-            updateThemeIcon();
-
-        });
-
-    }
-
-    function updateThemeIcon() {
-
-        if (!themeIcon) return;
-
-        if (html.getAttribute("data-bs-theme") === "dark") {
-
-            themeIcon.className = "bi bi-sun-fill";
-
-        } else {
-
-            themeIcon.className = "bi bi-moon-stars-fill";
-
-        }
-
-    }
 
     /* ==========================================
        SIDEBAR TOGGLE
@@ -163,16 +114,19 @@ document.addEventListener("DOMContentLoaded", function () {
             greeting = "🌅 Good Morning";
 
         }
-
         else if (hour < 17) {
 
             greeting = "☀️ Good Afternoon";
 
         }
+        else if (hour < 21) {
 
+            greeting = "🌇 Good Evening";
+
+        }
         else {
 
-            greeting = "🌙 Good Evening";
+            greeting = "🌙 Good Night";
 
         }
 

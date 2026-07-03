@@ -8,24 +8,26 @@ Dashboard
 
 {% block content %}
 
-{% include "dashboard/welcome_card.html" %}
+<div class="dashboard-container">
 
-{% if current_user.role == "admin" %}
+    {% include "dashboard/welcome_card.html" %}
 
-    {% include "dashboard/admin_stats.html" %}
+    {% if current_user.role == "admin" %}
+        {% include "dashboard/admin_stats.html" %}
+    {% endif %}
 
-{% endif %}
+    {% if current_user.role == "teacher" %}
+        {% include "dashboard/teacher_stats.html" %}
+    {% endif %}
 
-{% if current_user.role == "teacher" %}
+    {% include "dashboard/quick_actions.html" %}
 
-    {% include "dashboard/teacher_stats.html" %}
+    {% include "dashboard/attendance_summary.html" %}
 
-{% endif %}
+    {% include "dashboard/attendance_chart.html" %}
 
-{% include "dashboard/quick_actions.html" %}
+    {% include "dashboard/recent_activity.html" %}
 
-{% include "dashboard/attendance_chart.html" %}
-
-{% include "dashboard/recent_activity.html" %}
+</div>
 
 {% endblock %}

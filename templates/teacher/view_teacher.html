@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+Teacher Details
+
+{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+
+        <h2 class="fw-bold">
+
+            <i class="bi bi-person-workspace text-primary"></i>
+
+            Teacher Details
+
+        </h2>
+
+        <p class="text-muted">
+
+            View teacher information.
+
+        </p>
+
+    </div>
+
+    <a
+        href="{{ url_for('teacher_management.view_teachers') }}"
+        class="btn btn-outline-secondary"
+    >
+
+        <i class="bi bi-arrow-left"></i>
+
+        Back
+
+    </a>
+
+</div>
+
+<div class="card border-0 shadow-sm rounded-4">
+
+    <div class="card-body">
+
+        <div class="row">
+
+            <div class="col-md-3 text-center">
+
+                <div class="teacher-avatar mx-auto mb-3">
+
+                    {{ teacher.name[0]|upper }}
+
+                </div>
+
+                <h4>
+
+                    {{ teacher.name }}
+
+                </h4>
+
+            </div>
+
+            <div class="col-md-9">
+
+                <table class="table">
+
+                    <tr>
+
+                        <th width="220">
+
+                            Username
+
+                        </th>
+
+                        <td>
+
+                            {{ teacher.username }}
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <th>
+
+                            Mobile
+
+                        </th>
+
+                        <td>
+
+                            {{ teacher.mobile }}
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <th>
+
+                            Email
+
+                        </th>
+
+                        <td>
+
+                            {{ teacher.email }}
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <th>
+
+                            Role
+
+                        </th>
+
+                        <td>
+
+                            Teacher
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <th>
+
+                            Assigned Abhyasikas
+
+                        </th>
+
+                        <td>
+
+                            {% if teacher.teacher_assignments %}
+
+                                {% for assignment in teacher.teacher_assignments %}
+
+                                    <span class="fw-medium">
+
+                                        {{ assignment.abhyasika.name }}
+
+                                    </span>
+
+                                {% endfor %}
+
+                            {% else %}
+
+                                <span class="badge bg-secondary">
+
+                                    Not Assigned
+
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                </table>
+
+                <div class="mt-4">
+
+                    <a
+                        href="{{ url_for('teacher_management.assign_abhyasika', id=teacher.id) }}"
+                        class="btn btn-primary"
+                    >
+
+                        <i class="bi bi-building-add"></i>
+
+                        Assign Abhyasika
+
+                    </a>
+
+                    <a
+                        href="{{ url_for('teacher_management.edit_teacher', id=teacher.id) }}"
+                        class="btn btn-warning"
+                    >
+
+                        <i class="bi bi-pencil-square"></i>
+
+                        Edit
+
+                    </a>
+
+                    <a
+                        href="{{ url_for('teacher_management.delete_teacher', id=teacher.id) }}"
+                        class="btn btn-danger"
+                        onclick="return confirm('Delete this teacher?')"
+                    >
+
+                        <i class="bi bi-trash"></i>
+
+                        Delete
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="light">
+<html lang="en">
 
 <head>
 
@@ -8,6 +8,11 @@
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Abhyasika Management System for Shri Laxmikeshav Pratisthan, Satara."
     >
 
     <title>
@@ -34,19 +39,12 @@
 
     <!-- Google Font -->
 
-    <link
-        rel="preconnect"
-        href="https://fonts.googleapis.com"
-    >
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin
-    >
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
         rel="stylesheet"
     >
 
@@ -64,56 +62,56 @@
 
 <body>
 
-    <!-- Navbar -->
+    <div class="app-wrapper">
 
-    {% include "includes/navbar.html" %}
+        <!-- Sidebar -->
 
-    <div class="container-fluid">
+        {% include "includes/sidebar.html" %}
 
-        <div class="row">
+        <!-- Main Content -->
 
-            <!-- Sidebar -->
+        <div class="main-content">
 
-            <div
-                class="col-lg-2 p-0"
-            >
+            <!-- Navbar -->
 
-                {% include "includes/sidebar.html" %}
+            {% include "includes/navbar.html" %}
 
-            </div>
+            <!-- Page -->
 
-            <!-- Main Content -->
+            <main class="page-content">
 
-            <main
-                class="col-lg-10 py-4 px-4"
-            >
+                <div class="page-container">
 
-                {% include "includes/flash_messages.html" %}
+                    {% include "includes/flash_messages.html" %}
 
-                {% block content %}
-                {% endblock %}
+                    {% block content %}
+                    {% endblock %}
+
+                </div>
 
             </main>
+
+            <!-- Footer -->
+
+            {% include "includes/footer.html" %}
 
         </div>
 
     </div>
 
-    <!-- Footer -->
-
-    {% include "includes/footer.html" %}
-
     <!-- Bootstrap JS -->
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Custom JS -->
+    <!-- Current User -->
 
     <script>
 
-    const currentUserName = "{{ current_user.name }}";
+        const currentUserName = "{{ current_user.name }}";
 
     </script>
+
+    <!-- Custom JS -->
 
     <script
         src="{{ url_for('static', filename='js/script.js') }}"

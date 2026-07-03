@@ -1,44 +1,481 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Add Teacher</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-<h1>Add Teacher</h1>
+{% block title %}
+
+Add Teacher
+
+{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+
+        <h2 class="fw-bold">
+
+            <i class="bi bi-person-plus-fill text-primary"></i>
+
+            Add Teacher
+
+        </h2>
+
+        <p class="text-muted mb-0">
+
+            Register a new teacher in the system.
+
+        </p>
+
+    </div>
+
+    <a
+        href="{{ url_for('teacher_management.view_teachers') }}"
+        class="btn btn-outline-secondary"
+    >
+
+        <i class="bi bi-arrow-left"></i>
+
+        Back
+
+    </a>
+
+</div>
 
 <form method="POST">
 
-    <p>
-        Name:
-        <input type="text" name="name" required>
-    </p>
+    <!-- =======================================
+         Teacher Information
+    ======================================== -->
 
-    <p>
-        Mobile:
-        <input type="tel" name="mobile" pattern="[0-9]{10}" maxlength="10" required>
-    </p>
+    <div class="card form-card border-0 shadow-sm rounded-4">
 
-    <p>
-        Email:
-        <input type="email" name="email">
-    </p>
+        <div class="card-body p-4">
 
-    <p>
-        Username:
-        <input type="text" name="username" required>
-    </p>
+            <div class="form-section-title">
 
-    <p>
-        Password:
-        <input type="password" name="password" required>
-    </p>
+                <i class="bi bi-person-vcard-fill"></i>
 
-    <button type="submit">
-        Save Teacher
-    </button>
+                Teacher Information
+
+            </div>
+
+            <div class="row">
+
+                <!-- Full Name -->
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+
+                        Full Name
+
+                    </label>
+
+                    <input
+                        type="text"
+                        name="name"
+                        class="form-control"
+                        placeholder="Enter teacher full name"
+                        required
+                    >
+
+                </div>
+
+                <!-- Mobile -->
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+
+                        Mobile Number
+
+                    </label>
+
+                    <input
+                        type="tel"
+                        id="mobile"
+                        name="mobile"
+                        class="form-control"
+                        placeholder="Enter 10-digit mobile number"
+                        maxlength="10"
+                        autocomplete="off"
+                        required
+                    >
+
+                    <div
+                        id="mobileHelp"
+                        class="form-text"
+                    >
+
+                        Mobile number must contain exactly 10 digits.
+
+                    </div>
+
+                </div>
+
+                <!-- Email -->
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+
+                        Email Address
+
+                    </label>
+
+                    <input
+                        type="email"
+                        name="email"
+                        class="form-control"
+                        placeholder="teacher@example.com"
+                    >
+
+                </div>
+
+                <!-- Username -->
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+
+                        Username
+
+                    </label>
+
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        class="form-control"
+                        placeholder="Create username"
+                        autocomplete="off"
+                        required
+                    >
+
+                    <div
+                        id="usernameHelp"
+                        class="form-text"
+                    >
+
+                        Username must be unique.
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- =======================================
+         Login Credentials
+    ======================================== -->
+
+    <div class="card form-card border-0 shadow-sm rounded-4 mt-4">
+
+        <div class="card-body p-4">
+
+            <div class="form-section-title">
+
+                <i class="bi bi-shield-lock-fill"></i>
+
+                Login Credentials
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+
+                        Password
+
+                    </label>
+
+                    <div class="input-group">
+
+                        <input
+                            type="password"
+                            name="password"
+                            id="password"
+                            class="form-control"
+                            placeholder="Create password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="btn btn-outline-secondary"
+                            onclick="togglePassword()"
+                        >
+
+                            <i
+                                class="bi bi-eye"
+                                id="passwordIcon"
+                            ></i>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="alert alert-info mt-4 mb-0">
+
+                <i class="bi bi-info-circle-fill me-2"></i>
+
+                Password must contain at least
+                <strong>6 characters</strong>.
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- =======================================
+         Buttons
+    ======================================== -->
+
+    <div class="d-flex justify-content-end gap-2 mt-4">
+
+        <a
+            href="{{ url_for('teacher_management.view_teachers') }}"
+            class="btn btn-outline-secondary"
+        >
+
+            Cancel
+
+        </a>
+
+        <button
+            type="submit"
+            class="btn btn-primary"
+        >
+
+            <i class="bi bi-check-circle-fill me-2"></i>
+
+            Save Teacher
+
+        </button>
+
+    </div>
 
 </form>
 
-</body>
-</html>
+<script>
+
+function togglePassword(){
+
+    const password = document.getElementById("password");
+
+    const icon = document.getElementById("passwordIcon");
+
+    if(password.type === "password"){
+
+        password.type = "text";
+
+        icon.className = "bi bi-eye-slash";
+
+    }
+
+    else{
+
+        password.type = "password";
+
+        icon.className = "bi bi-eye";
+
+    }
+
+}
+
+/* ==========================================
+   Mobile Validation
+========================================== */
+
+const mobileInput = document.getElementById("mobile");
+
+const mobileHelp = document.getElementById("mobileHelp");
+
+mobileInput.addEventListener(
+
+    "input",
+
+    function(){
+
+        this.value = this.value.replace(/\D/g,'');
+
+        if(this.value.length === 10){
+
+            this.classList.remove("is-invalid");
+
+            this.classList.add("is-valid");
+
+            mobileHelp.innerHTML =
+
+                "✓ Valid mobile number";
+
+            mobileHelp.className =
+
+                "text-success";
+
+        }
+
+        else{
+
+            this.classList.remove("is-valid");
+
+            this.classList.add("is-invalid");
+
+            mobileHelp.innerHTML =
+
+                "Mobile number must contain exactly 10 digits.";
+
+            mobileHelp.className =
+
+                "text-danger";
+
+        }
+
+    }
+
+);
+
+/* ==========================================
+   Username Availability
+========================================== */
+
+const usernameInput = document.getElementById(
+
+    "username"
+
+);
+
+const usernameHelp = document.getElementById(
+
+    "usernameHelp"
+
+);
+
+let usernameTimer;
+
+usernameInput.addEventListener(
+
+    "input",
+
+    function(){
+
+        clearTimeout(
+
+            usernameTimer
+
+        );
+
+        const username =
+
+            this.value.trim();
+
+        this.classList.remove(
+
+            "is-valid",
+
+            "is-invalid"
+
+        );
+
+        usernameHelp.innerHTML =
+
+            "Checking...";
+
+        usernameHelp.className =
+
+            "text-muted";
+
+        if(username.length < 3){
+
+            usernameHelp.innerHTML =
+
+                "Username must contain at least 3 characters.";
+
+            return;
+
+        }
+
+        usernameTimer = setTimeout(
+
+            function(){
+
+                fetch(
+
+                    `/admin/check-username?username=${encodeURIComponent(username)}`
+
+                )
+
+                .then(
+
+                    response => response.json()
+
+                )
+
+                .then(
+
+                    data => {
+
+                        if(data.available){
+
+                            usernameInput.classList.add(
+
+                                "is-valid"
+
+                            );
+
+                            usernameHelp.innerHTML =
+
+                                "✓ Username Available";
+
+                            usernameHelp.className =
+
+                                "text-success";
+
+                        }
+
+                        else{
+
+                            usernameInput.classList.add(
+
+                                "is-invalid"
+
+                            );
+
+                            usernameHelp.innerHTML =
+
+                                "✗ Username Already Exists";
+
+                            usernameHelp.className =
+
+                                "text-danger";
+
+                        }
+
+                    }
+
+                );
+
+            },
+
+            500
+
+        );
+
+    }
+
+);
+
+</script>
+
+{% endblock %}

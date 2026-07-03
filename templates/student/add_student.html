@@ -1,247 +1,874 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Add Student</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-<h1>Add Student</h1>
+{% block title %}
+
+Add Student
+
+{% endblock %}
+
+{% block content %}
+
+<!-- ===========================
+     PAGE HEADER
+============================ -->
+
+<div class="page-header">
+
+    <div class="page-header-content">
+
+        <div class="page-icon">
+
+            <i class="bi bi-person-plus-fill"></i>
+
+        </div>
+
+        <div>
+
+            <h1 class="page-title">
+
+                Add Student
+
+            </h1>
+
+            <p class="page-description">
+
+                Register a new student in the Abhyasika Management System.
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="page-header-actions">
+
+        <a
+            href="{{ url_for('student.view_students') }}"
+            class="btn btn-outline"
+        >
+
+            <i class="bi bi-arrow-left"></i>
+
+            Back to Students
+
+        </a>
+
+    </div>
+
+</div>
+
+<!--=========================================================
+    PAGE INFO
+==========================================================-->
+
+<div class="info-banner">
+
+    <i class="bi bi-info-circle-fill"></i>
+
+    <span>
+
+        Fields marked with
+        <strong>*</strong>
+        are required.
+
+    </span>
+
+</div>
 
 <form method="POST">
 
-    <p>
-        Student Full Name
-        <input
-            type="text"
-            name="student_name"
-            required
-        >
-    </p>
+<!-- ==========================================================
+     PERSONAL INFORMATION
+=========================================================== -->
 
-    <p>
+<div class="card form-card section-card mb-4">
 
-        Gender
+    <div class="section-header">
 
-        <select
-            name="gender"
-            required
-        >
+        <div class="section-icon">
 
-            <option value="">-- Select Gender --</option>
+            <i class="bi bi-person-vcard-fill"></i>
 
-            {% for gender in genders %}
+        </div>
 
-            <option value="{{ gender }}">
+        <div>
 
-                {{ gender }}
+            <h3 class="section-title">
 
-            </option>
+                Personal Information
 
-            {% endfor %}
+            </h3>
 
-        </select>
+            <p class="section-description">
 
-    </p>
+                Enter the student's basic personal details.
 
-    <p>
-        Date of Birth
+            </p>
 
-        <input
-            type="date"
-            name="date_of_birth"
-            required
-        >
-
-    </p>
-
-    <p>
-
-        School / College Name
-
-        <input
-            type="text"
-            name="school_college_name"
-            required
-        >
-
-    </p>
-
-   <p>
-
-        Standard
-
-        <select
-            name="standard"
-            id="standard"
-            required
-            onchange="toggleStream()"
-        >
-
-            <option value="">
-                -- Select Standard --
-            </option>
-
-            {% for standard in standards %}
-
-            <option value="{{ standard }}">
-
-                {{ standard }}
-
-            </option>
-
-            {% endfor %}
-
-        </select>
-
-    </p>
-
-    <div
-        id="stream_div"
-        style="display:none;"
-    >
-
-        <p>
-
-            Stream
-
-            <select
-                name="stream"
-                id="stream"
-                onchange="toggleOtherStream()"
-            >
-
-                <option value="">
-                    -- Select Stream --
-                </option>
-
-                {% for stream in streams %}
-
-                <option value="{{ stream }}">
-
-                    {{ stream }}
-
-                </option>
-
-                {% endfor %}
-
-            </select>
-
-        </p>
+        </div>
 
     </div>
 
-    <div id="other_stream_div" style="display:none;">
+    <div class="card-body">
 
-        <p>
+        <div class="row g-4">
 
-            Specify Stream
+            <!-- Student Name -->
 
-            <input
-                type="text"
-                name="other_stream"
-                id="other_stream"
-            >
+            <div class="col-lg-6">
 
-        </p>
+                <label class="form-label">
+
+                    Student Full Name
+
+                    <span class="required">*</span>
+
+                </label>
+
+                <input
+                    type="text"
+                    name="student_name"
+                    class="form-control"
+                    placeholder="Enter student's full name"
+                    required
+                >
+
+            </div>
+
+            <!-- Gender -->
+
+            <div class="col-lg-3">
+
+                <label class="form-label">
+
+                    Gender
+
+                    <span class="required">*</span>
+
+                </label>
+
+                <select
+                    name="gender"
+                    class="form-select"
+                    required
+                >
+
+                    <option value="">
+
+                        Select Gender
+
+                    </option>
+
+                    {% for gender in genders %}
+
+                    <option value="{{ gender }}">
+
+                        {{ gender }}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+            <!-- Date of Birth -->
+
+            <div class="col-lg-3">
+
+                <label class="form-label">
+
+                    Date of Birth
+
+                    <span class="required">*</span>
+
+                </label>
+
+                <input
+                    type="date"
+                    name="date_of_birth"
+                    class="form-control"
+                    required
+                >
+
+            </div>
+
+        </div>
 
     </div>
 
-    <p>
-        Parent Name
-        <input
-            type="text"
-            name="parent_name"
-        >
-    </p>
+</div>
 
-    <p>
-        Parent Mobile
-        <input
-            type="tel"
-            name="parent_mobile"
-            pattern="[0-9]{10}"
-            maxlength="10"
-            required
-        >
-    </p>
 
-    <p>
+<!-- ==========================================================
+     ACADEMIC INFORMATION
+=========================================================== -->
 
-        Residential Address
+<div class="card form-card section-card mb-4">
 
-        <br>
+    <div class="section-header">
 
-        <textarea
-            name="address"
-            rows="4"
-            cols="40"
-            required
-        ></textarea>
+        <div class="section-icon">
 
-    </p>
+            <i class="bi bi-mortarboard-fill"></i>
 
-    <p>
+        </div>
 
-        Admission Date
+        <div>
 
-        <input
-            type="date"
-            name="admission_date"
-            required
-        >
+            <h3 class="section-title">
 
-    </p>
+                Academic Information
 
-    {% if current_user.role == "admin" %}
+            </h3>
 
-    <p>
+            <p class="section-description">
 
-        <label>
-            Abhyasika
-        </label>
+                School, standard and admission details.
 
-        <select
-            name="abhyasika_id"
-            required
-        >
+            </p>
 
-            {% for abhyasika in abhyasikas %}
+        </div>
 
-            <option value="{{ abhyasika.id }}">
-                {{ abhyasika.name }}
-            </option>
+    </div>
 
-            {% endfor %}
+    <div class="card-body">
 
-        </select>
+        <div class="row g-4">
 
-    </p>
+            <!-- School / College -->
 
-    {% else %}
+            <div class="col-lg-6">
 
-    <p>
+                <label class="form-label">
 
-        <label>
-            Current Abhyasika
-        </label>
+                    School / College Name
 
-        <input
-            type="text"
-            value="{{ selected_abhyasika.name }}"
-            readonly
-        >
+                    <span class="required">*</span>
 
-    </p>
+                </label>
 
-    {% endif %}
+                <input
+                    type="text"
+                    name="school_college_name"
+                    class="form-control"
+                    placeholder="Enter school or college name"
+                    required
+                >
 
-    <button type="submit">
-        Save Student
-    </button>
+            </div>
 
-</form>
+            <!-- Standard -->
+
+            <div class="col-lg-3">
+
+                <label class="form-label">
+
+                    Standard
+
+                    <span class="required">*</span>
+
+                </label>
+
+                <select
+                    name="standard"
+                    id="standard"
+                    class="form-select"
+                    onchange="toggleStream()"
+                    required
+                >
+
+                    <option value="">
+
+                        Select Standard
+
+                    </option>
+
+                    {% for standard in standards %}
+
+                    <option value="{{ standard }}">
+
+                        {{ standard }}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+            <!-- Admission Date -->
+
+            <div class="col-lg-3">
+
+                <label class="form-label">
+
+                    Admission Date
+
+                    <span class="required">*</span>
+
+                </label>
+
+                <input
+                    type="date"
+                    name="admission_date"
+                    class="form-control"
+                    required
+                >
+
+            </div>
+
+            <!-- Stream -->
+
+            <div
+                class="col-lg-6"
+                id="stream_div"
+                style="display:none;"
+            >
+
+                <label class="form-label">
+
+                    Stream
+
+                </label>
+
+                <select
+                    name="stream"
+                    id="stream"
+                    class="form-select"
+                    onchange="toggleOtherStream()"
+                >
+
+                    <option value="">
+
+                        Select Stream
+
+                    </option>
+
+                    {% for stream in streams %}
+
+                    <option value="{{ stream }}">
+
+                        {{ stream }}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+            <!-- Other Stream -->
+
+            <div
+                class="col-lg-6"
+                id="other_stream_div"
+                style="display:none;"
+            >
+
+                <label class="form-label">
+
+                    Specify Stream
+
+                </label>
+
+                <input
+                    type="text"
+                    name="other_stream"
+                    id="other_stream"
+                    class="form-control"
+                    placeholder="Enter stream name"
+                >
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ==========================================================
+     PARENT INFORMATION
+=========================================================== -->
+
+<div class="card form-card section-card mb-4">
+
+    <div class="section-header">
+
+        <div class="section-icon">
+
+            <i class="bi bi-people-fill"></i>
+
+        </div>
+
+        <div>
+
+            <h3 class="section-title">
+
+                Parent Information
+
+            </h3>
+
+            <p class="section-description">
+
+                Enter the parent or guardian contact details.
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="row g-4">
+
+            <!-- Parent Name -->
+
+            <div class="col-lg-6">
+
+                <label class="form-label">
+
+                    Parent / Guardian Name
+
+                    <span class="required">*</span>
+
+                </label>
+
+                <input
+                    type="text"
+                    name="parent_name"
+                    class="form-control"
+                    placeholder="Enter parent or guardian name"
+                    required
+                >
+
+            </div>
+
+            <!-- Parent Mobile -->
+
+            <div class="col-lg-6">
+
+                <label class="form-label">
+
+                    Mobile Number
+
+                    <span class="required">*</span>
+
+                </label>
+
+                <input
+                    type="tel"
+                    name="parent_mobile"
+                    class="form-control"
+                    placeholder="Enter 10-digit mobile number"
+                    pattern="[0-9]{10}"
+                    minlength="10"
+                    maxlength="10"
+                    inputmode="numeric"
+                    required
+                >
+
+                <div class="form-text">
+
+                    Enter a valid 10-digit mobile number.
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ==========================================================
+     ADDRESS INFORMATION
+=========================================================== -->
+
+<div class="card form-card section-card mb-4">
+
+    <div class="section-header">
+
+        <div class="section-icon">
+
+            <i class="bi bi-geo-alt-fill"></i>
+
+        </div>
+
+        <div>
+
+            <h3 class="section-title">
+
+                Address Information
+
+            </h3>
+
+            <p class="section-description">
+
+                Enter the student's complete residential address.
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="row g-4">
+
+            <div class="col-12">
+
+                <label class="form-label">
+
+                    Residential Address
+
+                    <span class="required">*</span>
+
+                </label>
+
+                <textarea
+                    name="address"
+                    class="form-control"
+                    rows="5"
+                    placeholder="House No., Street, Area, Village/City, Taluka, District, PIN Code"
+                    required
+                ></textarea>
+
+                <div class="form-text">
+
+                    Please enter the complete address for future communication.
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ==========================================================
+     ADMISSION DETAILS
+=========================================================== -->
+
+<div class="card form-card section-card mb-4">
+
+    <div class="section-header">
+
+        <div class="section-icon">
+
+            <i class="bi bi-building-fill"></i>
+
+        </div>
+
+        <div>
+
+            <h3 class="section-title">
+
+                Admission Details
+
+            </h3>
+
+            <p class="section-description">
+
+                Select the student's Abhyasika and current admission status.
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="row g-4">
+
+            <!-- Admin -->
+
+            {% if current_user.role == "admin" %}
+
+            <div class="col-lg-6">
+
+                <label class="form-label">
+
+                    Abhyasika
+
+                    <span class="required">*</span>
+
+                </label>
+
+                <select
+                    name="abhyasika_id"
+                    class="form-select"
+                    required
+                >
+
+                    <option value="">
+
+                        Select Abhyasika
+
+                    </option>
+
+                    {% for abhyasika in abhyasikas %}
+
+                    <option value="{{ abhyasika.id }}">
+
+                        {{ abhyasika.name }}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+                <div class="form-text">
+
+                    Choose the study centre where the student is enrolled.
+
+                </div>
+
+            </div>
+
+            {% else %}
+
+            <!-- Teacher -->
+
+            <div class="col-lg-6">
+
+                <label class="form-label">
+
+                    Assigned Abhyasika
+
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    value="{{ selected_abhyasika.name }}"
+                    readonly
+                >
+
+                <div class="form-text">
+
+                    This student will be assigned to your Abhyasika.
+
+                </div>
+
+            </div>
+
+            {% endif %}
+
+            <!-- Status -->
+
+            <div class="col-lg-6">
+
+                <label class="form-label">
+
+                    Student Status
+
+                </label>
+
+                <select
+                    name="status"
+                    class="form-select"
+                >
+
+                    {% for item in student_status %}
+
+                    <option
+                        value="{{ item }}"
+                        {% if item == "Active" %}selected{% endif %}
+                    >
+
+                        {{ item }}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+                <div class="form-text">
+
+                    Active students will appear in attendance and reports.
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ==========================================================
+     FORM ACTIONS
+=========================================================== -->
+
+<div class="card action-card mb-5">
+
+    <div class="card-body">
+
+        <div class="action-bar">
+
+            <div class="action-info">
+
+                <i class="bi bi-info-circle-fill"></i>
+
+                <span>
+
+                    Review all information before saving the student record.
+
+                </span>
+
+            </div>
+
+            <div class="action-buttons">
+
+                <a
+                    href="{{ url_for('student.view_students') }}"
+                    class="btn btn-outline"
+                >
+
+                    <i class="bi bi-arrow-left"></i>
+
+                    Back
+
+                </a>
+
+                <button
+                    type="reset"
+                    class="btn btn-secondary"
+                >
+
+                    <i class="bi bi-arrow-clockwise"></i>
+
+                    Reset
+
+                </button>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+
+                    <i class="bi bi-check-circle-fill"></i>
+
+                    Save Student
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ===========================
+     STUDENT JAVASCRIPT
+============================ -->
 
 <script src="{{ url_for('static', filename='js/student.js') }}"></script>
 
-</body>
-</html>
+<script>
+
+/* ==========================================
+   Auto Capitalize Student Name
+========================================== */
+
+const studentName = document.querySelector(
+    'input[name="student_name"]'
+);
+
+if(studentName){
+
+    studentName.addEventListener("input", function(){
+
+        this.value = this.value.replace(
+            /\b\w/g,
+            letter => letter.toUpperCase()
+        );
+
+    });
+
+}
+
+/* ==========================================
+   Auto Capitalize Parent Name
+========================================== */
+
+const parentName = document.querySelector(
+    'input[name="parent_name"]'
+);
+
+if(parentName){
+
+    parentName.addEventListener("input", function(){
+
+        this.value = this.value.replace(
+            /\b\w/g,
+            letter => letter.toUpperCase()
+        );
+
+    });
+
+}
+
+/* ==========================================
+   Mobile Number Validation
+========================================== */
+
+const mobileInput = document.querySelector(
+    'input[name="parent_mobile"]'
+);
+
+if(mobileInput){
+
+    mobileInput.addEventListener("input", function(){
+
+        this.value = this.value.replace(
+            /\D/g,
+            ""
+        );
+
+        if(this.value.length > 10){
+
+            this.value = this.value.slice(0,10);
+
+        }
+
+    });
+
+}
+
+/* ==========================================
+   Set Today's Admission Date
+========================================== */
+
+const admissionDate = document.querySelector(
+    'input[name="admission_date"]'
+);
+
+if(admissionDate && admissionDate.value === ""){
+
+    admissionDate.value = new Date()
+        .toISOString()
+        .split("T")[0];
+
+}
+
+</script>
+
+{% endblock %}

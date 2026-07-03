@@ -51,6 +51,89 @@ def admin_dashboard():
 
     today = date.today()
 
+    # ==========================================
+    # Selected Abhyasika
+    # ==========================================
+
+    abhyasikas = Abhyasika.query.order_by(
+        Abhyasika.name
+    ).all()
+
+    selected_id = request.args.get(
+        "abhyasika_id",
+        type=int
+    )
+
+    if selected_id:
+
+        selected_abhyasika = Abhyasika.query.get(
+            selected_id
+        )
+
+    else:
+
+        selected_abhyasika = (
+
+            abhyasikas[0]
+
+            if abhyasikas
+
+            else None
+
+        )
+
+    # ==========================================
+    # Today's Attendance by Abhyasika
+    # ==========================================
+
+    present_count = 0
+
+    absent_count = 0
+
+    attendance_percentage = 0
+
+    if selected_abhyasika:
+
+        present_count = (
+            Attendance.query
+            .join(
+                Student,
+                Attendance.student_id == Student.id
+            )
+            .filter(
+                Student.abhyasika_id == selected_abhyasika.id,
+                Attendance.attendance_date == today,
+                Attendance.status == "Present"
+            )
+            .count()
+        )
+
+        absent_count = (
+            Attendance.query
+            .join(
+                Student,
+                Attendance.student_id == Student.id
+            )
+            .filter(
+                Student.abhyasika_id == selected_abhyasika.id,
+                Attendance.attendance_date == today,
+                Attendance.status == "Absent"
+            )
+            .count()
+        )
+
+        total = present_count + absent_count
+
+        if total > 0:
+
+            attendance_percentage = round(
+
+                (present_count / total) * 100,
+
+                1
+
+            )
+
     present_today = Attendance.query.filter_by(
         attendance_date=today,
         status="Present"
@@ -73,7 +156,17 @@ def admin_dashboard():
 
         present_today=present_today,
 
-        absent_today=absent_today
+        absent_today=absent_today,
+
+        abhyasikas=abhyasikas,
+
+        selected_abhyasika=selected_abhyasika,
+
+        present_count=present_count,
+
+        absent_count=absent_count,
+
+        attendance_percentage=attendance_percentage
 
     )
 

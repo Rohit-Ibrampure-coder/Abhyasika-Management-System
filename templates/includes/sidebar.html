@@ -4,45 +4,40 @@
 
 <aside
     id="sidebar"
-    class="sidebar d-none d-lg-flex flex-column shadow-sm"
+    class="sidebar d-none d-lg-flex flex-column"
 >
 
     <!-- Logo -->
 
-    <div
-        class="sidebar-brand"
-        id="sidebarBrand"
-    >
+    <div class="sidebar-brand">
 
         <div class="brand-logo">
 
-            <i class="bi bi-mortarboard-fill"></i>
+            <img
+                src="{{ url_for('static', filename='images/logo-icon.png') }}"
+                alt="Shri Laxmikeshav Pratisthan Logo"
+            >
 
         </div>
 
-        <h4 class="mt-3">
+        <h5>{{ APP_SHORT_NAME }}</h5>
 
-            {{ APP_SHORT_NAME }}
+        <p>Shri Laxmikeshav Pratisthan</p>
 
-        </h4>
-
-        <small>
-
-            {{ APP_NAME }}
-
-        </small>
+        <small>Abhyasika Management System</small>
 
     </div>
 
-    <hr>
 
-    <ul class="nav nav-pills flex-column">
+    <nav class="sidebar-menu">
 
-        <!-- MAIN -->
+    <ul class="nav flex-column">
+
+        <!-- Main -->
 
         <li class="sidebar-heading">
 
-            MAIN
+            Main
 
         </li>
 
@@ -68,11 +63,11 @@
 
         </li>
 
-        <!-- MANAGEMENT -->
+        <!-- Management -->
 
         <li class="sidebar-heading mt-4">
 
-            MANAGEMENT
+            Management
 
         </li>
 
@@ -156,7 +151,13 @@
 
         <li class="nav-item">
 
-            <a href="#" class="nav-link">
+            <a
+
+                href="{{ url_for('teacher_management.view_teachers') }}"
+
+                class="nav-link {% if request.endpoint=='teacher_management.view_teachers' %}active{% endif %}"
+
+            >
 
                 <i class="bi bi-person-badge-fill"></i>
 
@@ -172,11 +173,11 @@
 
         {% endif %}
 
-        <!-- REPORTS -->
+        <!-- Reports -->
 
         <li class="sidebar-heading mt-4">
 
-            REPORTS
+            Reports
 
         </li>
 
@@ -196,11 +197,11 @@
 
         </li>
 
-        <!-- SYSTEM -->
+        <!-- System -->
 
         <li class="sidebar-heading mt-4">
 
-            SYSTEM
+            System
 
         </li>
 
@@ -221,17 +222,13 @@
         </li>
 
     </ul>
+    </nav>
 
-    <div class="mt-auto">
-
-        <hr>
+    <div class="sidebar-footer">
 
         <a
-
             href="{{ url_for('auth.logout') }}"
-
             class="nav-link text-danger"
-
         >
 
             <i class="bi bi-box-arrow-right"></i>
@@ -268,11 +265,21 @@
 
     <div class="offcanvas-header">
 
-        <h5 class="fw-bold">
+        <div>
 
-            {{ APP_SHORT_NAME }}
+            <h5 class="mb-1">
 
-        </h5>
+                {{ APP_SHORT_NAME }}
+
+            </h5>
+
+            <small>
+
+                Abhyasika Management System
+
+            </small>
+
+        </div>
 
         <button
 
@@ -288,7 +295,9 @@
 
     <div class="offcanvas-body">
 
-        <ul class="nav nav-pills flex-column">
+        <nav class="sidebar-menu">
+
+        <ul class="nav flex-column">
 
             <li class="nav-item">
 
@@ -296,7 +305,7 @@
 
                     href="{% if current_user.role == 'admin' %}{{ url_for('admin.admin_dashboard') }}{% else %}{{ url_for('teacher.teacher_dashboard') }}{% endif %}"
 
-                    class="nav-link"
+                    class="nav-link {% if request.endpoint in ['admin.admin_dashboard','teacher.teacher_dashboard'] %}active{% endif %}"
 
                 >
 
@@ -311,11 +320,8 @@
             <li class="nav-item">
 
                 <a
-
                     href="{{ url_for('student.view_students') }}"
-
-                    class="nav-link"
-
+                    class="nav-link {% if request.endpoint=='student.view_students' %}active{% endif %}"
                 >
 
                     <i class="bi bi-people-fill"></i>
@@ -332,7 +338,7 @@
 
                     href="{{ url_for('attendance.mark_attendance') }}"
 
-                    class="nav-link"
+                    class="nav-link {% if request.endpoint=='attendance.mark_attendance' %}active{% endif %}"
 
                 >
 
@@ -356,13 +362,18 @@
 
                     <i class="bi bi-box-arrow-right"></i>
 
-                    Logout
+                    <span class="menu-text">
+
+                        Logout
+
+                    </span>
 
                 </a>
 
             </li>
 
         </ul>
+        </nav>
 
     </div>
 

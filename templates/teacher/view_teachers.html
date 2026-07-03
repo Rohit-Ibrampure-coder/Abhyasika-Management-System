@@ -1,49 +1,314 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Teachers</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-<h1>Teachers</h1>
+{% block title %}
 
-<a href="/admin/teacher/add">
-    Add Teacher
-</a>
+Teachers
 
-<hr>
+{% endblock %}
 
-{% for teacher in teachers %}
+{% block content %}
 
-<p>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
 
-    {{ teacher.name }}
+    <div>
 
-    -
+        <h2 class="fw-bold mb-1">
 
-    {{ teacher.mobile }}
+            <i class="bi bi-person-workspace text-primary"></i>
 
-    -
+            Teachers
 
-    {{ teacher.username }}
+        </h2>
 
-    -
+        <p class="text-muted mb-0">
 
-    {{ teacher.email }}
+            Manage all registered teachers.
 
-    -
+        </p>
 
-    <a href="/admin/teacher/edit/{{ teacher.id }}">
-        Edit
-    </a>
+    </div>
 
-    <a href="/admin/teacher/delete/{{ teacher.id }}">
-        Delete
-    </a>
+    <div class="d-flex gap-2">
 
-</p>
+        <form
+            method="GET"
+            class="d-flex"
+        >
 
-{% endfor %}
+            <input
+                type="search"
+                name="search"
+                class="form-control"
+                placeholder="Search teacher..."
+                value="{{ search }}"
+            >
 
-</body>
-</html>
+            <button
+                class="btn btn-outline-primary ms-2"
+                type="submit"
+            >
+
+                <i class="bi bi-search"></i>
+
+            </button>
+
+        </form>
+
+        <a
+            href="{{ url_for('teacher_management.add_teacher') }}"
+            class="btn btn-primary"
+        >
+
+            <i class="bi bi-plus-circle me-2"></i>
+
+            Add Teacher
+
+        </a>
+
+    </div>
+
+</div>
+
+<div class="card border-0 shadow-sm rounded-4">
+
+    <div class="card-body">
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Teacher</th>
+
+                        <th>Mobile</th>
+
+                        <th>Username</th>
+
+                        <th>Email</th>
+
+                        <th>Abhyasika</th>
+
+                        <th>Status</th>
+
+                        <th class="text-center">
+
+                            Actions
+
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for teacher in teachers %}
+
+                    <tr>
+
+                        <!-- Teacher -->
+
+                        <td>
+
+                            <div class="d-flex align-items-center">
+
+                                <div class="teacher-avatar me-3">
+
+                                    {{ teacher.name[0]|upper }}
+
+                                </div>
+
+                                <strong>
+
+                                    {{ teacher.name }}
+
+                                </strong>
+
+                            </div>
+
+                        </td>
+
+                        <!-- Mobile -->
+
+                        <td>
+
+                            {{ teacher.mobile }}
+
+                        </td>
+
+                        <!-- Username -->
+
+                        <td>
+
+                            {{ teacher.username }}
+
+                        </td>
+
+                        <!-- Email -->
+
+                        <td>
+
+                            {{ teacher.email }}
+
+                        </td>
+
+                        <!-- Abhyasika -->
+
+                        <td>
+
+                            {% if teacher.teacher_assignments %}
+
+                                {% for assignment in teacher.teacher_assignments %}
+
+                                    <div class="fw-medium">
+
+                                        {{ assignment.abhyasika.name }}
+
+                                    </div>
+
+                                {% endfor %}
+
+                            {% else %}
+
+                                <span class="text-muted">
+
+                                    Not Assigned
+
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <!-- Status -->
+
+                        <td>
+
+                            {% if teacher.teacher_assignments %}
+
+                                <span class="badge bg-success">
+
+                                    <i class="bi bi-check-circle-fill me-1"></i>
+
+                                    Assigned
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-warning text-dark">
+
+                                    <i class="bi bi-exclamation-circle-fill me-1"></i>
+
+                                    Unassigned
+
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <!-- Actions -->
+
+                        <td class="text-center">
+
+                            <div class="table-actions">
+
+                                <!-- View -->
+
+                                <a
+                                    href="{{ url_for('teacher_management.view_teacher', id=teacher.id) }}"
+                                    class="btn btn-sm btn-info"
+                                    title="View Teacher"
+                                >
+
+                                    <i class="bi bi-eye"></i>
+
+                                </a>
+
+                                <!-- Edit -->
+
+                                <a
+                                    href="{{ url_for('teacher_management.edit_teacher', id=teacher.id) }}"
+                                    class="btn btn-sm btn-warning"
+                                    title="Edit Teacher"
+                                >
+
+                                    <i class="bi bi-pencil-square"></i>
+
+                                </a>
+
+                                <!-- Assign Abhyasika -->
+
+                                <a
+                                    href="{{ url_for('teacher_management.assign_abhyasika', id=teacher.id) }}"
+                                    class="btn btn-sm btn-primary"
+                                    title="Assign Abhyasika"
+                                >
+
+                                    <i class="bi bi-building-fill"></i>
+
+                                </a>
+
+                                <!-- Delete -->
+
+                                <a
+                                    href="{{ url_for('teacher_management.delete_teacher', id=teacher.id) }}"
+                                    class="btn btn-sm btn-danger"
+                                    title="Delete Teacher"
+                                    onclick="return confirm('Delete this teacher?')"
+                                >
+
+                                    <i class="bi bi-trash"></i>
+
+                                </a>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% else %}
+
+                    <tr>
+
+                        <td
+                            colspan="7"
+                            class="text-center py-5 text-muted"
+                        >
+
+                            <i class="bi bi-person-x fs-1 d-block mb-3"></i>
+
+                            <h5>
+
+                                No Teachers Found
+
+                            </h5>
+
+                            <p>
+
+                                Click <strong>Add Teacher</strong> to register the first teacher.
+
+                            </p>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

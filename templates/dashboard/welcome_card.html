@@ -1,25 +1,47 @@
-<div class="card welcome-card shadow-sm border-0 mb-4">
+<div class="card welcome-card">
 
-    <div class="card-body p-4">
+    <div class="card-body">
 
-        <div class="row align-items-center">
+        <div class="row align-items-center g-5">
 
-            <div class="col-lg-8">
+            <!-- Left Side -->
 
-                <h2
-                    class="fw-bold mb-2"
-                    id="welcomeGreeting"
-                >
+            <div class="col-lg-8 col-md-8">
 
-                    Welcome
+                <div class="d-flex align-items-center mb-3">
 
-                </h2>
+                    <div class="welcome-icon">
+
+                        <i class="bi bi-sun-fill"></i>
+
+                    </div>
+
+                    <div class="welcome-content">
+
+                        <h2
+                            class="welcome-title mb-1"
+                            id="welcomeGreeting"
+                        >
+
+                            Welcome
+
+                        </h2>
+
+                        <p class="welcome-subtitle mb-0">
+
+                            Welcome to your workspace.
+
+                        </p>
+
+                    </div>
+
+                </div>
 
                 <div class="mb-3">
 
                     {% if current_user.role == "admin" %}
 
-                    <span class="badge bg-primary">
+                    <span class="role-badge role-admin">
 
                         Administrator
 
@@ -27,7 +49,7 @@
 
                     {% else %}
 
-                    <span class="badge bg-success">
+                    <span class="role-badge role-teacher">
 
                         Teacher
 
@@ -37,19 +59,19 @@
 
                 </div>
 
-                <h5 class="fw-semibold">
+                <h5 class="system-title">
 
                     {{ APP_NAME }}
 
                 </h5>
 
-                <p class="text-muted mb-2">
+                <p class="system-tagline">
 
                     {{ APP_TAGLINE }}
 
                 </p>
 
-                <p class="mb-0">
+                <p class="welcome-message">
 
                     Have a productive and successful day.
 
@@ -57,26 +79,28 @@
 
             </div>
 
-            <div
-                class="col-lg-4 text-lg-end mt-4 mt-lg-0"
-            >
+            <!-- Right Side -->
 
-                <h5
-                    class="fw-bold"
-                    id="currentDate"
-                >
+            <div class="col-lg-4 col-md-4">
 
-                </h5>
+                <div class="welcome-status">
 
-                <span
-                    class="badge bg-success mt-2"
-                >
+                    <h5
+                        id="currentDate"
+                        class="current-date"
+                    >
 
-                    <i class="bi bi-circle-fill me-1"></i>
+                    </h5>
 
-                    Active
+                    <span class="status-badge">
 
-                </span>
+                        <i class="bi bi-check-circle-fill"></i>
+
+                        Active
+
+                    </span>
+
+                </div>
 
             </div>
 

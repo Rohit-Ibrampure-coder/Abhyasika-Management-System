@@ -1,196 +1,755 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
-    <title>Students</title>
-</head>
+{% block title %}
 
-<body>
+Students
 
-    <h1>Students</h1>
+{% endblock %}
 
-    <h3>
+{% block content %}
 
-        Total Students :
+    <!--=========================================================
+        PAGE HEADER
+    ==========================================================-->
 
-        {{ student_count }}
+    <div class="page-header">
 
-    </h3>
+        <div class="page-header-content">
 
-    <hr>
+            <div class="page-icon">
 
-    <a href="{{ url_for('student.add_student') }}">
-        Add Student
-    </a>
+                <i class="bi bi-mortarboard-fill"></i>
 
-    <hr>
+            </div>
 
-    <form method="GET">
+            <div>
 
-        <input
-            type="text"
-            name="search"
-            placeholder="Search Student..."
-            value="{{ search }}"
-        >
+                <h1 class="page-title">
 
-        <p>
+                    Students
 
-            Status
+                </h1>
 
-            <select name="status">
+                <p class="page-description">
 
-                <option value="">
-                    All Status
-                </option>
+                    Manage student records, admissions and academic information.
 
-                {% for item in student_status %}
+                </p>
 
-                <option
-                    value="{{ item }}"
-                    {% if status == item %}
-                    selected
-                    {% endif %}
-                >
+            </div>
 
-                    {{ item }}
+        </div>
 
-                </option>
+        <div class="page-header-actions">
 
-                {% endfor %}
+            <a
+                href="{{ url_for('student.add_student') }}"
+                class="btn btn-primary"
+            >
 
-            </select>
+                <i class="bi bi-person-plus-fill"></i>
 
-        </p>
+                Add Student
 
-        <p>
+            </a>
 
-            Standard
+        </div>
 
-            <select name="standard">
+    </div>
 
-                <option value="">
-                    All Standards
-                </option>
+    <!--=========================================================
+        STUDENT STATISTICS
+    ==========================================================-->
 
-                {% for item in standards %}
+    <div class="row g-4 stats-grid mb-4">
 
-                <option
-                    value="{{ item }}"
-                    {% if standard == item %}
-                    selected
-                    {% endif %}
-                >
+        <div class="col-xl-3 col-md-6">
 
-                    {{ item }}
+            <div class="card stats-card">
 
-                </option>
+                <div class="card-body">
 
-                {% endfor %}
+                    <div class="stats-content">
 
-            </select>
+                        <p class="stats-label">
 
-        </p>
+                            Total Students
+
+                        </p>
+
+                        <h2 class="stats-number">
+
+                            {{ student_count }}
+
+                        </h2>
+
+                        <span class="stats-footer">
+
+                            Registered Students
+
+                        </span>
+
+                    </div>
+
+                    <div class="stats-icon students-icon">
+
+                        <i class="bi bi-mortarboard-fill"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+
+            <div class="card stats-card">
+
+                <div class="card-body">
+
+                    <div class="stats-content">
+
+                        <p class="stats-label">
+
+                            Active Students
+
+                        </p>
+
+                        <h2 class="stats-number">
+
+                            {{ students|selectattr('status','equalto','Active')|list|length }}
+
+                        </h2>
+
+                        <span class="stats-footer">
+
+                            Currently Active
+
+                        </span>
+
+                    </div>
+
+                    <div class="stats-icon quick-green">
+
+                        <i class="bi bi-person-check-fill"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+
+            <div class="card stats-card">
+
+                <div class="card-body">
+
+                    <div class="stats-content">
+
+                        <p class="stats-label">
+
+                            Standards
+
+                        </p>
+
+                        <h2 class="stats-number">
+
+                            {{ standards|length }}
+
+                        </h2>
+
+                        <span class="stats-footer">
+
+                            Available Classes
+
+                        </span>
+
+                    </div>
+
+                    <div class="stats-icon quick-yellow">
+
+                        <i class="bi bi-book-fill"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
 
         {% if current_user.role == "admin" %}
 
-        <p>
+        <div class="col-xl-3 col-md-6">
 
-            Abhyasika
+            <div class="card stats-card">
 
-            <select name="abhyasika">
+                <div class="card-body">
 
-                <option value="">
-                    All Abhyasikas
-                </option>
+                    <div class="stats-content">
 
-                {% for item in abhyasikas %}
+                        <p class="stats-label">
 
-                <option
-                    value="{{ item.id }}"
-                    {% if abhyasika == item.id|string %}
-                    selected
-                    {% endif %}
-                >
+                            Abhyasikas
 
-                    {{ item.name }}
+                        </p>
 
-                </option>
+                        <h2 class="stats-number">
 
-                {% endfor %}
+                            {{ abhyasikas|length }}
 
-            </select>
+                        </h2>
 
-        </p>
+                        <span class="stats-footer">
+
+                            Study Centres
+
+                        </span>
+
+                    </div>
+
+                    <div class="stats-icon quick-cyan">
+
+                        <i class="bi bi-building-fill"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
 
         {% endif %}
 
-        <button type="submit">
-            Search
-        </button>
+    </div>
 
-        <a href="{{ url_for('student.view_students') }}">
-            Reset
-        </a>
+    <!--=========================================================
+        SEARCH & FILTERS
+    ==========================================================-->
 
-    </form>
+    <div class="card filter-card mb-4">
+
+        <div class="card-header">
+
+            <div class="card-title">
+
+                <i class="bi bi-funnel-fill"></i>
+
+                Search & Filters
+
+            </div>
+
+        </div>
+
+        <div class="card-body">
+
+            <form method="GET">
+
+                <div class="row g-4">
+
+                    <!-- Search -->
+
+                    <div class="col-lg-4">
+
+                        <label class="form-label">
+
+                            Search Student
+
+                        </label>
+
+                        <input
+                            type="text"
+                            name="search"
+                            class="form-control"
+                            placeholder="Search by name, parent or mobile"
+                            value="{{ search }}"
+                        >
+
+                    </div>
+
+                    <!-- Status -->
+
+                    <div class="col-lg-2">
+
+                        <label class="form-label">
+
+                            Status
+
+                        </label>
+
+                        <select
+                            name="status"
+                            class="form-select"
+                        >
+
+                            <option value="">All Status</option>
+
+                            {% for item in student_status %}
+
+                            <option
+                                value="{{ item }}"
+                                {% if status == item %}selected{% endif %}
+                            >
+
+                                {{ item }}
+
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    <!-- Standard -->
+
+                    <div class="col-lg-2">
+
+                        <label class="form-label">
+
+                            Standard
+
+                        </label>
+
+                        <select
+                            name="standard"
+                            class="form-select"
+                        >
+
+                            <option value="">All Standards</option>
+
+                            {% for item in standards %}
+
+                            <option
+                                value="{{ item }}"
+                                {% if standard == item %}selected{% endif %}
+                            >
+
+                                {{ item }}
+
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    {% if current_user.role == "admin" %}
+
+                    <!-- Abhyasika -->
+
+                    <div class="col-lg-2">
+
+                        <label class="form-label">
+
+                            Abhyasika
+
+                        </label>
+
+                        <select
+                            name="abhyasika"
+                            class="form-select"
+                        >
+
+                            <option value="">All Centres</option>
+
+                            {% for item in abhyasikas %}
+
+                            <option
+                                value="{{ item.id }}"
+                                {% if abhyasika == item.id|string %}selected{% endif %}
+                            >
+
+                                {{ item.name }}
+
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    {% endif %}
+
+                    <!-- Buttons -->
+
+                    <div class="col-lg-2 d-flex align-items-end">
+
+                        <div class="d-flex gap-2 w-100">
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary flex-grow-1"
+                            >
+
+                                <i class="bi bi-search"></i>
+
+                                Search
+
+                            </button>
+
+                            <a
+                                href="{{ url_for('student.view_students') }}"
+                                class="btn btn-outline"
+                                title="Reset Filters"
+                            >
+
+                                <i class="bi bi-arrow-clockwise"></i>
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
 
     <br>
 
     <br>
 
-    <table border="1" cellpadding="8">
+    <!--=========================================================
+        STUDENTS TABLE
+    ==========================================================-->
 
-        <tr>
+    <div class="card table-card">
 
-            <th>Student Name</th>
-            <th>Standard</th>
-            <th>Abhyasika</th>
-            <th>Status</th>
-            <th>Action</th>
+        <div class="card-header">
 
-        </tr>
+            <div class="card-title">
 
-        {% for student in students %}
+                <i class="bi bi-people-fill"></i>
 
-        <tr>
+                Student Records
 
-            <td>{{ student.student_name }}</td>
+            </div>
 
-            <td>{{ student.standard }}</td>
+            <div class="table-count">
 
-            <td>{{ student.abhyasika.name }}</td>
+                {{ student_count }} Students
 
-            <td>{{ student.status }}</td>
+            </div>
 
-            <td>
+        </div>
 
-                <a href="{{ url_for('student.student_profile', student_id=student.id) }}">
-                    View Profile
-                </a>
+        <div class="card-body p-0">
 
-            </td>
+            <div class="table-responsive">
 
-        </tr>
+                <table class="table custom-table align-middle mb-0">
 
-        {% endfor %}
+                    <thead>
 
-    </table>
+                        <tr>
 
-    {% if students|length == 0 %}
+                            <th>Student</th>
 
-    <tr>
+                            <th>Standard</th>
 
-        <td colspan="5">
+                            <th>Abhyasika</th>
 
-            No students found.
+                            <th>Status</th>
 
-        </td>
+                            <th class="text-center">
 
-    </tr>
+                                Actions
 
-    {% endif %}
+                            </th>
 
-</body>
+                        </tr>
 
-</html>
+                    </thead>
+
+                    <tbody>
+
+                    {% for student in students %}
+
+                    <tr>
+
+                        <!-- Student -->
+
+                        <td>
+
+                            <div class="student-info">
+
+                                <div class="student-avatar">
+
+                                    {{ student.student_name[0] }}
+
+                                </div>
+
+                                <div>
+
+                                    <div class="student-name">
+
+                                        {{ student.student_name }}
+
+                                    </div>
+
+                                    <div class="student-subtitle">
+
+                                        Student ID : {{ student.id }}
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+                        <!-- Standard -->
+
+                        <td>
+
+                            <span class="standard-pill">
+
+                                {{ student.standard }}
+
+                            </span>
+
+                        </td>
+
+                        <!-- Abhyasika -->
+
+                        <td>
+
+                            {{ student.abhyasika.name }}
+
+                        </td>
+
+                        <!-- Status -->
+
+                        <td>
+
+                            {% if student.status=="Active" %}
+
+                            <span class="status-badge status-active">
+
+                                Active
+
+                            </span>
+
+                            {% elif student.status=="Inactive" %}
+
+                            <span class="status-badge status-inactive">
+
+                                Inactive
+
+                            </span>
+
+                            {% elif student.status=="Transferred" %}
+
+                            <span class="status-badge status-transfer">
+
+                                Transferred
+
+                            </span>
+
+                            {% else %}
+
+                            <span class="status-badge status-left">
+
+                                Left
+
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <!-- Actions -->
+
+                        <td>
+
+                            <div class="table-actions">
+
+                                <a
+                                    href="{{ url_for('student.student_profile',student_id=student.id) }}"
+                                    class="btn btn-icon btn-outline"
+                                    title="View">
+
+                                    <i class="bi bi-eye"></i>
+
+                                </a>
+
+                                <a
+                                    href="{{ url_for('student.edit_student',student_id=student.id) }}"
+                                    class="btn btn-icon btn-warning"
+                                    title="Edit">
+
+                                    <i class="bi bi-pencil"></i>
+
+                                </a>
+
+                                <button
+                                    class="btn btn-icon btn-danger"
+                                    title="Delete">
+
+                                    <i class="bi bi-trash"></i>
+
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% else %}
+
+                    <tr>
+
+                        <td colspan="5">
+
+                            <div class="empty-state">
+
+                                <i class="bi bi-mortarboard-fill"></i>
+
+                                <h4>
+
+                                    No Students Found
+
+                                </h4>
+
+                                <p>
+
+                                    There are no students matching your search.
+
+                                </p>
+
+                                <a
+                                    href="{{ url_for('student.add_student') }}"
+                                    class="btn btn-primary">
+
+                                    <i class="bi bi-person-plus-fill"></i>
+
+                                    Add Student
+
+                                </a>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!--=========================================================
+        TABLE FOOTER
+    ==========================================================-->
+
+    <div class="table-footer">
+
+        <div class="table-footer-left">
+
+            Showing
+
+            <strong>
+
+                {{ students|length }}
+
+            </strong>
+
+            of
+
+            <strong>
+
+                {{ student_count }}
+
+            </strong>
+
+            students
+
+        </div>
+
+        <div class="table-footer-right">
+
+            <nav>
+
+                <ul class="pagination pagination-modern">
+
+                    <li class="page-item disabled">
+
+                        <a class="page-link">
+
+                            <i class="bi bi-chevron-left"></i>
+
+                        </a>
+
+                    </li>
+
+                    <li class="page-item active">
+
+                        <a class="page-link">
+
+                            1
+
+                        </a>
+
+                    </li>
+
+                    <li class="page-item">
+
+                        <a class="page-link">
+
+                            2
+
+                        </a>
+
+                    </li>
+
+                    <li class="page-item">
+
+                        <a class="page-link">
+
+                            3
+
+                        </a>
+
+                    </li>
+
+                    <li class="page-item">
+
+                        <a class="page-link">
+
+                            <i class="bi bi-chevron-right"></i>
+
+                        </a>
+
+                    </li>
+
+                </ul>
+
+            </nav>
+
+        </div>
+
+    </div>
+
+{% endblock %}

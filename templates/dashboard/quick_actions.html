@@ -1,0 +1,220 @@
+<div class="section quick-actions-section">
+
+    <h4 class="quick-actions-title">
+        <i class="bi bi-lightning-charge-fill"></i>
+        Quick Actions
+    </h4>
+
+    <div class="row g-4 quick-grid">
+
+        <!-- Add Student -->
+        <div class="col-12 col-md-6 col-xl-4">
+
+            <a
+                href="{{ url_for('student.add_student') }}"
+                class="text-decoration-none"
+                aria-label="Add Student"
+            >
+
+                <div class="quick-card">
+
+                    <div class="quick-icon quick-blue">
+                        <i class="bi bi-person-plus-fill"></i>
+                    </div>
+
+                    <div class="quick-content">
+
+                        <h5 class="quick-title">
+                            Add Student
+                        </h5>
+
+                        <p class="quick-text">
+                            Register a new student in the system.
+                        </p>
+
+                    </div>
+
+                    <div class="quick-link">
+                        Open
+                        <i class="bi bi-arrow-right"></i>
+                    </div>
+
+                </div>
+
+            </a>
+
+        </div>
+
+        <!-- Attendance -->
+        <div class="col-12 col-md-6 col-xl-4">
+
+            <a href="{{ url_for('attendance.mark_attendance') }}" class="text-decoration-none">
+
+                <div class="quick-card">
+
+                    <div class="quick-icon quick-green">
+                        <i class="bi bi-calendar-check-fill"></i>
+                    </div>
+
+                    <div class="quick-content">
+
+                        <h5 class="quick-title">
+                            Attendance
+                        </h5>
+
+                        <p class="quick-text">
+                            Mark today's attendance quickly.
+                        </p>
+
+                    </div>
+
+                    <div class="quick-link">
+                        Open
+                        <i class="bi bi-arrow-right"></i>
+                    </div>
+
+                </div>
+
+            </a>
+
+        </div>
+
+        <!-- Teachers -->
+        <div class="col-12 col-md-6 col-xl-4">
+
+            <a href="{{ url_for('teacher_management.view_teachers') }}" class="text-decoration-none">
+
+                <div class="quick-card">
+
+                    <div class="quick-icon quick-cyan">
+                        <i class="bi bi-person-workspace"></i>
+                    </div>
+
+                    <div class="quick-content">
+
+                        <h5 class="quick-title">
+                            Teachers
+                        </h5>
+
+                        <p class="quick-text">
+                            Manage teacher accounts and permissions.
+                        </p>
+
+                    </div>
+
+                    <div class="quick-link">
+                        Open
+                        <i class="bi bi-arrow-right"></i>
+                    </div>
+
+                </div>
+
+            </a>
+
+        </div>
+
+        <!-- Marks -->
+        <div class="col-12 col-md-6 col-xl-4">
+
+            <a href="#" class="text-decoration-none">
+
+                <div class="quick-card">
+
+                    <div class="quick-icon quick-yellow">
+                        <i class="bi bi-journal-bookmark-fill"></i>
+                    </div>
+
+                    <div class="quick-content">
+
+                        <h5 class="quick-title">
+                            Marks
+                        </h5>
+
+                        <p class="quick-text">
+                            Manage and update student marks.
+                        </p>
+
+                    </div>
+
+                    <div class="quick-link">
+                        Open
+                        <i class="bi bi-arrow-right"></i>
+                    </div>
+
+                </div>
+
+            </a>
+
+        </div>
+
+        <!-- Reports -->
+        <div class="col-12 col-md-6 col-xl-4">
+
+            <a href="#" class="text-decoration-none">
+
+                <div class="quick-card">
+
+                    <div class="quick-icon quick-red">
+                        <i class="bi bi-bar-chart-fill"></i>
+                    </div>
+
+                    <div class="quick-content">
+
+                        <h5 class="quick-title">
+                            Reports
+                        </h5>
+
+                        <p class="quick-text">
+                            View attendance and student reports.
+                        </p>
+
+                    </div>
+
+                    <div class="quick-link">
+                        Open
+                        <i class="bi bi-arrow-right"></i>
+                    </div>
+
+                </div>
+
+            </a>
+
+        </div>
+
+        <!-- Abhyasikas -->
+        <div class="col-12 col-md-6 col-xl-4">
+
+            <a href="{{ url_for('admin.view_abhyasikas') }}" class="text-decoration-none">
+
+                <div class="quick-card">
+
+                    <div class="quick-icon quick-gray">
+                        <i class="bi bi-building-fill"></i>
+                    </div>
+
+                    <div class="quick-content">
+
+                        <h5 class="quick-title">
+                            Abhyasikas
+                        </h5>
+
+                        <p class="quick-text">
+                            Manage study centres and their details.
+                        </p>
+
+                    </div>
+
+                    <div class="quick-link">
+                        Open
+                        <i class="bi bi-arrow-right"></i>
+                    </div>
+
+                </div>
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>

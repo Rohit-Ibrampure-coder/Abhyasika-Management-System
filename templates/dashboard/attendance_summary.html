@@ -1,0 +1,154 @@
+<div class="card attendance-card section">
+
+    <div class="card-body">
+
+        <div class="card-header attendance-header">
+
+            <div>
+
+                <h4 class="attendance-title">
+
+                    <i class="bi bi-calendar-check-fill"></i>
+
+                    Today's Attendance
+
+                </h4>
+
+                <p class="attendance-subtitle">
+
+                    Attendance summary by Abhyasika
+
+                </p>
+
+            </div>
+
+            <form method="GET">
+
+                <select
+                    class="form-select attendance-select"
+                    name="abhyasika_id"
+                    onchange="this.form.submit()"
+                >
+
+                    {% for abhyasika in abhyasikas %}
+
+                    <option
+                        value="{{ abhyasika.id }}"
+                        {% if selected_abhyasika and selected_abhyasika.id == abhyasika.id %}selected{% endif %}
+                    >
+
+                        {{ abhyasika.name }}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </form>
+
+        </div>
+
+        <div class="row g-4 mt-2">
+
+            <!-- Present -->
+
+            <div class="col-lg-4">
+
+                <div class="attendance-box attendance-present card">
+
+                    <div class="attendance-icon">
+
+                        <i class="bi bi-check-circle-fill"></i>
+
+                    </div>
+
+                    <div>
+
+                        <h2>
+
+                            {{ present_count }}
+
+                        </h2>
+
+                        <p>
+
+                            Present Students
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Absent -->
+
+            <div class="col-lg-4">
+
+                <div class="attendance-box attendance-absent card">
+
+                    <div class="attendance-icon">
+
+                        <i class="bi bi-x-circle-fill"></i>
+
+                    </div>
+
+                    <div>
+
+                        <h2>
+
+                            {{ absent_count }}
+
+                        </h2>
+
+                        <p>
+
+                            Absent Students
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Percentage -->
+
+            <div class="col-lg-4">
+
+                <div class="attendance-box attendance-rate card">
+
+                    <div class="attendance-icon">
+
+                        <i class="bi bi-bar-chart-fill"></i>
+
+                    </div>
+
+                    <div>
+
+                        <h2>
+
+                            {{ attendance_percentage }}%
+
+                        </h2>
+
+                        <p>
+
+                            Attendance Rate
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

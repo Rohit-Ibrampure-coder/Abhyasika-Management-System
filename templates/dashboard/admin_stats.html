@@ -1,175 +1,227 @@
-<div class="row g-4 mb-4">
+<div class="row g-4 stats-grid">
 
-    <!-- Students -->
+    <!-- ==========================
+         Total Students
+    ========================== -->
+    <div class="col-xl-3 col-md-6">
+        <a href="{{ url_for('student.view_students') }}" class="text-decoration-none">
 
-    <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card stats-card">
 
-        <div class="card stats-card border-0">
+                <div class="card-body">
 
-            <div class="card-body">
+                    <div class="stats-content">
 
-                <div class="stats-top">
+                        <p class="stats-label">
 
-                    <div class="stats-icon bg-primary">
+                            Total Students
 
-                        <i class="bi bi-mortarboard-fill"></i>
+                        </p>
+
+                        <h2 class="stats-number">
+
+                            {{ total_students }}
+
+                        </h2>
+
+                        <span class="stats-footer">
+
+                            View Students
+
+                            <i class="bi bi-arrow-right"></i>
+
+                        </span>
+
+                    </div>
+
+                    <div class="stats-icon students-icon">
+
+                        <i class="bi bi-people-fill"></i>
 
                     </div>
 
                 </div>
 
-                <h6 class="stats-title">
-
-                    Total Students
-
-                </h6>
-
-                <h2 class="stats-number">
-
-                    {{ total_students }}
-
-                </h2>
-
-                <small class="text-muted">
-
-                    Active Students
-
-                </small>
-
             </div>
 
-        </div>
-
+        </a>
     </div>
 
-    <!-- Teachers -->
+    <!-- ==========================
+         Total Teachers
+    ========================== -->
 
-    <div class="col-12 col-sm-6 col-xl-3">
-
-        <div class="card stats-card border-0">
-
-            <div class="card-body">
-
-                <div class="stats-top">
-
-                    <div class="stats-icon bg-success">
-
+    <div class="col-xl-3 col-md-6">
+    
+        <a href="{{ url_for('teacher_management.view_teachers') }}" class="text-decoration-none">
+    
+            <div class="card stats-card">
+    
+                <div class="card-body">
+    
+                    <div class="stats-content">
+    
+                        <p class="stats-label">
+    
+                            Total Teachers
+    
+                        </p>
+    
+                        <h2 class="stats-number">
+    
+                            {{ total_teachers }}
+    
+                        </h2>
+    
+                        <span class="stats-footer">
+    
+                            View Teachers
+    
+                            <i class="bi bi-arrow-right"></i>
+    
+                        </span>
+    
+                    </div>
+    
+                    <div class="stats-icon teachers-icon">
+    
                         <i class="bi bi-person-workspace"></i>
-
+    
                     </div>
-
+    
                 </div>
-
-                <h6 class="stats-title">
-
-                    Teachers
-
-                </h6>
-
-                <h2 class="stats-number">
-
-                    {{ total_teachers }}
-
-                </h2>
-
-                <small class="text-muted">
-
-                    Registered Teachers
-
-                </small>
-
+    
             </div>
-
-        </div>
-
+    
+        </a>
     </div>
 
-    <!-- Abhyasikas -->
+    <!-- ==========================
+         Total Abhyasikas
+    ========================== -->
 
-    <div class="col-12 col-sm-6 col-xl-3">
-
-        <div class="card stats-card border-0">
-
-            <div class="card-body">
-
-                <div class="stats-top">
-
-                    <div class="stats-icon bg-warning">
-
+    <div class="col-xl-3 col-md-6">
+    
+        <a href="{{ url_for('admin.view_abhyasikas') }}" class="text-decoration-none">
+    
+            <div class="card stats-card">
+    
+                <div class="card-body">
+    
+                    <div class="stats-content">
+    
+                        <p class="stats-label">
+    
+                            Abhyasikas
+    
+                        </p>
+    
+                        <h2 class="stats-number">
+    
+                            {{ total_abhyasikas }}
+    
+                        </h2>
+    
+                        <span class="stats-footer">
+    
+                            View Centers
+    
+                            <i class="bi bi-arrow-right"></i>
+    
+                        </span>
+    
+                    </div>
+    
+                    <div class="stats-icon abhyasika-icon">
+    
                         <i class="bi bi-building"></i>
-
+    
                     </div>
-
+    
                 </div>
-
-                <h6 class="stats-title">
-
-                    Abhyasikas
-
-                </h6>
-
-                <h2 class="stats-number">
-
-                    {{ total_abhyasikas }}
-
-                </h2>
-
-                <small class="text-muted">
-
-                    Active Centers
-
-                </small>
-
+    
             </div>
-
-        </div>
-
+    
+        </a>
     </div>
 
-    <!-- Attendance -->
+    <!-- ==========================
+         Today's Attendance
+    ========================== -->
 
-    <div class="col-12 col-sm-6 col-xl-3">
-
-        <div class="card stats-card border-0">
-
-            <div class="card-body">
-
-                <div class="stats-top">
-
-                    <div class="stats-icon bg-danger">
-
-                        <i class="bi bi-calendar-check-fill"></i>
-
+    <div class="col-xl-3 col-md-6">
+    
+        <a href="{{ url_for('attendance.mark_attendance') }}" class="text-decoration-none">
+    
+            <div class="card stats-card">
+    
+                <div class="card-body">
+    
+                    <div class="stats-content">
+    
+                        <p class="stats-label">
+    
+                            Today's Attendance
+    
+                        </p>
+    
+                        <div class="attendance-summary">
+    
+                            <div class="attendance-item">
+    
+                                <span class="attendance-value">
+    
+                                    {{ present_today }}
+    
+                                </span>
+    
+                                <span class="attendance-label">
+    
+                                    Present
+    
+                                </span>
+    
+                            </div>
+    
+                            <div class="attendance-item">
+    
+                                <span class="attendance-value">
+    
+                                    {{ absent_today }}
+    
+                                </span>
+    
+                                <span class="attendance-label">
+    
+                                    Absent
+    
+                                </span>
+    
+                            </div>
+    
+                        </div>
+    
+                        <span class="stats-footer">
+    
+                            Mark Attendance
+    
+                            <i class="bi bi-arrow-right"></i>
+    
+                        </span>
+    
                     </div>
-
+    
+                    <div class="stats-icon attendance-icon">
+    
+                        <i class="bi bi-calendar-check"></i>
+    
+                    </div>
+    
                 </div>
-
-                <h6 class="stats-title">
-
-                    Today's Attendance
-
-                </h6>
-
-                <div class="mt-3">
-
-                    <span class="badge bg-success">
-
-                        Present {{ present_today }}
-
-                    </span>
-
-                    <span class="badge bg-danger ms-2">
-
-                        Absent {{ absent_today }}
-
-                    </span>
-
-                </div>
-
+    
             </div>
-
-        </div>
-
+    
+        </a>
     </div>
 
 </div>
