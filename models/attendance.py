@@ -38,6 +38,11 @@ class Attendance(db.Model):
         server_default=db.func.now()
     )
 
+    student = db.relationship(
+        "Student",
+        back_populates="attendance_records"
+    )
+    
     __table_args__ = (
 
         db.UniqueConstraint(

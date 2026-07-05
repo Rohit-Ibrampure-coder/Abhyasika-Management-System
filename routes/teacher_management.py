@@ -370,7 +370,8 @@ def edit_teacher(id):
     )
 
 @teacher_management_bp.route(
-    "/admin/teacher/delete/<int:id>"
+    "/admin/teacher/delete/<int:id>",
+    methods=["GET", "POST"]
 )
 @login_required
 def delete_teacher(id):
@@ -380,13 +381,32 @@ def delete_teacher(id):
 
     teacher = User.query.get_or_404(id)
 
-    db.session.delete(teacher)
-    db.session.commit()
+    if request.method == "POST":
 
-    return redirect(
-        url_for(
-            "teacher_management.view_teachers"
+        # Delete Teacher ↔ Abhyasika Mapping
+        TeacherAbhyasika.query.filter_by(
+            teacher_id=teacher.id
+        ).delete()
+
+        # Delete Teacher
+        db.session.delete(teacher)
+
+        db.session.commit()
+
+        flash(
+            f'Teacher "{teacher.name}" deleted successfully.',
+            "success"
         )
+
+        return redirect(
+            url_for(
+                "teacher_management.view_teachers"
+            )
+        )
+
+    return render_template(
+        "teacher/delete_teacher.html",
+        teacher=teacher
     )
 
 @teacher_management_bp.route(

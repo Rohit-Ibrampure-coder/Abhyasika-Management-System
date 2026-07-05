@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+Teacher Remark
+
+{% endblock %}
+
+{% block content %}
+
+<!-- =======================================================
+     PAGE HEADER
+======================================================= -->
+
+<div class="page-header">
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+        <div>
+
+            <h1 class="page-title">
+
+                <i class="bi bi-chat-left-text-fill me-2"></i>
+
+                Teacher Remark
+
+            </h1>
+
+            <p class="page-subtitle mb-0">
+
+                Add or update a remark for the selected student.
+
+            </p>
+
+        </div>
+
+        <a
+            href="{{ url_for('student.student_profile', student_id=student.id) }}"
+            class="btn btn-outline-secondary"
+        >
+
+            <i class="bi bi-arrow-left me-2"></i>
+
+            Back to Profile
+
+        </a>
+
+    </div>
+
+</div>
+
+<!-- =======================================================
+     STUDENT INFORMATION
+======================================================= -->
+
+<div class="card profile-card mb-4">
+
+    <div class="card-body">
+
+        <div class="row align-items-center">
+
+            <div class="col-md-2 text-center">
+
+                <div class="profile-avatar">
+
+                    <i class="bi bi-person-fill"></i>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-10">
+
+                <h3 class="profile-name">
+
+                    {{ student.student_name }}
+
+                </h3>
+
+                <p class="profile-school mb-1">
+
+                    {{ student.school_college_name }}
+
+                </p>
+
+                <span class="badge bg-primary">
+
+                    {{ student.standard }}
+
+                </span>
+
+                {% if student.stream %}
+
+                <span class="badge bg-info text-dark">
+
+                    {{ student.stream }}
+
+                </span>
+
+                {% endif %}
+
+                <span class="badge bg-success">
+
+                    {{ student.status }}
+
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- =======================================================
+     REMARK FORM
+======================================================= -->
+
+<div class="card form-card">
+
+    <div class="card-body">
+
+        <form method="POST">
+
+            <div class="mb-4">
+
+                <label class="form-label">
+
+                    Teacher Remark
+
+                </label>
+
+                <textarea
+                    name="remark"
+                    class="form-control"
+                    rows="6"
+                    placeholder="Write your remark here..."
+                    required
+                >{{ remark.remark if remark else "" }}</textarea>
+
+                <div class="form-text">
+
+                    Example: Student has shown excellent discipline and regular attendance.
+
+                </div>
+
+            </div>
+
+            <div class="d-flex justify-content-end gap-3">
+
+                <a
+                    href="{{ url_for('student.student_profile', student_id=student.id) }}"
+                    class="btn btn-outline-secondary"
+                >
+
+                    Cancel
+
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+
+                    <i class="bi bi-save me-2"></i>
+
+                    {% if remark %}
+
+                        Update Remark
+
+                    {% else %}
+
+                        Save Remark
+
+                    {% endif %}
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

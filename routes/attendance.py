@@ -13,6 +13,7 @@ from models.abhyasika import Abhyasika
 from models import db
 from models.attendance import Attendance
 from datetime import datetime
+from models.achievement import Achievement
 
 from flask_login import (
     login_required,

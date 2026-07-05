@@ -1,123 +1,713 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
-    <title>Student Profile</title>
-</head>
+{% block title %}
 
-<body>
+Student Profile
 
-    <h1>Student Profile</h1>
+{% endblock %}
 
-    <hr>
+{% block content %}
 
-    <p>
-        <strong>Student Full Name:</strong>
-        {{ student.student_name }}
-    </p>
+    <!-- =======================================================
+        PAGE HEADER
+    ======================================================= -->
 
-    <p>
-        <strong>Gender:</strong>
-        {{ student.gender }}
-    </p>
+    <div class="page-header">
 
-    <p>
-        <strong>Date of Birth:</strong>
-        {{ student.date_of_birth }}
-    </p>
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
 
-    <p>
-        <strong>School / College:</strong>
-        {{ student.school_college_name }}
-    </p>
+            <div>
 
-    <p>
-        <strong>Standard:</strong>
-        {{ student.standard }}
-    </p>
+                <h1 class="page-title">
 
-    {% if student.stream %}
+                    <i class="bi bi-person-vcard-fill me-2"></i>
 
-    <p>
+                    Student Profile
 
-        <strong>Stream:</strong>
+                </h1>
 
-        {% if student.stream == "Other" %}
+                <p class="page-subtitle mb-0">
 
-            {{ student.other_stream }}
+                    View complete information and academic details of the student.
 
-        {% else %}
+                </p>
 
-            {{ student.stream }}
+            </div>
 
-        {% endif %}
+            <div class="d-flex gap-2">
 
-    </p>
+                <a
+                    href="{{ url_for('student.view_students') }}"
+                    class="btn btn-outline-secondary"
+                >
 
-    {% endif %}
+                    <i class="bi bi-arrow-left me-2"></i>
 
-    <p>
-        <strong>Parent Name:</strong>
-        {{ student.parent_name }}
-    </p>
+                    Back
+
+                </a>
+
+                <a
+                    href="{{ url_for('student.edit_student', student_id=student.id) }}"
+                    class="btn btn-primary"
+                >
+
+                    <i class="bi bi-pencil-square me-2"></i>
+
+                    Edit Student
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- =======================================================
+        STUDENT PROFILE CARD
+    ======================================================= -->
+
+    <div class="card profile-card mb-4">
+
+        <div class="card-body">
+
+            <div class="row align-items-center">
+
+                <!-- Student Photo -->
+
+                <div class="col-lg-3 text-center mb-4 mb-lg-0">
+
+                    <div class="profile-avatar">
+
+                        <i class="bi bi-person-fill"></i>
+
+                    </div>
+
+                    <span class="badge bg-success mt-3 px-3 py-2">
+
+                        {{ student.status }}
+
+                    </span>
+
+                </div>
+
+                <!-- Student Details -->
+
+                <div class="col-lg-9">
+
+                    <h2 class="profile-name">
+
+                        {{ student.student_name }}
+
+                    </h2>
+
+                    <p class="profile-school">
+
+                        <i class="bi bi-building me-2"></i>
+
+                        {{ student.school_college_name }}
+
+                    </p>
+
+                    <div class="row g-3 mt-3">
+
+                        <div class="col-md-4">
+
+                            <div class="profile-info-box">
+
+                                <small>Standard</small>
+
+                                <h6>
+
+                                    {{ student.standard }}
+
+                                </h6>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <div class="profile-info-box">
+
+                                <small>Stream</small>
+
+                                <h6>
+
+                                    {% if student.stream %}
+
+                                        {% if student.stream == "Other" %}
+
+                                            {{ student.other_stream }}
+
+                                        {% else %}
+
+                                            {{ student.stream }}
+
+                                        {% endif %}
+
+                                    {% else %}
+
+                                        -
+
+                                    {% endif %}
+
+                                </h6>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <div class="profile-info-box">
+
+                                <small>Abhyasika</small>
+
+                                <h6>
+
+                                    {{ student.abhyasika.name }}
+
+                                </h6>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
     
-    <p>
-        <strong>Parent Mobile:</strong>
-        {{ student.parent_mobile }}
-    </p>
+    <!-- =======================================================
+        INFORMATION SECTION
+    ======================================================= -->
 
-    <p>
-        <strong>Residential Address:</strong>
-        {{ student.address }}
-    </p>
+    <div class="row g-4 mb-4">
 
-    <p>
-        <strong>Admission Date:</strong>
-        {{ student.admission_date }}
-    </p>
+        <!-- Personal Information -->
 
-    <p>
-        <strong>Status:</strong>
-        {{ student.status }}
-    </p>
+        <div class="col-lg-6">
 
-    <p>
-        <strong>Abhyasika:</strong>
-        {{ student.abhyasika.name }}
-    </p>
+            <div class="card info-card h-100">
 
-    <hr>
+                <div class="card-header info-header">
 
-    <h2>Attendance</h2>
+                    <i class="bi bi-person-vcard-fill me-2"></i>
 
-    <p>No attendance records available.</p>
+                    Personal Information
 
-    <hr>
+                </div>
 
-    <h2>Teacher Remarks</h2>
+                <div class="card-body">
 
-    <p>No remarks available.</p>
+                    <div class="info-row">
 
-    <hr>
+                        <span>Gender</span>
 
-    <h2>Achievements</h2>
+                        <strong>{{ student.gender }}</strong>
 
-    <p>No achievements available.</p>
+                    </div>
 
-    <hr>
+                    <div class="info-row">
 
-    <p>
+                        <span>Date of Birth</span>
 
-        <a href="{{ url_for('student.edit_student', student_id=student.id) }}">
-            Edit Student
-        </a>
+                        <strong>{{ student.date_of_birth }}</strong>
 
-    </p>
+                    </div>
 
-    <a href="{{ url_for('student.view_students') }}">
-        Back to Students
-    </a>
+                    <div class="info-row">
 
-</body>
+                        <span>Status</span>
 
-</html>
+                        <span class="badge bg-success">
+
+                            {{ student.status }}
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Academic Information -->
+
+        <div class="col-lg-6">
+
+            <div class="card info-card h-100">
+
+                <div class="card-header info-header">
+
+                    <i class="bi bi-mortarboard-fill me-2"></i>
+
+                    Academic Information
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="info-row">
+
+                        <span>School / College</span>
+
+                        <strong>
+
+                            {{ student.school_college_name }}
+
+                        </strong>
+
+                    </div>
+
+                    <div class="info-row">
+
+                        <span>Standard</span>
+
+                        <strong>
+
+                            {{ student.standard }}
+
+                        </strong>
+
+                    </div>
+
+                    <div class="info-row">
+
+                        <span>Stream</span>
+
+                        <strong>
+
+                            {% if student.stream %}
+
+                                {% if student.stream == "Other" %}
+
+                                    {{ student.other_stream }}
+
+                                {% else %}
+
+                                    {{ student.stream }}
+
+                                {% endif %}
+
+                            {% else %}
+
+                                -
+
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+                    <div class="info-row">
+
+                        <span>Admission Date</span>
+
+                        <strong>
+
+                            {{ student.admission_date }}
+
+                        </strong>
+
+                    </div>
+
+                    <div class="info-row">
+
+                        <span>Abhyasika</span>
+
+                        <strong>
+
+                            {{ student.abhyasika.name }}
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Parent Information -->
+
+        <div class="col-lg-6">
+
+            <div class="card info-card h-100">
+
+                <div class="card-header info-header">
+
+                    <i class="bi bi-people-fill me-2"></i>
+
+                    Parent Information
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="info-row">
+
+                        <span>Parent Name</span>
+
+                        <strong>
+
+                            {{ student.parent_name }}
+
+                        </strong>
+
+                    </div>
+
+                    <div class="info-row">
+
+                        <span>Parent Mobile</span>
+
+                        <strong>
+
+                            {{ student.parent_mobile }}
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Address -->
+
+        <div class="col-lg-6">
+
+            <div class="card info-card h-100">
+
+                <div class="card-header info-header">
+
+                    <i class="bi bi-geo-alt-fill me-2"></i>
+
+                    Residential Address
+
+                </div>
+
+                <div class="card-body">
+
+                    <p class="mb-0">
+
+                        {{ student.address }}
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- =======================================================
+        ATTENDANCE SUMMARY
+    ======================================================= -->
+
+    <div class="card attendance-card mb-4">
+
+        <div class="card-header attendance-header">
+
+            <i class="bi bi-calendar-check-fill me-2"></i>
+
+            Attendance Summary
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row g-4">
+
+                <div class="col-md-4">
+
+                    <div class="attendance-box">
+
+                        <div class="attendance-icon present-icon">
+
+                            <i class="bi bi-check-circle-fill"></i>
+
+                        </div>
+
+                        <h3>
+
+                            0
+
+                        </h3>
+
+                        <p>
+
+                            Present Days
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div class="attendance-box">
+
+                        <div class="attendance-icon absent-icon">
+
+                            <i class="bi bi-x-circle-fill"></i>
+
+                        </div>
+
+                        <h3>
+
+                            0
+
+                        </h3>
+
+                        <p>
+
+                            Absent Days
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div class="attendance-box">
+
+                        <div class="attendance-icon percentage-icon">
+
+                            <i class="bi bi-graph-up-arrow"></i>
+
+                        </div>
+
+                        <h3>
+
+                            0%
+
+                        </h3>
+
+                        <p>
+
+                            Attendance Percentage
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- =======================================================
+        REMARKS & ACHIEVEMENTS
+    ======================================================= -->
+
+    <div class="row g-4 mb-4">
+
+        <!-- Teacher Remarks -->
+
+        <div class="col-lg-6">
+
+            <div class="card info-card h-100">
+
+                <div class="card-header info-header">
+
+                    <i class="bi bi-chat-left-text-fill me-2"></i>
+
+                    Teacher Remarks
+
+                </div>
+
+                <div class="card-body">
+
+                    {% if latest_remark %}
+
+                        <div class="remark-card">
+
+                            <p class="remark-text">
+
+                                {{ latest_remark.remark }}
+
+                            </p>
+
+                            <div class="remark-footer">
+
+                                <div>
+
+                                    <i class="bi bi-person-fill me-1"></i>
+
+                                    {{ latest_remark.teacher.name }}
+
+                                </div>
+
+                                <div>
+
+                                    <i class="bi bi-calendar-event me-1"></i>
+
+                                    {{ latest_remark.created_at.strftime("%d %b %Y") }}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="empty-state">
+
+                            <i class="bi bi-chat-square-text"></i>
+
+                            <h5>
+
+                                No Remarks Available
+
+                            </h5>
+
+                            <p>
+
+                                No teacher has added a remark yet.
+
+                            </p>
+
+                        </div>
+
+                    {% endif %}
+
+                    {% if current_user.role == "teacher" %}
+
+                        <div class="mt-4">
+
+                            <a
+
+                                href="{{ url_for('remark.manage_remark', student_id=student.id) }}"
+
+                                class="btn btn-primary"
+
+                            >
+
+                                <i class="bi bi-pencil-square me-2"></i>
+
+                                {% if latest_remark %}
+
+                                    Edit Remark
+
+                                {% else %}
+
+                                    Add Remark
+
+                                {% endif %}
+
+                            </a>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Achievements -->
+
+        <div class="col-lg-6">
+
+            <div class="card info-card h-100">
+
+                <div class="card-header info-header">
+
+                    <i class="bi bi-trophy-fill me-2"></i>
+
+                    Achievements
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="empty-state">
+
+                        <i class="bi bi-award"></i>
+
+                        <h5>
+
+                            No Achievements
+
+                        </h5>
+
+                        <p>
+
+                            Student achievements will appear here in future.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- =======================================================
+        ACTION BUTTONS
+    ======================================================= -->
+
+    <div class="card action-card mb-4">
+
+        <div class="card-body">
+
+            <div class="d-flex flex-column flex-md-row justify-content-end gap-3">
+
+                <a
+                    href="{{ url_for('student.view_students') }}"
+                    class="btn btn-outline-secondary btn-lg"
+                >
+
+                    <i class="bi bi-arrow-left me-2"></i>
+
+                    Back to Students
+
+                </a>
+
+                <a
+                    href="{{ url_for('student.edit_student', student_id=student.id) }}"
+                    class="btn btn-primary btn-lg"
+                >
+
+                    <i class="bi bi-pencil-square me-2"></i>
+
+                    Edit Student
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+{% endblock %}

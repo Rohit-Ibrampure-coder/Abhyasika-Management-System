@@ -24,6 +24,10 @@ from constants import (
     STREAMS,
     STUDENT_STATUS
 )
+from models.remark import Remark
+from models.teacher_abhyasika import TeacherAbhyasika
+from models.attendance import Attendance
+from models.achievement import Achievement
 
 student_bp = Blueprint(
     "student",
@@ -335,19 +339,44 @@ def view_students():
         student_status=STUDENT_STATUS,
     )
 
-@student_bp.route(
-    "/students/<int:student_id>"
-)
+@student_bp.route("/student/<int:student_id>")
 @login_required
 def student_profile(student_id):
 
-    student = Student.query.get_or_404(
-        student_id
-    )
+    student = Student.query.get_or_404(student_id)
+
+    latest_remark = Remark.query.filter_by(
+        student_id=student.id
+    ).order_by(
+        Remark.created_at.desc()
+    ).first()
+
+    # -----------------------------------------
+    # Check Remark Permission
+    # -----------------------------------------
+
+    can_manage_remark = False
+
+    if current_user.role == "admin":
+
+        can_manage_remark = False
+
+    elif current_user.role == "teacher":
+
+        assignment = TeacherAbhyasika.query.filter_by(
+            teacher_id=current_user.id,
+            abhyasika_id=student.abhyasika_id
+        ).first()
+
+        if assignment:
+            can_manage_remark = True
 
     return render_template(
+
         "student/student_profile.html",
-        student=student
+        student=student,
+        latest_remark=latest_remark,
+        can_manage_remark=can_manage_remark
     )
 
 @student_bp.route(
@@ -530,4 +559,54 @@ def edit_student(student_id):
         streams=STREAMS,
 
         student_status=STUDENT_STATUS
+    )
+
+@student_bp.route(
+    "/students/<int:student_id>/delete",
+    methods=["GET", "POST"]
+)
+@login_required
+def delete_student(student_id):
+
+    if current_user.role != "admin":
+        abort(403)
+
+    student = Student.query.get_or_404(student_id)
+
+    if request.method == "POST":
+
+        db.session.delete(student)
+
+        db.session.commit()
+
+        flash(
+
+            f'Student "{student.student_name}" and all related records were deleted successfully.',
+
+            "success"
+
+        )
+
+        return redirect(
+
+            url_for(
+
+                "student.view_students"
+
+            )
+
+        )
+
+    return render_template(
+
+        "student/delete_student.html",
+
+        student=student,
+
+        attendance_count=len(student.attendance_records),
+
+        remark_count=len(student.remarks),
+
+        achievement_count=len(student.achievements)
+
     )

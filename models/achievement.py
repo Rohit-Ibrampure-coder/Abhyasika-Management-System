@@ -23,3 +23,8 @@ class Achievement(db.Model):
         db.DateTime,
         server_default=db.func.now()
     )
+
+    student = db.relationship(
+        "Student",
+        back_populates="achievements"
+    )

@@ -95,6 +95,27 @@ class Student(db.Model):
         server_default=db.func.now()
     )
 
+    # Attendance Relationship
+    attendance_records = db.relationship(
+        "Attendance",
+        back_populates="student",
+        cascade="all, delete-orphan"
+    )
+
+    # Remark Relationship
+    remarks = db.relationship(
+        "Remark",
+        back_populates="student",
+        cascade="all, delete-orphan"
+    )
+
+    # Achievement Relationship
+    achievements = db.relationship(
+        "Achievement",
+        back_populates="student",
+        cascade="all, delete-orphan"
+    )
+
     def __repr__(self):
         return f"<Student {self.student_name}>"
     

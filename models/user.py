@@ -18,7 +18,6 @@ class User(UserMixin,db.Model):
         nullable=False
     )
     
-
     email = db.Column(
         db.String(120),
         unique=True
@@ -38,6 +37,12 @@ class User(UserMixin,db.Model):
     created_at = db.Column(
         db.DateTime,
         server_default=db.func.now()
+    )
+
+    teacher_assignments = db.relationship(
+        "TeacherAbhyasika",
+        back_populates="teacher",
+        cascade="all, delete-orphan"
     )
 
     def __repr__(self):

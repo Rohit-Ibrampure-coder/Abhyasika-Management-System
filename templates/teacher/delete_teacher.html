@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block title %}
+Delete Teacher
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <h2 class="page-title">
+
+        Delete Teacher
+
+    </h2>
+
+    <p class="page-subtitle">
+
+        Please review the information before deleting this teacher.
+
+    </p>
+
+</div>
+
+
+<div class="card form-card">
+
+    <div class="card-body">
+
+        <div class="alert alert-danger">
+
+            <h5 class="mb-2">
+
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+
+                Warning
+
+            </h5>
+
+            <p class="mb-0">
+
+                This action cannot be undone.
+
+            </p>
+
+        </div>
+
+        <table class="table">
+
+            <tr>
+
+                <th width="220">
+
+                    Teacher Name
+
+                </th>
+
+                <td>
+
+                    {{ teacher.name }}
+
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <th>
+
+                    Username
+
+                </th>
+
+                <td>
+
+                    {{ teacher.username }}
+
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <th>
+
+                    Email
+
+                </th>
+
+                <td>
+
+                    {{ teacher.email }}
+
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <th>
+
+                    Mobile
+
+                </th>
+
+                <td>
+
+                    {{ teacher.mobile }}
+
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <th>
+
+                    Assigned Abhyasikas
+
+                </th>
+
+                <td>
+
+                    {% if teacher.teacher_assignments %}
+
+                        {% for assignment in teacher.teacher_assignments %}
+
+                            <span class="badge bg-primary me-2">
+
+                                {{ assignment.abhyasika.name }}
+
+                            </span>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <span class="text-muted">
+
+                            No Assignment
+
+                        </span>
+
+                    {% endif %}
+
+                </td>
+
+            </tr>
+
+        </table>
+
+        <hr>
+
+        <h5>
+
+            What will happen?
+
+        </h5>
+
+        <ul>
+
+            <li>
+
+                Teacher account will be deleted.
+
+            </li>
+
+            <li>
+
+                Teacher ↔ Abhyasika assignments will be removed.
+
+            </li>
+
+            <li>
+
+                Abhyasika records will remain safe.
+
+            </li>
+
+        </ul>
+
+        <form method="POST">
+
+            <div class="d-flex justify-content-end gap-3 mt-4">
+
+                <a
+                    href="{{ url_for('teacher_management.view_teachers') }}"
+                    class="btn btn-outline-secondary"
+                >
+
+                    Cancel
+
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn btn-danger"
+                >
+
+                    <i class="bi bi-trash me-2"></i>
+
+                    Delete Teacher
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

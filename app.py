@@ -10,6 +10,7 @@ from routes.teacher_management import teacher_management_bp
 from routes.teacher_assignment import teacher_assignment_bp
 from routes.student import student_bp
 from routes.attendance import attendance_bp
+from routes.remark import remark_bp
 
 from branding import (
     APP_NAME,
@@ -64,6 +65,7 @@ app.register_blueprint(teacher_management_bp)
 app.register_blueprint(teacher_assignment_bp)
 app.register_blueprint(student_bp)
 app.register_blueprint(attendance_bp)
+app.register_blueprint(remark_bp)
 
 
 
@@ -72,4 +74,4 @@ def home():
     return "AMIS Running Successfully"
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)

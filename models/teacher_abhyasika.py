@@ -27,7 +27,7 @@ class TeacherAbhyasika(db.Model):
 
     teacher = db.relationship(
         "User",
-        backref="teacher_assignments"
+        back_populates="teacher_assignments"
     )
 
     abhyasika = db.relationship(

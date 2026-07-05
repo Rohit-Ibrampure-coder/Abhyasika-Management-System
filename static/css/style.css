@@ -4700,3 +4700,625 @@ TABLE FOOTER
     gap:8px;
 
 }
+
+/*==================================================
+SELECT ABHYASIKA
+==================================================*/
+
+.selection-wrapper{
+
+    min-height:100vh;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:40px 20px;
+
+}
+
+.selection-card{
+
+    width:100%;
+
+    max-width:650px;
+
+    background:#ffffff;
+
+    border-radius:28px;
+
+    padding:45px;
+
+    box-shadow:0 20px 60px rgba(15,23,42,.08);
+
+    border:1px solid #e5e7eb;
+
+}
+
+.selection-logo{
+
+    width:90px;
+
+    height:90px;
+
+    margin:0 auto 25px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:#f8fafc;
+
+    border-radius:24px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.06);
+
+}
+
+.selection-logo img{
+
+    width:60px;
+
+    height:60px;
+
+    object-fit:contain;
+
+}
+
+.selection-title{
+
+    text-align:center;
+
+    font-size:2rem;
+
+    font-weight:700;
+
+    color:var(--primary-color);
+
+    margin-bottom:8px;
+
+}
+
+.selection-subtitle{
+
+    text-align:center;
+
+    color:#64748b;
+
+    margin-bottom:28px;
+
+}
+
+.selection-info{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    background:#eef4ff;
+
+    color:#2563eb;
+
+    border:1px solid #dbeafe;
+
+    border-radius:14px;
+
+    padding:14px 18px;
+
+    margin-bottom:28px;
+
+    font-weight:500;
+
+}
+
+.abhyasika-option{
+
+    display:block;
+
+    margin-bottom:18px;
+
+    cursor:pointer;
+
+}
+
+.abhyasika-option input{
+
+    display:none;
+
+}
+
+.option-content{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:22px;
+
+    border:2px solid #e5e7eb;
+
+    border-radius:18px;
+
+    transition:.25s;
+
+    background:#fff;
+
+}
+
+.option-content h5{
+
+    margin-bottom:4px;
+
+    font-size:1.1rem;
+
+    font-weight:600;
+
+    color:#1e293b;
+
+}
+
+.option-content small{
+
+    color:#64748b;
+
+}
+
+.option-content i{
+
+    font-size:1.8rem;
+
+    color:#94a3b8;
+
+}
+
+.abhyasika-option:hover .option-content{
+
+    border-color:#3b82f6;
+
+    transform:translateY(-2px);
+
+    box-shadow:0 12px 30px rgba(59,130,246,.08);
+
+}
+
+.abhyasika-option input:checked + .option-content{
+
+    border-color:var(--primary-color);
+
+    background:#eff6ff;
+
+    box-shadow:0 0 0 4px rgba(37,99,235,.12);
+
+}
+
+.abhyasika-option input:checked + .option-content i{
+
+    color:var(--primary-color);
+
+}
+
+@media(max-width:768px){
+
+.selection-card{
+
+    padding:30px 22px;
+
+}
+
+.selection-title{
+
+    font-size:1.6rem;
+
+}
+
+}
+
+/*==================================================
+PAGE HEADER
+==================================================*/
+
+.page-header{
+
+    margin-bottom:30px;
+
+}
+
+.page-title{
+
+    font-size:2rem;
+
+    font-weight:700;
+
+    color:var(--primary-color);
+
+    margin-bottom:8px;
+
+}
+
+.page-subtitle{
+
+    color:#64748b;
+
+    font-size:.98rem;
+
+}
+
+/*==================================================
+STUDENT PROFILE CARD
+==================================================*/
+
+.profile-card{
+
+    border:none;
+
+    border-radius:22px;
+
+    box-shadow:0 15px 35px rgba(15,23,42,.08);
+
+}
+
+.profile-avatar{
+
+    width:140px;
+
+    height:140px;
+
+    margin:auto;
+
+    border-radius:50%;
+
+    background:linear-gradient(135deg,#2563eb,#3b82f6);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    color:#fff;
+
+    font-size:4rem;
+
+}
+
+.profile-name{
+
+    font-size:2rem;
+
+    font-weight:700;
+
+    color:#1e293b;
+
+    margin-bottom:10px;
+
+}
+
+.profile-school{
+
+    color:#64748b;
+
+    margin-bottom:20px;
+
+}
+
+.profile-info-box{
+
+    background:#f8fafc;
+
+    border-radius:14px;
+
+    padding:18px;
+
+    border:1px solid #e2e8f0;
+
+}
+
+.profile-info-box small{
+
+    color:#64748b;
+
+    display:block;
+
+    margin-bottom:6px;
+
+}
+
+.profile-info-box h6{
+
+    margin:0;
+
+    font-size:1rem;
+
+    font-weight:600;
+
+    color:#1e293b;
+
+}
+
+/*==================================================
+INFORMATION CARDS
+==================================================*/
+
+.info-card{
+
+    border:none;
+
+    border-radius:20px;
+
+    box-shadow:0 10px 30px rgba(15,23,42,.06);
+
+}
+
+.info-header{
+
+    background:#f8fafc;
+
+    border-bottom:1px solid #e2e8f0;
+
+    font-weight:600;
+
+    color:#1e293b;
+
+    padding:16px 20px;
+
+}
+
+.info-row{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:14px 0;
+
+    border-bottom:1px solid #edf2f7;
+
+}
+
+.info-row:last-child{
+
+    border-bottom:none;
+
+}
+
+.info-row span:first-child{
+
+    color:#64748b;
+
+    font-weight:500;
+
+}
+
+.info-row strong{
+
+    color:#1e293b;
+
+    font-weight:600;
+
+}
+
+/*==================================================
+ATTENDANCE SUMMARY
+==================================================*/
+
+.attendance-card{
+
+    border:none;
+
+    border-radius:20px;
+
+    box-shadow:0 10px 30px rgba(15,23,42,.06);
+
+}
+
+.attendance-header{
+
+    background:#f8fafc;
+
+    font-weight:600;
+
+    color:#1e293b;
+
+    border-bottom:1px solid #e2e8f0;
+
+    padding:16px 20px;
+
+}
+
+.attendance-box{
+
+    background:#fff;
+
+    border:1px solid #e5e7eb;
+
+    border-radius:18px;
+
+    padding:30px 20px;
+
+    text-align:center;
+
+    transition:.3s;
+
+}
+
+.attendance-box:hover{
+
+    transform:translateY(-5px);
+
+    box-shadow:0 15px 35px rgba(37,99,235,.08);
+
+}
+
+.attendance-icon{
+
+    width:65px;
+
+    height:65px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    margin:0 auto 18px;
+
+    font-size:1.6rem;
+
+    color:#fff;
+
+}
+
+.present-icon{
+
+    background:#16a34a;
+
+}
+
+.absent-icon{
+
+    background:#dc2626;
+
+}
+
+.percentage-icon{
+
+    background:#2563eb;
+
+}
+
+.attendance-box h3{
+
+    font-size:2rem;
+
+    font-weight:700;
+
+    color:#1e293b;
+
+}
+
+.attendance-box p{
+
+    margin:0;
+
+    color:#64748b;
+
+}
+
+/*==================================================
+EMPTY STATE
+==================================================*/
+
+.empty-state{
+
+    text-align:center;
+
+    padding:40px 20px;
+
+}
+
+.empty-state i{
+
+    font-size:3rem;
+
+    color:#2563eb;
+
+    margin-bottom:20px;
+
+}
+
+.empty-state h5{
+
+    font-weight:600;
+
+    color:#1e293b;
+
+    margin-bottom:10px;
+
+}
+
+.empty-state p{
+
+    color:#64748b;
+
+    margin-bottom:0;
+
+}
+
+/*==================================================
+ACTION CARD
+==================================================*/
+
+.action-card{
+
+    border:none;
+
+    border-radius:20px;
+
+    box-shadow:0 10px 30px rgba(15,23,42,.06);
+
+}
+
+.action-card .card-body{
+
+    padding:24px;
+
+}
+
+/*==================================================
+REMARK CARD
+==================================================*/
+
+.remark-card{
+
+    background:#f8fafc;
+
+    border-left:4px solid var(--primary-color);
+
+    padding:20px;
+
+    border-radius:12px;
+
+}
+
+.remark-text{
+
+    font-size:1rem;
+
+    color:#1e293b;
+
+    margin-bottom:20px;
+
+    line-height:1.7;
+
+}
+
+.remark-footer{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    color:#64748b;
+
+    font-size:.9rem;
+
+    border-top:1px solid #e2e8f0;
+
+    padding-top:15px;
+
+}
