@@ -1,7 +1,12 @@
 from models import db
 
+
 class Student(db.Model):
     __tablename__ = "students"
+
+    # ==========================================
+    # Basic Information
+    # ==========================================
 
     id = db.Column(
         db.Integer,
@@ -63,10 +68,17 @@ class Student(db.Model):
         nullable=False
     )
 
+    # ==========================================
     # Student Photo
+    # ==========================================
+
     photo = db.Column(
         db.String(255)
     )
+
+    # ==========================================
+    # Abhyasika
+    # ==========================================
 
     abhyasika_id = db.Column(
         db.Integer,
@@ -75,6 +87,15 @@ class Student(db.Model):
         ),
         nullable=False
     )
+
+    abhyasika = db.relationship(
+        "Abhyasika",
+        back_populates="students"
+    )
+
+    # ==========================================
+    # Admission Details
+    # ==========================================
 
     admission_date = db.Column(
         db.Date
@@ -95,28 +116,39 @@ class Student(db.Model):
         server_default=db.func.now()
     )
 
+    # ==========================================
     # Attendance Relationship
+    # ==========================================
+
     attendance_records = db.relationship(
         "Attendance",
         back_populates="student",
         cascade="all, delete-orphan"
     )
 
+    # ==========================================
     # Remark Relationship
+    # ==========================================
+
     remarks = db.relationship(
         "Remark",
         back_populates="student",
         cascade="all, delete-orphan"
     )
 
+    # ==========================================
     # Achievement Relationship
+    # ==========================================
+
     achievements = db.relationship(
         "Achievement",
         back_populates="student",
         cascade="all, delete-orphan"
     )
 
+    # ==========================================
+    # String Representation
+    # ==========================================
+
     def __repr__(self):
         return f"<Student {self.student_name}>"
-    
-    

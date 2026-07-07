@@ -1,53 +1,323 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Add Abhyasika</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-<h1>Add Abhyasika</h1>
+{% block title %}
 
-<form method="POST">
+Add Abhyasika
 
-    <p>
-        Name:
-        <input
-            type="text"
-            name="name"
-            required
+{% endblock %}
+
+{% block content %}
+
+<!-- =======================================================
+PAGE HEADER
+======================================================= -->
+
+<div class="page-header">
+
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+
+        <div>
+
+            <h1 class="page-title">
+
+                <i class="bi bi-building-add me-2"></i>
+
+                Add Abhyasika
+
+            </h1>
+
+            <p class="page-subtitle mb-0">
+
+                Create a new Abhyasika for Shri Laxmikeshav Pratisthan.
+
+            </p>
+
+        </div>
+
+        <a
+            href="{{ url_for('admin.view_abhyasikas') }}"
+            class="btn btn-outline-secondary"
         >
-    </p>
 
-    <p>
-        Location:
-        <input
-            type="text"
-            name="location"
-        >
-    </p>
+            <i class="bi bi-arrow-left me-2"></i>
 
-    <p>
-        Type:
+            Back
 
-        <select name="type">
+        </a>
 
-            <option value="daily">
-                Daily
-            </option>
+    </div>
 
-            <option value="weekly">
-                Weekly
-            </option>
+</div>
 
-        </select>
+<!-- =======================================================
+INFORMATION CARD
+======================================================= -->
 
-    </p>
+<div class="card border-0 shadow-sm mb-4">
 
-    <button type="submit">
-        Save
-    </button>
+    <div class="card-body">
 
-</form>
+        <div class="d-flex">
 
-</body>
-</html>
+            <div class="me-3">
+
+                <i class="bi bi-info-circle-fill fs-2 text-primary"></i>
+
+            </div>
+
+            <div>
+
+                <h5 class="mb-2">
+
+                    Abhyasika Information
+
+                </h5>
+
+                <p class="text-muted mb-0">
+
+                    Enter the details of the Abhyasika. These details are
+                    used for assigning teachers, students, attendance,
+                    achievements and other academic records.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- =======================================================
+FORM
+======================================================= -->
+
+<div class="card border-0 shadow-sm">
+
+    <div class="card-header bg-white">
+
+        <h5 class="mb-0">
+
+            <i class="bi bi-pencil-square me-2"></i>
+
+            Abhyasika Details
+
+        </h5>
+
+    </div>
+
+    <div class="card-body">
+
+        <form method="POST">
+
+            <div class="row">
+
+                <!-- Name -->
+
+                <div class="col-lg-6 mb-4">
+
+                    <label class="form-label fw-semibold">
+
+                        Abhyasika Name
+
+                        <span class="text-danger">*</span>
+
+                    </label>
+
+                    <input
+                        type="text"
+                        name="name"
+                        class="form-control"
+                        maxlength="100"
+                        placeholder="Enter Abhyasika Name"
+                        required
+                        autofocus
+                    >
+
+                </div>
+
+                <!-- Location -->
+
+                <div class="col-lg-6 mb-4">
+
+                    <label class="form-label fw-semibold">
+
+                        Location
+
+                    </label>
+
+                    <input
+                        type="text"
+                        name="location"
+                        class="form-control"
+                        maxlength="150"
+                        placeholder="Enter Location"
+                    >
+
+                </div>
+
+                <!-- Type -->
+
+                <div class="col-lg-4 mb-4">
+
+                    <label class="form-label fw-semibold">
+
+                        Type
+
+                        <span class="text-danger">*</span>
+
+                    </label>
+
+                    <select
+                        name="type"
+                        class="form-select"
+                        required
+                    >
+
+                        <option value="">
+
+                            Select Type
+
+                        </option>
+
+                        <option value="daily">
+
+                            Daily
+
+                        </option>
+
+                        <option value="weekly">
+
+                            Weekly
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <!-- Start Time -->
+
+                <div class="col-lg-4 mb-4">
+
+                    <label class="form-label fw-semibold">
+
+                        Start Time
+
+                        <span class="text-danger">*</span>
+
+                    </label>
+
+                    <input
+                        type="time"
+                        name="start_time"
+                        class="form-control"
+                        required
+                    >
+
+                </div>
+
+                <!-- End Time -->
+
+                <div class="col-lg-4 mb-4">
+
+                    <label class="form-label fw-semibold">
+
+                        End Time
+
+                        <span class="text-danger">*</span>
+
+                    </label>
+
+                    <input
+                        type="time"
+                        name="end_time"
+                        class="form-control"
+                        required
+                    >
+
+                </div>
+
+                <!-- Status -->
+
+                <div class="col-lg-4 mb-4">
+
+                    <label class="form-label fw-semibold">
+
+                        Status
+
+                        <span class="text-danger">*</span>
+
+                    </label>
+
+                    <select
+                        name="status"
+                        class="form-select"
+                        required
+                    >
+
+                        <option value="Active" selected>
+
+                            Active
+
+                        </option>
+
+                        <option value="Inactive">
+
+                            Inactive
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <hr>
+
+            <div class="d-flex justify-content-end gap-2">
+
+                <a
+                    href="{{ url_for('admin.view_abhyasikas') }}"
+                    class="btn btn-outline-secondary"
+                >
+
+                    <i class="bi bi-x-circle me-2"></i>
+
+                    Cancel
+
+                </a>
+
+                <button
+                    type="reset"
+                    class="btn btn-outline-warning"
+                >
+
+                    <i class="bi bi-arrow-counterclockwise me-2"></i>
+
+                    Reset
+
+                </button>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+
+                    <i class="bi bi-check-circle me-2"></i>
+
+                    Save Abhyasika
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

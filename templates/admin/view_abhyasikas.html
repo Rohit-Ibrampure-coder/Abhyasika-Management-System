@@ -1,37 +1,302 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Abhyasikas</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-<h1>Abhyasikas</h1>
+{% block title %}
 
-<a href="/admin/abhyasika/add">
-    Add New Abhyasika
-</a>
+View Abhyasikas
 
-<hr>
+{% endblock %}
 
-{% for abhyasika in abhyasikas %}
+{% block content %}
 
-<p>
-    {{ abhyasika.name }}
-    -
-    {{ abhyasika.location }}
-    -
-    {{ abhyasika.type }}
+<!-- =======================================================
+PAGE HEADER
+======================================================= -->
 
-    <a href="/admin/abhyasika/edit/{{ abhyasika.id }}">
-        Edit
-    </a>
+<div class="page-header">
 
-    <a href="/admin/abhyasika/delete/{{ abhyasika.id }}">
-        Delete
-    </a>
-</p>
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
 
-{% endfor %}
+        <div>
 
-</body>
-</html>
+            <h1 class="page-title">
+
+                <i class="bi bi-building-fill me-2"></i>
+
+                Abhyasikas
+
+            </h1>
+
+            <p class="page-subtitle mb-0">
+
+                Manage all Abhyasikas of the organisation.
+
+            </p>
+
+        </div>
+
+        <a
+            href="{{ url_for('admin.add_abhyasika') }}"
+            class="btn btn-primary"
+        >
+
+            <i class="bi bi-plus-circle me-2"></i>
+
+            Add Abhyasika
+
+        </a>
+
+    </div>
+
+</div>
+
+<!-- =======================================================
+SEARCH CARD
+======================================================= -->
+
+<div class="card mb-4">
+
+    <div class="card-body">
+
+        <form method="GET">
+
+            <div class="row g-3">
+
+                <div class="col-lg-10">
+
+                    <input
+                        type="text"
+                        name="search"
+                        class="form-control"
+                        placeholder="Search by Name, Location or Type..."
+                        value="{{ search }}"
+                    >
+
+                </div>
+
+                <div class="col-lg-2 d-grid">
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+
+                        <i class="bi bi-search me-2"></i>
+
+                        Search
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- =======================================================
+TABLE CARD
+======================================================= -->
+
+<div class="card">
+
+    <div class="card-header d-flex justify-content-between align-items-center">
+
+        <h5 class="mb-0">
+
+            Abhyasika List
+
+        </h5>
+
+        <span class="badge bg-primary">
+
+            Total :
+
+            {{ abhyasikas|length }}
+
+        </span>
+
+    </div>
+
+    <div class="card-body">
+
+        {% if abhyasikas %}
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Name</th>
+
+                        <th>Location</th>
+
+                        <th>Type</th>
+
+                        <th class="text-center">
+
+                            Students
+
+                        </th>
+
+                        <th class="text-center">
+
+                            Actions
+
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for abhyasika in abhyasikas %}
+
+                    <tr>
+
+                        <td>
+
+                            <strong>
+
+                                {{ abhyasika.name }}
+
+                            </strong>
+
+                        </td>
+
+                        <td>
+
+                            {{ abhyasika.location or "-" }}
+
+                        </td>
+
+                        <td>
+
+                            {% if abhyasika.type == "daily" %}
+
+                                <span class="badge bg-success">
+
+                                    Daily
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-info">
+
+                                    Weekly
+
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td class="text-center">
+
+                            <span class="badge bg-secondary">
+
+                                {{ abhyasika.students|length }}
+
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            <div class="table-actions justify-content-center">
+
+                                <!-- View (Future) -->
+
+                                <button
+                                    class="btn btn-icon btn-outline"
+                                    disabled
+                                    title="Coming Soon"
+                                >
+
+                                    <i class="bi bi-eye"></i>
+
+                                </button>
+
+                                <!-- Edit -->
+
+                                <a
+                                    href="{{ url_for('admin.edit_abhyasika', id=abhyasika.id) }}"
+                                    class="btn btn-icon btn-warning"
+                                    title="Edit"
+                                >
+
+                                    <i class="bi bi-pencil"></i>
+
+                                </a>
+
+                                <!-- Delete -->
+
+                                <a
+                                    href="{{ url_for('admin.delete_abhyasika', id=abhyasika.id) }}"
+                                    class="btn btn-icon btn-danger"
+                                    title="Delete"
+                                >
+
+                                    <i class="bi bi-trash"></i>
+
+                                </a>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-state">
+
+            <i class="bi bi-building display-3"></i>
+
+            <h4>
+
+                No Abhyasikas Found
+
+            </h4>
+
+            <p>
+
+                There are no Abhyasikas available.
+
+            </p>
+
+            <a
+                href="{{ url_for('admin.add_abhyasika') }}"
+                class="btn btn-primary"
+            >
+
+                <i class="bi bi-plus-circle me-2"></i>
+
+                Add First Abhyasika
+
+            </a>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

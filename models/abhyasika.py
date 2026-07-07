@@ -1,9 +1,13 @@
 from models import db
 
+
 class Abhyasika(db.Model):
     __tablename__ = "abhyasikas"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
     name = db.Column(
         db.String(100),
@@ -24,13 +28,42 @@ class Abhyasika(db.Model):
         db.ForeignKey("users.id")
     )
 
-    students = db.relationship(
-        "Student",
-        backref="abhyasika",
-        lazy=True
+    start_time = db.Column(
+        db.Time,
+        nullable=True
+    )
+
+    end_time = db.Column(
+        db.Time,
+        nullable=True
+    )
+
+    status = db.Column(
+        db.Enum(
+            "Active",
+            "Inactive"
+        ),
+        nullable=False,
+        default="Active"
     )
 
     created_at = db.Column(
         db.DateTime,
         server_default=db.func.now()
+    )
+
+    # ==========================================
+    # Relationships
+    # ==========================================
+
+    students = db.relationship(
+        "Student",
+        back_populates="abhyasika",
+        cascade="all, delete-orphan"
+    )
+
+    teacher_assignments = db.relationship(
+        "TeacherAbhyasika",
+        back_populates="abhyasika",
+        cascade="all, delete-orphan"
     )

@@ -1,5 +1,6 @@
 from models import db
 
+
 class TeacherAbhyasika(db.Model):
     __tablename__ = "teacher_abhyasika"
 
@@ -25,6 +26,10 @@ class TeacherAbhyasika(db.Model):
         server_default=db.func.now()
     )
 
+    # ==========================================
+    # Relationships
+    # ==========================================
+
     teacher = db.relationship(
         "User",
         back_populates="teacher_assignments"
@@ -32,5 +37,5 @@ class TeacherAbhyasika(db.Model):
 
     abhyasika = db.relationship(
         "Abhyasika",
-        backref="teacher_assignments"
+        back_populates="teacher_assignments"
     )

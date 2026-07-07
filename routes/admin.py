@@ -4,7 +4,8 @@ from flask import (
     request,
     redirect,
     url_for,
-    render_template
+    render_template,
+    flash
 )
 
 from flask_login import (
@@ -20,7 +21,11 @@ from models.student import Student
 from models.user import User
 from models.abhyasika import Abhyasika
 from models.attendance import Attendance
-
+from models.student import Student
+from models.attendance import Attendance
+from models.remark import Remark
+from models.achievement import Achievement
+from models.teacher_abhyasika import TeacherAbhyasika
 
 admin_bp = Blueprint(
     "admin",
@@ -177,29 +182,110 @@ def admin_dashboard():
 @login_required
 def add_abhyasika():
 
+    # ==========================================
+    # Permission Check
+    # ==========================================
+
     if current_user.role != "admin":
         abort(403)
 
+    # ==========================================
+    # Form Submission
+    # ==========================================
+
     if request.method == "POST":
 
-        name = request.form.get("name")
-        location = request.form.get("location")
-        type = request.form.get("type")
+        name = request.form.get(
+            "name",
+            ""
+        ).strip()
 
-        abhyasika = Abhyasika(
-            name=name,
-            location=location,
-            type=type
+        location = request.form.get(
+            "location",
+            ""
+        ).strip()
+
+        type = request.form.get(
+            "type"
         )
 
-        db.session.add(abhyasika)
+        start_time = request.form.get(
+            "start_time"
+        )
+
+        end_time = request.form.get(
+            "end_time"
+        )
+
+        status = request.form.get(
+            "status"
+        )
+
+        # ==========================================
+        # Validation
+        # ==========================================
+
+        existing_abhyasika = Abhyasika.query.filter_by(
+            name=name
+        ).first()
+
+        if existing_abhyasika:
+
+            flash(
+                "An Abhyasika with this name already exists.",
+                "danger"
+            )
+
+            return redirect(
+                url_for(
+                    "admin.add_abhyasika"
+                )
+            )
+
+        # ==========================================
+        # Create Abhyasika
+        # ==========================================
+
+        abhyasika = Abhyasika(
+
+            name=name,
+
+            location=location,
+
+            type=type,
+
+            start_time=start_time,
+
+            end_time=end_time,
+
+            status=status
+
+        )
+
+        db.session.add(
+            abhyasika
+        )
+
         db.session.commit()
+
+        # ==========================================
+        # Success Message
+        # ==========================================
+
+        flash(
+            "Abhyasika added successfully.",
+            "success"
+        )
 
         return redirect(
             url_for(
                 "admin.view_abhyasikas"
             )
         )
+
+    # ==========================================
+    # Load Page
+    # ==========================================
 
     return render_template(
         "admin/add_abhyasika.html"
@@ -214,11 +300,37 @@ def view_abhyasikas():
     if current_user.role != "admin":
         abort(403)
 
-    abhyasikas = Abhyasika.query.all()
+    search = request.args.get(
+        "search",
+        ""
+    )
+
+    abhyasikas = Abhyasika.query
+
+    if search:
+
+        abhyasikas = abhyasikas.filter(
+
+            (Abhyasika.name.ilike(f"%{search}%")) |
+
+            (Abhyasika.location.ilike(f"%{search}%")) |
+
+            (Abhyasika.type.ilike(f"%{search}%"))
+
+        )
+
+    abhyasikas = abhyasikas.order_by(
+        Abhyasika.name
+    ).all()
 
     return render_template(
+
         "admin/view_abhyasikas.html",
-        abhyasikas=abhyasikas
+
+        abhyasikas=abhyasikas,
+
+        search=search
+
     )
 
 @admin_bp.route(
@@ -228,22 +340,101 @@ def view_abhyasikas():
 @login_required
 def edit_abhyasika(id):
 
+    # ==========================================
+    # Permission Check
+    # ==========================================
+
     if current_user.role != "admin":
         abort(403)
 
+    # ==========================================
+    # Get Abhyasika
+    # ==========================================
+
     abhyasika = Abhyasika.query.get_or_404(id)
+
+    # ==========================================
+    # Form Submission
+    # ==========================================
 
     if request.method == "POST":
 
-        abhyasika.name = request.form.get("name")
-        abhyasika.location = request.form.get("location")
-        abhyasika.type = request.form.get("type")
+        name = request.form.get(
+            "name",
+            ""
+        ).strip()
+
+        location = request.form.get(
+            "location",
+            ""
+        ).strip()
+
+        type = request.form.get(
+            "type"
+        )
+
+        start_time = request.form.get(
+            "start_time"
+        )
+
+        end_time = request.form.get(
+            "end_time"
+        )
+
+        status = request.form.get(
+            "status"
+        )
+
+        # ==========================================
+        # Duplicate Name Validation
+        # ==========================================
+
+        existing = Abhyasika.query.filter(
+            Abhyasika.name == name,
+            Abhyasika.id != id
+        ).first()
+
+        if existing:
+
+            flash(
+                "An Abhyasika with this name already exists.",
+                "danger"
+            )
+
+            return redirect(
+                url_for(
+                    "admin.edit_abhyasika",
+                    id=id
+                )
+            )
+
+        # ==========================================
+        # Update Data
+        # ==========================================
+
+        abhyasika.name = name
+        abhyasika.location = location
+        abhyasika.type = type
+        abhyasika.start_time = start_time
+        abhyasika.end_time = end_time
+        abhyasika.status = status
 
         db.session.commit()
 
-        return redirect(
-            url_for("admin.view_abhyasikas")
+        flash(
+            "Abhyasika updated successfully.",
+            "success"
         )
+
+        return redirect(
+            url_for(
+                "admin.view_abhyasikas"
+            )
+        )
+
+    # ==========================================
+    # Load Page
+    # ==========================================
 
     return render_template(
         "admin/edit_abhyasika.html",
@@ -251,19 +442,84 @@ def edit_abhyasika(id):
     )
 
 @admin_bp.route(
-    "/admin/abhyasika/delete/<int:id>"
+    "/admin/abhyasika/delete/<int:id>",
+    methods=["GET", "POST"]
 )
 @login_required
 def delete_abhyasika(id):
 
+    # ==========================================
+    # Permission Check
+    # ==========================================
+
     if current_user.role != "admin":
         abort(403)
 
+    # ==========================================
+    # Get Abhyasika
+    # ==========================================
+
     abhyasika = Abhyasika.query.get_or_404(id)
 
-    db.session.delete(abhyasika)
-    db.session.commit()
+    # ==========================================
+    # Statistics
+    # ==========================================
 
-    return redirect(
-        url_for("admin.view_abhyasikas")
+    student_count = len(abhyasika.students)
+
+    teacher_assignment_count = TeacherAbhyasika.query.filter_by(
+        abhyasika_id=id
+    ).count()
+
+    attendance_count = Attendance.query.join(Student).filter(
+        Student.abhyasika_id == id
+    ).count()
+
+    remark_count = Remark.query.join(Student).filter(
+        Student.abhyasika_id == id
+    ).count()
+
+    achievement_count = Achievement.query.join(Student).filter(
+        Student.abhyasika_id == id
+    ).count()
+
+    # ==========================================
+    # Delete
+    # ==========================================
+
+    if request.method == "POST":
+
+        db.session.delete(abhyasika)
+
+        db.session.commit()
+
+        flash(
+            "Abhyasika deleted successfully.",
+            "success"
+        )
+
+        return redirect(
+            url_for("admin.view_abhyasikas")
+        )
+
+    # ==========================================
+    # Load Page
+    # ==========================================
+
+    return render_template(
+
+        "admin/delete_abhyasika.html",
+
+        abhyasika=abhyasika,
+
+        student_count=student_count,
+
+        teacher_assignment_count=teacher_assignment_count,
+
+        attendance_count=attendance_count,
+
+        remark_count=remark_count,
+
+        achievement_count=achievement_count
+
     )

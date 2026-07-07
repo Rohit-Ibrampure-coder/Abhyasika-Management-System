@@ -1,61 +1,233 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Edit Abhyasika</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-<h1>Edit Abhyasika</h1>
+{% block title %}
 
-<form method="POST">
+Edit Abhyasika
 
-    <p>
-        Name:
-        <input
-            type="text"
-            name="name"
-            value="{{ abhyasika.name }}"
-            required
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+
+        <div>
+
+            <h1 class="page-title">
+
+                <i class="bi bi-pencil-square me-2"></i>
+
+                Edit Abhyasika
+
+            </h1>
+
+            <p class="page-subtitle mb-0">
+
+                Update the details of the selected Abhyasika.
+
+            </p>
+
+        </div>
+
+        <a
+            href="{{ url_for('admin.view_abhyasikas') }}"
+            class="btn btn-outline-secondary"
         >
-    </p>
 
-    <p>
-        Location:
-        <input
-            type="text"
-            name="location"
-            value="{{ abhyasika.location }}"
-        >
-    </p>
+            <i class="bi bi-arrow-left me-2"></i>
 
-    <p>
-        Type:
+            Back
 
-        <select name="type">
+        </a>
 
-            <option value="daily"
-            {% if abhyasika.type == 'daily' %}
-            selected
-            {% endif %}>
-            Daily
-            </option>
+    </div>
 
-            <option value="weekly"
-            {% if abhyasika.type == 'weekly' %}
-            selected
-            {% endif %}>
-            Weekly
-            </option>
+</div>
 
-        </select>
+<div class="card border-0 shadow-sm">
 
-    </p>
+    <div class="card-header bg-white">
 
-    <button type="submit">
-        Update
-    </button>
+        <h5 class="mb-0">
 
-</form>
+            <i class="bi bi-building me-2"></i>
 
-</body>
-</html>
+            Abhyasika Details
+
+        </h5>
+
+    </div>
+
+    <div class="card-body">
+
+        <form method="POST">
+
+            <div class="row">
+
+                <div class="col-lg-6 mb-4">
+
+                    <label class="form-label fw-semibold">
+
+                        Abhyasika Name
+
+                    </label>
+
+                    <input
+                        type="text"
+                        name="name"
+                        class="form-control"
+                        value="{{ abhyasika.name }}"
+                        required
+                    >
+
+                </div>
+
+                <div class="col-lg-6 mb-4">
+
+                    <label class="form-label fw-semibold">
+
+                        Location
+
+                    </label>
+
+                    <input
+                        type="text"
+                        name="location"
+                        class="form-control"
+                        value="{{ abhyasika.location }}"
+                    >
+
+                </div>
+
+                <div class="col-lg-4 mb-4">
+
+                    <label class="form-label fw-semibold">
+
+                        Type
+
+                    </label>
+
+                    <select
+                        name="type"
+                        class="form-select"
+                    >
+
+                        <option
+                            value="daily"
+                            {% if abhyasika.type=="daily" %}selected{% endif %}
+                        >
+                            Daily
+                        </option>
+
+                        <option
+                            value="weekly"
+                            {% if abhyasika.type=="weekly" %}selected{% endif %}
+                        >
+                            Weekly
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="col-lg-4 mb-4">
+
+                    <label class="form-label fw-semibold">
+
+                        Start Time
+
+                    </label>
+
+                    <input
+                        type="time"
+                        name="start_time"
+                        class="form-control"
+                        value="{{ abhyasika.start_time }}"
+                    >
+
+                </div>
+
+                <div class="col-lg-4 mb-4">
+
+                    <label class="form-label fw-semibold">
+
+                        End Time
+
+                    </label>
+
+                    <input
+                        type="time"
+                        name="end_time"
+                        class="form-control"
+                        value="{{ abhyasika.end_time }}"
+                    >
+
+                </div>
+
+                <div class="col-lg-4 mb-4">
+
+                    <label class="form-label fw-semibold">
+
+                        Status
+
+                    </label>
+
+                    <select
+                        name="status"
+                        class="form-select"
+                    >
+
+                        <option
+                            value="Active"
+                            {% if abhyasika.status=="Active" %}selected{% endif %}
+                        >
+                            Active
+                        </option>
+
+                        <option
+                            value="Inactive"
+                            {% if abhyasika.status=="Inactive" %}selected{% endif %}
+                        >
+                            Inactive
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <hr>
+
+            <div class="d-flex justify-content-end gap-2">
+
+                <a
+                    href="{{ url_for('admin.view_abhyasikas') }}"
+                    class="btn btn-outline-secondary"
+                >
+
+                    Cancel
+
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+
+                    <i class="bi bi-check-circle me-2"></i>
+
+                    Update Abhyasika
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
