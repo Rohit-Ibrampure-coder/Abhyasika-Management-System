@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+Delete Achievement
+
+{% endblock %}
+
+{% block content %}
+
+<!-- =======================================================
+PAGE HEADER
+======================================================= -->
+
+<div class="page-header">
+
+    <div class="d-flex justify-content-between align-items-center">
+
+        <div>
+
+            <h1 class="page-title text-danger">
+
+                <i class="bi bi-trash-fill me-2"></i>
+
+                Delete Achievement
+
+            </h1>
+
+            <p class="page-subtitle mb-0">
+
+                Permanently remove this achievement.
+
+            </p>
+
+        </div>
+
+        <a
+            href="{{ url_for('achievement.view_achievements', student_id=student.id) }}"
+            class="btn btn-outline-secondary"
+        >
+
+            <i class="bi bi-arrow-left me-2"></i>
+
+            Back
+
+        </a>
+
+    </div>
+
+</div>
+
+<!-- =======================================================
+ACHIEVEMENT DETAILS
+======================================================= -->
+
+<div class="card profile-card mb-4">
+
+    <div class="card-body">
+
+        <div class="row">
+
+            <div class="col-md-6">
+
+                <div class="profile-info-box">
+
+                    <small>
+
+                        Student
+
+                    </small>
+
+                    <h6>
+
+                        {{ student.student_name }}
+
+                    </h6>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-6">
+
+                <div class="profile-info-box">
+
+                    <small>
+
+                        Achievement Date
+
+                    </small>
+
+                    <h6>
+
+                        {{ achievement.achievement_date.strftime("%d %b %Y") }}
+
+                    </h6>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <hr>
+
+        <h5>
+
+            {{ achievement.title }}
+
+        </h5>
+
+        <p class="mb-0">
+
+            {{ achievement.description }}
+
+        </p>
+
+    </div>
+
+</div>
+
+<!-- =======================================================
+WARNING
+======================================================= -->
+
+<div class="card border-danger">
+
+    <div class="card-header bg-danger text-white">
+
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+
+        Warning
+
+    </div>
+
+    <div class="card-body">
+
+        <p>
+
+            This achievement will be permanently deleted.
+
+        </p>
+
+        <div class="alert alert-warning">
+
+            <strong>
+
+                This action cannot be undone.
+
+            </strong>
+
+        </div>
+
+        <form method="POST">
+
+            <div class="d-flex justify-content-end gap-2">
+
+                <a
+                    href="{{ url_for('achievement.view_achievements', student_id=student.id) }}"
+                    class="btn btn-outline-secondary"
+                >
+
+                    Cancel
+
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn btn-danger"
+                >
+
+                    <i class="bi bi-trash-fill me-2"></i>
+
+                    Delete Achievement
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

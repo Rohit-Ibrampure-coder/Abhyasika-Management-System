@@ -28,6 +28,7 @@ from models.remark import Remark
 from models.teacher_abhyasika import TeacherAbhyasika
 from models.attendance import Attendance
 from models.achievement import Achievement
+from models.achievement import Achievement
 
 student_bp = Blueprint(
     "student",
@@ -343,7 +344,42 @@ def view_students():
 @login_required
 def student_profile(student_id):
 
+    # ==========================================
+    # Get Student
+    # ==========================================
+
     student = Student.query.get_or_404(student_id)
+
+    # ==========================================
+    # Attendance Summary
+    # ==========================================
+
+    present_days = Attendance.query.filter_by(
+        student_id=student.id,
+        status="Present"
+    ).count()
+
+    absent_days = Attendance.query.filter_by(
+        student_id=student.id,
+        status="Absent"
+    ).count()
+
+    total_days = present_days + absent_days
+
+    if total_days > 0:
+
+        attendance_percentage = round(
+            (present_days / total_days) * 100,
+            2
+        )
+
+    else:
+
+        attendance_percentage = 0
+
+    # ==========================================
+    # Latest Remark
+    # ==========================================
 
     latest_remark = Remark.query.filter_by(
         student_id=student.id
@@ -351,17 +387,23 @@ def student_profile(student_id):
         Remark.created_at.desc()
     ).first()
 
-    # -----------------------------------------
-    # Check Remark Permission
-    # -----------------------------------------
+    # ==========================================
+    # Latest Achievements
+    # ==========================================
 
-    can_manage_remark = False
+    achievements = Achievement.query.filter_by(
+        student_id=student.id
+    ).order_by(
+        Achievement.achievement_date.desc()
+    ).limit(3).all()
 
-    if current_user.role == "admin":
+    # ==========================================
+    # Teacher Permission
+    # ==========================================
 
-        can_manage_remark = False
+    can_manage_student = False
 
-    elif current_user.role == "teacher":
+    if current_user.role == "teacher":
 
         assignment = TeacherAbhyasika.query.filter_by(
             teacher_id=current_user.id,
@@ -369,14 +411,42 @@ def student_profile(student_id):
         ).first()
 
         if assignment:
+
+            can_manage_student = True
+
+    if current_user.role == "teacher":
+
+        assignment = TeacherAbhyasika.query.filter_by(
+            teacher_id=current_user.id,
+            abhyasika_id=student.abhyasika_id
+        ).first()
+
+        if assignment:
+
             can_manage_remark = True
+
+    # ==========================================
+    # Render Template
+    # ==========================================
 
     return render_template(
 
         "student/student_profile.html",
+
         student=student,
+
         latest_remark=latest_remark,
-        can_manage_remark=can_manage_remark
+
+        achievements=achievements,
+
+        can_manage_student=can_manage_student,
+
+        present_days=present_days,
+
+        absent_days=absent_days,
+
+        attendance_percentage=attendance_percentage
+
     )
 
 @student_bp.route(

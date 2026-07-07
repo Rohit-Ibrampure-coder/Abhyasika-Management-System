@@ -11,6 +11,7 @@ from routes.teacher_assignment import teacher_assignment_bp
 from routes.student import student_bp
 from routes.attendance import attendance_bp
 from routes.remark import remark_bp
+from routes.achievement import achievement_bp
 
 from branding import (
     APP_NAME,
@@ -66,6 +67,7 @@ app.register_blueprint(teacher_assignment_bp)
 app.register_blueprint(student_bp)
 app.register_blueprint(attendance_bp)
 app.register_blueprint(remark_bp)
+app.register_blueprint(achievement_bp)
 
 
 

@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+Edit Achievement
+
+{% endblock %}
+
+{% block content %}
+
+<!-- =======================================================
+PAGE HEADER
+======================================================= -->
+
+<div class="page-header">
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+        <div>
+
+            <h1 class="page-title">
+
+                <i class="bi bi-pencil-square me-2"></i>
+
+                Edit Achievement
+
+            </h1>
+
+            <p class="page-subtitle mb-0">
+
+                Update the student's achievement details.
+
+            </p>
+
+        </div>
+
+        <a
+            href="{{ url_for('achievement.view_achievements', student_id=student.id) }}"
+            class="btn btn-outline-secondary"
+        >
+
+            <i class="bi bi-arrow-left me-2"></i>
+
+            Back
+
+        </a>
+
+    </div>
+
+</div>
+
+<!-- =======================================================
+STUDENT INFORMATION
+======================================================= -->
+
+<div class="card profile-card mb-4">
+
+    <div class="card-body">
+
+        <div class="row">
+
+            <div class="col-md-4">
+
+                <div class="profile-info-box">
+
+                    <small>
+
+                        Student
+
+                    </small>
+
+                    <h6>
+
+                        {{ student.student_name }}
+
+                    </h6>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <div class="profile-info-box">
+
+                    <small>
+
+                        Standard
+
+                    </small>
+
+                    <h6>
+
+                        {{ student.standard }}
+
+                    </h6>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <div class="profile-info-box">
+
+                    <small>
+
+                        Abhyasika
+
+                    </small>
+
+                    <h6>
+
+                        {{ student.abhyasika.name }}
+
+                    </h6>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- =======================================================
+EDIT ACHIEVEMENT FORM
+======================================================= -->
+
+<div class="card">
+
+    <div class="card-header">
+
+        <h5 class="mb-0">
+
+            Achievement Details
+
+        </h5>
+
+    </div>
+
+    <div class="card-body">
+
+        <form method="POST">
+
+            <!-- Achievement Title -->
+
+            <div class="mb-3">
+
+                <label class="form-label">
+
+                    Achievement Title
+
+                </label>
+
+                <input
+                    type="text"
+                    name="title"
+                    class="form-control"
+                    value="{{ achievement.title }}"
+                    maxlength="200"
+                    required
+                >
+
+            </div>
+
+            <!-- Achievement Date -->
+
+            <div class="mb-3">
+
+                <label class="form-label">
+
+                    Achievement Date
+
+                </label>
+
+                <input
+                    type="date"
+                    name="achievement_date"
+                    class="form-control"
+                    value="{{ achievement.achievement_date }}"
+                    required
+                >
+
+            </div>
+
+            <!-- Description -->
+
+            <div class="mb-4">
+
+                <label class="form-label">
+
+                    Description
+
+                </label>
+
+                <textarea
+                    name="description"
+                    rows="5"
+                    class="form-control"
+                    placeholder="Enter achievement details..."
+                >{{ achievement.description }}</textarea>
+
+            </div>
+
+            <!-- Buttons -->
+
+            <div class="d-flex justify-content-end gap-2">
+
+                <a
+                    href="{{ url_for('achievement.view_achievements', student_id=student.id) }}"
+                    class="btn btn-outline-secondary"
+                >
+
+                    Cancel
+
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+
+                    <i class="bi bi-pencil-square me-2"></i>
+
+                    Update Achievement
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
