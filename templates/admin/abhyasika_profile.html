@@ -1,0 +1,1017 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+Abhyasika Profile
+
+{% endblock %}
+
+{% block content %}
+
+<!-- ==========================================
+PAGE HEADER
+========================================== -->
+
+<div class="page-header">
+
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+
+        <div>
+
+            <h1 class="page-title">
+
+                <i class="bi bi-building-fill me-2"></i>
+
+                {{ abhyasika.name }}
+
+            </h1>
+
+            <p class="page-subtitle mb-0">
+
+                Abhyasika Profile & Dashboard
+
+            </p>
+
+        </div>
+
+        <div class="d-flex gap-2">
+
+            <a
+                href="{{ url_for('admin.edit_abhyasika', id=abhyasika.id) }}"
+                class="btn btn-warning"
+            >
+
+                <i class="bi bi-pencil-square me-2"></i>
+
+                Edit
+
+            </a>
+
+            <a
+                href="{{ url_for('admin.view_abhyasikas') }}"
+                class="btn btn-outline-secondary"
+            >
+
+                <i class="bi bi-arrow-left me-2"></i>
+
+                Back
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ==========================================
+PROFILE CARD
+========================================== -->
+
+<div class="card shadow-sm border-0 mb-4">
+
+    <div class="card-body">
+
+        <div class="row">
+
+            <div class="col-lg-3">
+
+                <div class="text-center">
+
+                    <div
+                        class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center"
+                        style="width:90px;height:90px;font-size:34px;"
+                    >
+
+                        <i class="bi bi-building"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-9">
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+
+                        <small class="text-muted">
+
+                            Abhyasika Name
+
+                        </small>
+
+                        <h5>
+
+                            {{ abhyasika.name }}
+
+                        </h5>
+
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+
+                        <small class="text-muted">
+
+                            Location
+
+                        </small>
+
+                        <h5>
+
+                            {{ abhyasika.location or "-" }}
+
+                        </h5>
+
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+
+                        <small class="text-muted">
+
+                            Type
+
+                        </small>
+
+                        <h6>
+
+                            {% if abhyasika.type=="daily" %}
+
+                                <span class="badge bg-success">
+
+                                    Daily
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-info">
+
+                                    Weekly
+
+                                </span>
+
+                            {% endif %}
+
+                        </h6>
+
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+
+                        <small class="text-muted">
+
+                            Working Time
+
+                        </small>
+
+                        <h6>
+
+                            {{ abhyasika.start_time.strftime("%I:%M %p") }}
+
+                            -
+
+                            {{ abhyasika.end_time.strftime("%I:%M %p") }}
+
+                        </h6>
+
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+
+                        <small class="text-muted">
+
+                            Status
+
+                        </small>
+
+                        <h6>
+
+                            {% if abhyasika.status=="Active" %}
+
+                                <span class="badge bg-success">
+
+                                    Active
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-danger">
+
+                                    Inactive
+
+                                </span>
+
+                            {% endif %}
+
+                        </h6>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ==========================================
+STATISTICS
+========================================== -->
+
+<div class="row">
+
+    <div class="col-lg-3 col-md-6 mb-4">
+
+        <div class="card shadow-sm border-0 h-100">
+
+            <div class="card-body text-center">
+
+                <i class="bi bi-people-fill display-5 text-primary"></i>
+
+                <h2 class="mt-3">
+
+                    {{ total_students }}
+
+                </h2>
+
+                <p class="text-muted mb-0">
+
+                    Total Students
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-4">
+
+        <div class="card shadow-sm border-0 h-100">
+
+            <div class="card-body text-center">
+
+                <i class="bi bi-person-workspace display-5 text-success"></i>
+
+                <h2 class="mt-3">
+
+                    {{ total_teachers }}
+
+                </h2>
+
+                <p class="text-muted mb-0">
+
+                    Assigned Teachers
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-4">
+
+        <div class="card shadow-sm border-0 h-100">
+
+            <div class="card-body text-center">
+
+                <i class="bi bi-check-circle-fill display-5 text-info"></i>
+
+                <h2 class="mt-3">
+
+                    {{ present_today }}
+
+                </h2>
+
+                <p class="text-muted mb-0">
+
+                    Present Today
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-4">
+
+        <div class="card shadow-sm border-0 h-100">
+
+            <div class="card-body text-center">
+
+                <i class="bi bi-bar-chart-fill display-5 text-warning"></i>
+
+                <h2 class="mt-3">
+
+                    {{ attendance_percentage }}%
+
+                </h2>
+
+                <p class="text-muted mb-0">
+
+                    Attendance
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ==========================================
+ASSIGNED TEACHERS
+========================================== -->
+
+<div class="row">
+
+    <div class="col-lg-5 mb-4">
+
+        <div class="card shadow-sm border-0 h-100">
+
+            <div class="card-header bg-white">
+
+                <h5 class="mb-0">
+
+                    <i class="bi bi-person-workspace me-2"></i>
+
+                    Assigned Teachers
+
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                {% if teacher_assignments %}
+
+                    <div class="list-group list-group-flush">
+
+                        {% for assignment in teacher_assignments %}
+
+                        <div class="list-group-item px-0">
+
+                            <div class="d-flex justify-content-between align-items-center">
+
+                                <div>
+
+                                    <strong>
+
+                                        {{ assignment.teacher.name }}
+
+                                    </strong>
+
+                                    <br>
+
+                                    <small class="text-muted">
+
+                                        {{ assignment.teacher.username }}
+
+                                    </small>
+
+                                </div>
+
+                                <span class="badge bg-success">
+
+                                    Assigned
+
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="text-center py-5">
+
+                        <i class="bi bi-person-x display-5 text-secondary"></i>
+
+                        <p class="mt-3 text-muted">
+
+                            No teacher assigned.
+
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+<!-- ==========================================
+RECENT STUDENTS
+========================================== -->
+
+    <div class="col-lg-7 mb-4">
+
+        <div class="card shadow-sm border-0 h-100">
+
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+
+                <h5 class="mb-0">
+
+                    <i class="bi bi-people-fill me-2"></i>
+
+                    Recently Added Students
+
+                </h5>
+
+                <span class="badge bg-primary">
+
+                    {{ recent_students|length }}
+
+                </span>
+
+            </div>
+
+            <div class="card-body p-0">
+
+                {% if recent_students %}
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover mb-0">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Name</th>
+
+                                <th>Standard</th>
+
+                                <th>Status</th>
+
+                                <th></th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for student in recent_students %}
+
+                            <tr>
+
+                                <td>
+
+                                    {{ student.student_name }}
+
+                                </td>
+
+                                <td>
+
+                                    {{ student.standard }}
+
+                                </td>
+
+                                <td>
+
+                                    {% if student.status=="Active" %}
+
+                                        <span class="badge bg-success">
+
+                                            Active
+
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge bg-secondary">
+
+                                            {{ student.status }}
+
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td>
+
+                                    <a
+                                        href="{{ url_for('student.student_profile', student_id=student.id) }}"
+                                        class="btn btn-sm btn-outline-primary"
+                                    >
+
+                                        View
+
+                                    </a>
+
+                                </td>
+
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                {% else %}
+
+                <div class="text-center py-5">
+
+                    <i class="bi bi-person-fill-x display-5 text-secondary"></i>
+
+                    <p class="mt-3 text-muted">
+
+                        No students found.
+
+                    </p>
+
+                </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ==========================================
+TODAY'S ATTENDANCE
+========================================== -->
+
+<div class="card shadow-sm border-0 mb-4">
+
+    <div class="card-header bg-white">
+
+        <h5 class="mb-0">
+
+            <i class="bi bi-calendar-check me-2"></i>
+
+            Today's Attendance
+
+        </h5>
+
+    </div>
+
+    <div class="card-body p-0">
+
+        {% if today_attendance %}
+
+        <div class="table-responsive">
+
+            <table class="table table-hover mb-0">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Student</th>
+
+                        <th>Status</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for record in today_attendance %}
+
+                    <tr>
+
+                        <td>
+
+                            {{ record.student.student_name }}
+
+                        </td>
+
+                        <td>
+
+                            {% if record.status=="Present" %}
+
+                            <span class="badge bg-success">
+
+                                Present
+
+                            </span>
+
+                            {% else %}
+
+                            <span class="badge bg-danger">
+
+                                Absent
+
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="text-center py-5">
+
+            <i class="bi bi-calendar-x display-5 text-secondary"></i>
+
+            <p class="mt-3 text-muted">
+
+                Attendance has not been marked today.
+
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+<!-- ==========================================
+RECENT REMARKS
+========================================== -->
+
+<div class="card shadow-sm border-0 mb-4">
+
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+
+        <h5 class="mb-0">
+
+            <i class="bi bi-chat-left-text me-2"></i>
+
+            Recent Remarks
+
+        </h5>
+
+        <span class="badge bg-primary">
+
+            {{ recent_remarks|length }}
+
+        </span>
+
+    </div>
+
+    <div class="card-body">
+
+        {% if recent_remarks %}
+
+            {% for remark in recent_remarks %}
+
+            <div class="border-bottom pb-3 mb-3">
+
+                <div class="d-flex justify-content-between">
+
+                    <div>
+
+                        <strong>
+
+                            {{ remark.student.student_name }}
+
+                        </strong>
+
+                        <br>
+
+                        <small class="text-muted">
+
+                            {{ remark.teacher.name }}
+
+                        </small>
+
+                    </div>
+
+                    <small class="text-muted">
+
+                        {{ remark.created_at.strftime("%d %b %Y") }}
+
+                    </small>
+
+                </div>
+
+                <p class="mt-2 mb-0">
+
+                    {{ remark.remark }}
+
+                </p>
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="text-center py-5">
+
+                <i class="bi bi-chat-square-text display-4 text-secondary"></i>
+
+                <h5 class="mt-3">
+
+                    No Remarks
+
+                </h5>
+
+                <p class="text-muted mb-0">
+
+                    No remarks have been added yet.
+
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+<!-- ==========================================
+RECENT ACHIEVEMENTS
+========================================== -->
+
+<div class="card shadow-sm border-0">
+
+    <div class="card-header bg-white">
+
+        <h5 class="mb-0">
+
+            <i class="bi bi-trophy-fill me-2"></i>
+
+            Recent Achievements
+
+        </h5>
+
+    </div>
+
+    <div class="card-body">
+
+        {% if recent_achievements %}
+
+            {% for achievement in recent_achievements %}
+
+            <div class="border-bottom pb-3 mb-3">
+
+                <strong>
+
+                    {{ achievement.title }}
+
+                </strong>
+
+                <br>
+
+                <small class="text-muted">
+
+                    {{ achievement.student.student_name }}
+
+                </small>
+
+                {% if achievement.description %}
+
+                <p class="mt-2 mb-0">
+
+                    {{ achievement.description }}
+
+                </p>
+
+                {% endif %}
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="text-center py-4">
+
+                <i class="bi bi-award display-5 text-secondary"></i>
+
+                <p class="mt-3 text-muted">
+
+                    No achievements available.
+
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+<!-- ==========================================
+QUICK ACTIONS
+========================================== -->
+
+<div class="card shadow-sm border-0 mb-4">
+
+    <div class="card-header bg-white">
+
+        <h5 class="mb-0">
+
+            <i class="bi bi-lightning-charge-fill me-2"></i>
+
+            Quick Actions
+
+        </h5>
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="row g-3">
+
+            <div class="col-lg-3 col-md-6">
+
+                <a
+                    href="{{ url_for('student.add_student') }}"
+                    class="btn btn-primary w-100 py-3"
+                >
+
+                    <i class="bi bi-person-plus-fill fs-3 d-block mb-2"></i>
+
+                    Add Student
+
+                </a>
+
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+
+                <a
+                    href="{{ url_for('attendance.mark_attendance') }}"
+                    class="btn btn-success w-100 py-3"
+                >
+
+                    <i class="bi bi-calendar-check-fill fs-3 d-block mb-2"></i>
+
+                    Mark Attendance
+
+                </a>
+
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+
+                <a
+                    href="{{ url_for('teacher_assignment.assign_teacher') }}"
+                    class="btn btn-info text-white w-100 py-3"
+                >
+
+                    <i class="bi bi-person-workspace fs-3 d-block mb-2"></i>
+
+                    Assign Teacher
+
+                </a>
+
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+
+                <a
+                    href="{{ url_for('admin.edit_abhyasika', id=abhyasika.id) }}"
+                    class="btn btn-warning w-100 py-3"
+                >
+
+                    <i class="bi bi-pencil-square fs-3 d-block mb-2"></i>
+
+                    Edit
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ==========================================
+SYSTEM INFORMATION
+========================================== -->
+
+<div class="card shadow-sm border-0">
+
+    <div class="card-header bg-white">
+
+        <h5 class="mb-0">
+
+            <i class="bi bi-info-circle-fill me-2"></i>
+
+            Abhyasika Information
+
+        </h5>
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="row">
+
+            <div class="col-md-3 mb-3">
+
+                <small class="text-muted">
+
+                    Created
+
+                </small>
+
+                <h6>
+
+                    {{ abhyasika.created_at.strftime("%d %B %Y") }}
+
+                </h6>
+
+            </div>
+
+            <div class="col-md-3 mb-3">
+
+                <small class="text-muted">
+
+                    Status
+
+                </small>
+
+                <h6>
+
+                    {{ abhyasika.status }}
+
+                </h6>
+
+            </div>
+
+            <div class="col-md-3 mb-3">
+
+                <small class="text-muted">
+
+                    Working Hours
+
+                </small>
+
+                <h6>
+
+                    {{ abhyasika.start_time.strftime("%I:%M %p") }}
+
+                    -
+
+                    {{ abhyasika.end_time.strftime("%I:%M %p") }}
+
+                </h6>
+
+            </div>
+
+            <div class="col-md-3 mb-3">
+
+                <small class="text-muted">
+
+                    Type
+
+                </small>
+
+                <h6>
+
+                    {{ abhyasika.type.title() }}
+
+                </h6>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

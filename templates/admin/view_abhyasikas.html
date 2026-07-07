@@ -212,17 +212,15 @@ TABLE CARD
 
                             <div class="table-actions justify-content-center">
 
-                                <!-- View (Future) -->
-
-                                <button
+                                <a
+                                    href="{{ url_for('admin.abhyasika_profile', id=abhyasika.id) }}"
                                     class="btn btn-icon btn-outline"
-                                    disabled
-                                    title="Coming Soon"
+                                    title="View Profile"
                                 >
 
                                     <i class="bi bi-eye"></i>
 
-                                </button>
+                                </a>
 
                                 <!-- Edit -->
 
