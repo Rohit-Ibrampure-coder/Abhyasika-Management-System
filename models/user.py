@@ -45,5 +45,11 @@ class User(UserMixin,db.Model):
         cascade="all, delete-orphan"
     )
 
+    attendance_sessions = db.relationship(
+        "AttendanceSession",
+        back_populates="teacher",
+        cascade="all, delete-orphan"
+    )
+
     def __repr__(self):
         return f"<User {self.username}>"

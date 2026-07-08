@@ -8,12 +8,22 @@ from flask import (
     flash
 )
 
+from utils.file_upload import (
+    allowed_attendance_file,
+    save_attendance_photo,
+    delete_attendance_photo
+)
+
+from flask import abort
 from models.student import Student
 from models.abhyasika import Abhyasika
 from models import db
 from models.attendance import Attendance
+from datetime import date
 from datetime import datetime
 from models.achievement import Achievement
+from models.attendance_session import AttendanceSession
+from models.teacher_abhyasika import TeacherAbhyasika
 
 from flask_login import (
     login_required,
@@ -25,7 +35,6 @@ attendance_bp = Blueprint(
     __name__
 )
 
-
 @attendance_bp.route(
     "/attendance",
     methods=["GET", "POST"]
@@ -33,33 +42,61 @@ attendance_bp = Blueprint(
 @login_required
 def mark_attendance():
 
+    # ==========================================
+    # Default Values
+    # ==========================================
+
     students = []
+
+    students_loaded = False
+
+    attendance_date = date.today().isoformat()
 
     abhyasikas = []
 
     selected_abhyasika = None
 
-    attendance_date = request.form.get(
-        "attendance_date"
-    )
+    # ==========================================
+    # Load Abhyasikas (Admin)
+    # ==========================================
 
     if current_user.role == "admin":
 
         abhyasikas = Abhyasika.query.order_by(
+
             Abhyasika.name
+
         ).all()
+
+    # ==========================================
+    # Load Students
+    # ==========================================
 
     if request.method == "POST":
 
-        action = request.form.get(
-            "action"
+        print("=" * 50)
+        print("POST REQUEST RECEIVED")
+        print("Abhyasika:", request.form.get("abhyasika_id"))
+        print("Date:", request.form.get("attendance_date"))
+        print("=" * 50)
+
+        attendance_date = request.form.get(
+            "attendance_date"
         )
+
+        # --------------------------------------
+        # Admin
+        # --------------------------------------
 
         if current_user.role == "admin":
 
             abhyasika_id = request.form.get(
                 "abhyasika_id"
             )
+
+        # --------------------------------------
+        # Teacher
+        # --------------------------------------
 
         else:
 
@@ -69,74 +106,110 @@ def mark_attendance():
 
         selected_abhyasika = abhyasika_id
 
+        # ======================================
+        # Validation
+        # ======================================
+
         if not abhyasika_id:
 
             flash(
+
                 "Please select an Abhyasika.",
+
                 "warning"
+
             )
-
-            if current_user.role == "teacher":
-
-                return redirect(
-                    url_for(
-                        "teacher.select_abhyasika"
-                    )
-                )
 
             return redirect(
+
                 url_for(
+
                     "attendance.mark_attendance"
+
                 )
+
             )
 
-        if action == "load":
+        # ======================================
+        # Students Loaded
+        # ======================================
 
-            # Check attendance first
+        students_loaded = True
 
-            existing = Attendance.query.join(
-                Student
-            ).filter(
+        # ======================================
+        # Already Marked?
+        # ======================================
 
-                Student.abhyasika_id == abhyasika_id,
+        existing_session = AttendanceSession.query.filter_by(
 
-                Attendance.attendance_date == attendance_date
+            abhyasika_id=abhyasika_id,
 
-            ).first()
+            attendance_date=attendance_date
 
-            if existing:
+        ).first()
 
-                return redirect(
+        if existing_session:
 
-                    url_for(
+            flash(
 
-                        "attendance.attendance_exists",
+                "Attendance has already been marked for this date.",
 
-                        attendance_date=attendance_date,
+                "warning"
 
-                        abhyasika_id=abhyasika_id
+            )
 
-                    )
+            return redirect(
+
+                url_for(
+
+                    "attendance.view_attendance",
+
+                    attendance_session_id=existing_session.id
 
                 )
 
-            students = Student.query.filter_by(
+            )
 
-                abhyasika_id=abhyasika_id,
+        # ======================================
+        # Load Students
+        # ======================================
 
-                status="Active"
+        students = Student.query.filter_by(
 
-            ).order_by(
+            abhyasika_id=abhyasika_id,
 
-                Student.student_name
+            status="Active"
 
-            ).all()
+        ).order_by(
+
+            Student.student_name
+
+        ).all()
+
+        if not students:
+
+            flash(
+
+                "No active students found in the selected Abhyasika.",
+
+                "warning"
+
+            )
+
+        print("Students Loaded :", students_loaded)
+        print("Students Count :", len(students))
+
+    # ==========================================
+    # Render Template
+    # ==========================================
 
     return render_template(
 
         "attendance/mark_attendance.html",
 
         students=students,
+
+        students_loaded=students_loaded,
 
         attendance_date=attendance_date,
 
@@ -153,27 +226,189 @@ def mark_attendance():
 @login_required
 def save_attendance():
 
-    attendance_date = request.form.get(
-        "attendance_date"
-    )
+    # -----------------------------------------
+    # Attendance Date
+    # -----------------------------------------
 
-    # Admin
+    attendance_date = datetime.strptime(
+
+        request.form.get("attendance_date"),
+
+        "%Y-%m-%d"
+
+    ).date()
+
+    # -----------------------------------------
+    # Abhyasika
+    # -----------------------------------------
+
     if current_user.role == "admin":
 
         abhyasika_id = request.form.get(
             "abhyasika_id"
         )
 
-    # Teacher
     else:
 
         abhyasika_id = session.get(
             "abhyasika_id"
         )
 
-    students = Student.query.filter_by(
+    # -----------------------------------------
+    # Check Duplicate Attendance
+    # -----------------------------------------
+
+    existing_session = AttendanceSession.query.filter_by(
 
         abhyasika_id=abhyasika_id,
+
+        attendance_date=attendance_date
+
+    ).first()
+
+    if existing_session:
+
+        flash(
+
+            "Attendance already exists for this date.",
+
+            "warning"
+
+        )
+
+        return redirect(
+
+            url_for(
+
+                "attendance.mark_attendance"
+
+            )
+
+        )
+
+    # -----------------------------------------
+    # Attendance Photo
+    # -----------------------------------------
+
+    attendance_photo = request.files.get(
+        "attendance_photo"
+    )
+
+    if not attendance_photo:
+
+        flash(
+
+            "Please upload today's attendance photo.",
+
+            "danger"
+
+        )
+
+        return redirect(
+
+            url_for(
+
+                "attendance.mark_attendance"
+
+            )
+
+        )
+
+    if attendance_photo.filename == "":
+
+        flash(
+
+            "Please select an attendance photo.",
+
+            "danger"
+
+        )
+
+        return redirect(
+
+            url_for(
+
+                "attendance.mark_attendance"
+
+            )
+
+        )
+
+    if not allowed_attendance_file(
+
+        attendance_photo.filename
+
+    ):
+
+        flash(
+
+            "Only JPG, JPEG and PNG images are allowed.",
+
+            "danger"
+
+        )
+
+        return redirect(
+
+            url_for(
+
+                "attendance.mark_attendance"
+
+            )
+
+        )
+
+    # -----------------------------------------
+    # Get Abhyasika
+    # -----------------------------------------
+
+    abhyasika = Abhyasika.query.get_or_404(
+        abhyasika_id
+    )
+
+    # -----------------------------------------
+    # Save Image
+    # -----------------------------------------
+
+    filename = save_attendance_photo(
+
+        attendance_photo,
+
+        abhyasika.name,
+
+        attendance_date
+
+    )
+
+    # -----------------------------------------
+    # Create Attendance Session
+    # -----------------------------------------
+
+    attendance_session = AttendanceSession(
+
+        abhyasika_id=abhyasika.id,
+
+        teacher_id=current_user.id,
+
+        attendance_date=attendance_date,
+
+        attendance_photo=filename
+
+    )
+
+    db.session.add(
+        attendance_session
+    )
+
+    db.session.flush()
+
+    # -----------------------------------------
+    # Load Students
+    # -----------------------------------------
+
+    students = Student.query.filter_by(
+
+        abhyasika_id=abhyasika.id,
 
         status="Active"
 
@@ -183,7 +418,9 @@ def save_attendance():
 
     ).all()
 
+    # -----------------------------------------
     # Save Attendance
+    # -----------------------------------------
 
     for student in students:
 
@@ -195,19 +432,21 @@ def save_attendance():
 
         attendance = Attendance(
 
+            attendance_session_id=attendance_session.id,
+
             student_id=student.id,
 
-            attendance_date=attendance_date,
-
-            status=status,
-
-            marked_by=current_user.id
+            status=status
 
         )
 
         db.session.add(
             attendance
         )
+
+    # -----------------------------------------
+    # Commit
+    # -----------------------------------------
 
     db.session.commit()
 
@@ -222,154 +461,411 @@ def save_attendance():
     return redirect(
 
         url_for(
-            "attendance.mark_attendance"
+
+            "attendance.view_attendance",
+
+            attendance_session_id=attendance_session.id
+
         )
 
     )
 
 @attendance_bp.route(
-    "/attendance/view"
+    "/attendance/view/<int:attendance_session_id>"
 )
 @login_required
-def view_attendance():
+def view_attendance(attendance_session_id):
 
-    attendance_date = request.args.get(
-        "attendance_date"
+    # ==========================================
+    # Attendance Session
+    # ==========================================
+
+    attendance_session = AttendanceSession.query.get_or_404(
+        attendance_session_id
     )
 
-    abhyasika_id = request.args.get(
-        "abhyasika_id"
+    # ==========================================
+    # Permission Check
+    # ==========================================
+
+    if current_user.role == "teacher":
+
+        assignment = TeacherAbhyasika.query.filter_by(
+
+            teacher_id=current_user.id,
+
+            abhyasika_id=attendance_session.abhyasika_id
+
+        ).first()
+
+        if not assignment:
+
+            abort(403)
+
+    # ==========================================
+    # Attendance Records
+    # ==========================================
+
+    attendance_list = (
+
+        db.session.query(
+
+            Attendance,
+
+            Student
+
+        )
+
+        .join(
+
+            Student,
+
+            Attendance.student_id == Student.id
+
+        )
+
+        .filter(
+
+            Attendance.attendance_session_id == attendance_session.id
+
+        )
+
+        .order_by(
+
+            Student.student_name
+
+        )
+
+        .all()
+
     )
 
-    attendance_list = db.session.query(
+    # ==========================================
+    # Statistics
+    # ==========================================
 
-        Attendance,
+    total_students = len(attendance_list)
 
-        Student
+    present_count = sum(
 
-    ).join(
+        1
 
-        Student,
+        for attendance, student in attendance_list
 
-        Attendance.student_id == Student.id
+        if attendance.status == "Present"
 
-    ).filter(
+    )
 
-        Student.abhyasika_id == abhyasika_id,
+    absent_count = total_students - present_count
 
-        Attendance.attendance_date == attendance_date
+    attendance_percentage = 0
 
-    ).order_by(
+    if total_students > 0:
 
-        Student.student_name
+        attendance_percentage = round(
 
-    ).all()
+            (present_count / total_students) * 100,
+
+            2
+
+        )
+
+    # ==========================================
+    # Attendance Proof Image
+    # ==========================================
+
+    photo_url = url_for(
+
+        "static",
+
+        filename=f"uploads/attendance/{attendance_session.attendance_photo}"
+
+    )
+
+    # ==========================================
+    # Render Page
+    # ==========================================
 
     return render_template(
 
         "attendance/view_attendance.html",
 
+        attendance_session=attendance_session,
+
         attendance_list=attendance_list,
 
-        attendance_date=attendance_date,
+        total_students=total_students,
 
-        abhyasika_id=abhyasika_id
+        present_count=present_count,
+
+        absent_count=absent_count,
+
+        attendance_percentage=attendance_percentage,
+
+        photo_url=photo_url
 
     )
 
 @attendance_bp.route(
-    "/attendance/edit"
+    "/attendance/edit/<int:attendance_session_id>"
 )
 @login_required
-def edit_attendance():
+def edit_attendance(attendance_session_id):
 
-    attendance_date = request.args.get(
-        "attendance_date"
+    # ==========================================
+    # Attendance Session
+    # ==========================================
+
+    attendance_session = AttendanceSession.query.get_or_404(
+        attendance_session_id
     )
 
-    abhyasika_id = request.args.get(
-        "abhyasika_id"
+    # ==========================================
+    # Permission Check
+    # ==========================================
+
+    if current_user.role == "teacher":
+
+        assignment = TeacherAbhyasika.query.filter_by(
+
+            teacher_id=current_user.id,
+
+            abhyasika_id=attendance_session.abhyasika_id
+
+        ).first()
+
+        if not assignment:
+
+            abort(403)
+
+    # ==========================================
+    # Attendance Records
+    # ==========================================
+
+    attendance_list = (
+
+        db.session.query(
+
+            Attendance,
+
+            Student
+
+        )
+
+        .join(
+
+            Student,
+
+            Attendance.student_id == Student.id
+
+        )
+
+        .filter(
+
+            Attendance.attendance_session_id ==
+            attendance_session.id
+
+        )
+
+        .order_by(
+
+            Student.student_name
+
+        )
+
+        .all()
+
     )
 
-    attendance_list = db.session.query(
+    # ==========================================
+    # Statistics
+    # ==========================================
 
-        Attendance,
+    total_students = len(attendance_list)
 
-        Student
+    present_count = sum(
 
-    ).join(
+        1
 
-        Student,
+        for attendance, student in attendance_list
 
-        Attendance.student_id == Student.id
+        if attendance.status == "Present"
 
-    ).filter(
+    )
 
-        Student.abhyasika_id == abhyasika_id,
+    absent_count = total_students - present_count
 
-        Attendance.attendance_date == attendance_date
+    attendance_percentage = 0
 
-    ).order_by(
+    if total_students > 0:
 
-        Student.student_name
+        attendance_percentage = round(
 
-    ).all()
+            (present_count / total_students) * 100,
+
+            2
+
+        )
+
+    # ==========================================
+    # Image URL
+    # ==========================================
+
+    photo_url = url_for(
+
+        "static",
+
+        filename=f"uploads/attendance/{attendance_session.attendance_photo}"
+
+    )
+
+    # ==========================================
+    # Render
+    # ==========================================
 
     return render_template(
 
         "attendance/edit_attendance.html",
 
+        attendance_session=attendance_session,
+
         attendance_list=attendance_list,
 
-        attendance_date=attendance_date,
+        photo_url=photo_url,
 
-        abhyasika_id=abhyasika_id
+        total_students=total_students,
+
+        present_count=present_count,
+
+        absent_count=absent_count,
+
+        attendance_percentage=attendance_percentage
 
     )
 
 @attendance_bp.route(
-    "/attendance/update",
+    "/attendance/update/<int:attendance_session_id>",
     methods=["POST"]
 )
 @login_required
-def update_attendance():
+def update_attendance(attendance_session_id):
 
-    attendance_date = request.form.get(
-        "attendance_date"
+    # ==========================================
+    # Attendance Session
+    # ==========================================
+
+    attendance_session = AttendanceSession.query.get_or_404(
+        attendance_session_id
     )
 
-    abhyasika_id = request.form.get(
-        "abhyasika_id"
-    )
+    # ==========================================
+    # Permission Check
+    # ==========================================
 
-    attendance_records = db.session.query(
-        Attendance
-    ).join(
-        Student,
-        Attendance.student_id == Student.id
-    ).filter(
+    if current_user.role == "teacher":
 
-        Student.abhyasika_id == abhyasika_id,
+        assignment = TeacherAbhyasika.query.filter_by(
 
-        Attendance.attendance_date == attendance_date
+            teacher_id=current_user.id,
+
+            abhyasika_id=attendance_session.abhyasika_id
+
+        ).first()
+
+        if not assignment:
+
+            abort(403)
+
+    # ==========================================
+    # Update Student Attendance
+    # ==========================================
+
+    attendance_records = Attendance.query.filter_by(
+
+        attendance_session_id=attendance_session.id
 
     ).all()
 
     for attendance in attendance_records:
 
         new_status = request.form.get(
-            f"attendance_{attendance.id}"
+
+            f"attendance_{attendance.student_id}"
+
         )
 
         if new_status:
 
             attendance.status = new_status
 
+    # ==========================================
+    # Replace Attendance Photo (Optional)
+    # ==========================================
+
+    attendance_photo = request.files.get(
+        "attendance_photo"
+    )
+
+    if attendance_photo and attendance_photo.filename != "":
+
+        if not allowed_attendance_file(
+            attendance_photo.filename
+        ):
+
+            flash(
+
+                "Only JPG, JPEG and PNG images are allowed.",
+
+                "danger"
+
+            )
+
+            return redirect(
+
+                url_for(
+
+                    "attendance.edit_attendance",
+
+                    attendance_session_id=attendance_session.id
+
+                )
+
+            )
+
+        # Delete previous image
+
+        delete_attendance_photo(
+
+            attendance_session.attendance_photo
+
+        )
+
+        # Save new image
+
+        filename = save_attendance_photo(
+
+            attendance_photo,
+
+            attendance_session.abhyasika.name,
+
+            attendance_session.attendance_date
+
+        )
+
+        attendance_session.attendance_photo = filename
+
+    # ==========================================
+    # Save Changes
+    # ==========================================
+
     db.session.commit()
 
     flash(
+
         "Attendance updated successfully.",
+
         "success"
+
     )
 
     return redirect(
@@ -378,9 +874,106 @@ def update_attendance():
 
             "attendance.view_attendance",
 
-            attendance_date=attendance_date,
+            attendance_session_id=attendance_session.id
 
-            abhyasika_id=abhyasika_id
+        )
+
+    )
+
+@attendance_bp.route(
+    "/attendance/delete/<int:attendance_session_id>",
+    methods=["GET", "POST"]
+)
+@login_required
+def delete_attendance(attendance_session_id):
+
+    # ==========================================
+    # Attendance Session
+    # ==========================================
+
+    attendance_session = AttendanceSession.query.get_or_404(
+        attendance_session_id
+    )
+
+    # ==========================================
+    # Permission Check
+    # ==========================================
+
+    if current_user.role == "teacher":
+
+        assignment = TeacherAbhyasika.query.filter_by(
+
+            teacher_id=current_user.id,
+
+            abhyasika_id=attendance_session.abhyasika_id
+
+        ).first()
+
+        if not assignment:
+
+            abort(403)
+
+    # ==========================================
+    # Confirmation Page
+    # ==========================================
+
+    if request.method == "GET":
+
+        return render_template(
+
+            "attendance/delete_attendance.html",
+
+            attendance_session=attendance_session
+
+        )
+
+    # ==========================================
+    # Delete Attendance Image
+    # ==========================================
+
+    delete_attendance_photo(
+
+        attendance_session.attendance_photo
+
+    )
+
+    # ==========================================
+    # Delete Attendance Session
+    # ==========================================
+
+    db.session.delete(
+
+        attendance_session
+
+    )
+
+    db.session.commit()
+
+    flash(
+
+        "Attendance deleted successfully.",
+
+        "success"
+
+    )
+
+    if current_user.role == "admin":
+
+        return redirect(
+
+            url_for(
+
+                "attendance.mark_attendance"
+
+            )
+
+        )
+
+    return redirect(
+
+        url_for(
+
+            "attendance.mark_attendance"
 
         )
 

@@ -67,3 +67,9 @@ class Abhyasika(db.Model):
         back_populates="abhyasika",
         cascade="all, delete-orphan"
     )
+
+    attendance_sessions = db.relationship(
+        "AttendanceSession",
+        back_populates="abhyasika",
+        cascade="all, delete-orphan"
+    )

@@ -22,10 +22,10 @@ from models.user import User
 from models.abhyasika import Abhyasika
 from models.attendance import Attendance
 from models.student import Student
-from models.attendance import Attendance
 from models.remark import Remark
 from models.achievement import Achievement
 from models.teacher_abhyasika import TeacherAbhyasika
+from models.attendance_session import AttendanceSession
 
 admin_bp = Blueprint(
     "admin",
@@ -37,7 +37,6 @@ admin_bp = Blueprint(
 def admin_dashboard():
 
     if current_user.role != "admin":
-
         return "Unauthorized", 403
 
     # ==========================================
@@ -57,7 +56,7 @@ def admin_dashboard():
     today = date.today()
 
     # ==========================================
-    # Selected Abhyasika
+    # Load Abhyasikas
     # ==========================================
 
     abhyasikas = Abhyasika.query.order_by(
@@ -88,7 +87,7 @@ def admin_dashboard():
         )
 
     # ==========================================
-    # Today's Attendance by Abhyasika
+    # Attendance Statistics
     # ==========================================
 
     present_count = 0
@@ -97,57 +96,101 @@ def admin_dashboard():
 
     attendance_percentage = 0
 
+    present_today = 0
+
+    absent_today = 0
+
+    # ------------------------------------------
+    # Selected Abhyasika Attendance
+    # ------------------------------------------
+
     if selected_abhyasika:
 
-        present_count = (
-            Attendance.query
-            .join(
-                Student,
-                Attendance.student_id == Student.id
-            )
-            .filter(
-                Student.abhyasika_id == selected_abhyasika.id,
-                Attendance.attendance_date == today,
-                Attendance.status == "Present"
-            )
-            .count()
-        )
+        attendance_session = AttendanceSession.query.filter_by(
 
-        absent_count = (
-            Attendance.query
-            .join(
-                Student,
-                Attendance.student_id == Student.id
-            )
-            .filter(
-                Student.abhyasika_id == selected_abhyasika.id,
-                Attendance.attendance_date == today,
-                Attendance.status == "Absent"
-            )
-            .count()
-        )
+            abhyasika_id=selected_abhyasika.id,
 
-        total = present_count + absent_count
+            attendance_date=today
 
-        if total > 0:
+        ).first()
 
-            attendance_percentage = round(
+        if attendance_session:
 
-                (present_count / total) * 100,
+            present_count = Attendance.query.filter_by(
 
-                1
+                attendance_session_id=attendance_session.id,
 
-            )
+                status="Present"
 
-    present_today = Attendance.query.filter_by(
-        attendance_date=today,
-        status="Present"
-    ).count()
+            ).count()
 
-    absent_today = Attendance.query.filter_by(
-        attendance_date=today,
-        status="Absent"
-    ).count()
+            absent_count = Attendance.query.filter_by(
+
+                attendance_session_id=attendance_session.id,
+
+                status="Absent"
+
+            ).count()
+
+            total = present_count + absent_count
+
+            if total > 0:
+
+                attendance_percentage = round(
+
+                    (present_count / total) * 100,
+
+                    1
+
+                )
+
+    # ------------------------------------------
+    # Overall Today's Attendance
+    # ------------------------------------------
+
+    today_sessions = AttendanceSession.query.filter_by(
+
+        attendance_date=today
+
+    ).all()
+
+    session_ids = [
+
+        session.id
+
+        for session in today_sessions
+
+    ]
+
+    if session_ids:
+
+        present_today = Attendance.query.filter(
+
+            Attendance.attendance_session_id.in_(
+
+                session_ids
+
+            ),
+
+            Attendance.status == "Present"
+
+        ).count()
+
+        absent_today = Attendance.query.filter(
+
+            Attendance.attendance_session_id.in_(
+
+                session_ids
+
+            ),
+
+            Attendance.status == "Absent"
+
+        ).count()
+
+    # ==========================================
+    # Render Template
+    # ==========================================
 
     return render_template(
 

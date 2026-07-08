@@ -9,6 +9,7 @@ from models.attendance import Attendance
 from models.remark import Remark
 from models.achievement import Achievement
 from models.teacher_abhyasika import TeacherAbhyasika
+from models.attendance_session import AttendanceSession
 
 with app.app_context():
     db.create_all()

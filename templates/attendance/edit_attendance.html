@@ -1,110 +1,686 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
+{% block title %}
+Edit Attendance
+{% endblock %}
 
-    <title>Edit Attendance</title>
+{% block content %}
 
-</head>
+<div class="container-fluid mt-4">
 
-<body>
+    <!-- ========================================== -->
+    <!-- Page Header -->
+    <!-- ========================================== -->
 
-    <h1>Edit Attendance</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-    <p>
+        <div>
 
-        Attendance Date :
+            <h2 class="fw-bold mb-1">
 
-        <b>
+                Edit Attendance
 
-            {{ attendance_date }}
+            </h2>
 
-        </b>
+            <p class="text-muted mb-0">
 
-    </p>
+                Update student attendance and attendance proof.
 
-    <form method="POST" action="{{ url_for('attendance.update_attendance') }}">
+            </p>
 
-        <input type="hidden" name="attendance_date" value="{{ attendance_date }}">
+        </div>
 
-        <input type="hidden" name="abhyasika_id" value="{{ abhyasika_id }}">
+        <a
 
-        <table border="1" cellpadding="8">
+            href="{{ url_for(
+                'attendance.view_attendance',
+                attendance_session_id=attendance_session.id
+            ) }}"
 
-            <tr>
+            class="btn btn-secondary"
 
-                <th>
+        >
 
-                    Student Name
+            <i class="bi bi-arrow-left"></i>
 
-                </th>
+            Back
 
-                <th>
+        </a>
 
-                    Standard
+    </div>
 
-                </th>
+    <!-- ========================================== -->
+    <!-- Flash Messages -->
+    <!-- ========================================== -->
 
-                <th>
+    {% with messages = get_flashed_messages(with_categories=true) %}
 
-                    Present
+        {% if messages %}
 
-                </th>
+            {% for category, message in messages %}
 
-                <th>
+                <div class="alert alert-{{ category }} alert-dismissible fade show">
 
-                    Absent
+                    {{ message }}
 
-                </th>
+                    <button
 
-            </tr>
+                        type="button"
 
-            {% for attendance, student in attendance_list %}
+                        class="btn-close"
 
-            <tr>
+                        data-bs-dismiss="alert"
 
-                <td>
+                    ></button>
 
-                    {{ student.student_name }}
-
-                </td>
-
-                <td>
-
-                    {{ student.standard }}
-
-                </td>
-
-                <td align="center">
-
-                    <input type="radio" name="attendance_{{ attendance.id }}" value="Present" {% if
-                        attendance.status=="Present" %} checked {% endif %}>
-
-                </td>
-
-                <td align="center">
-
-                    <input type="radio" name="attendance_{{ attendance.id }}" value="Absent" {% if
-                        attendance.status=="Absent" %} checked {% endif %}>
-
-                </td>
-
-            </tr>
+                </div>
 
             {% endfor %}
 
-        </table>
+        {% endif %}
 
-        <br>
+    {% endwith %}
 
-        <button type="submit">
+    <!-- ========================================== -->
+    <!-- Attendance Information -->
+    <!-- ========================================== -->
 
-            Update Attendance
+    <div class="card shadow-sm border-0 mb-4">
 
-        </button>
+        <div class="card-header bg-primary text-white">
 
-    </form>
+            <h5 class="mb-0">
 
-</body>
+                Attendance Information
 
-</html>
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-lg-6 mb-3">
+
+                    <label class="form-label fw-semibold">
+
+                        Abhyasika
+
+                    </label>
+
+                    <div class="form-control bg-light">
+
+                        {{ attendance_session.abhyasika.name }}
+
+                    </div>
+
+                </div>
+
+                <div class="col-lg-6 mb-3">
+
+                    <label class="form-label fw-semibold">
+
+                        Teacher
+
+                    </label>
+
+                    <div class="form-control bg-light">
+
+                        {{ attendance_session.teacher.name }}
+
+                    </div>
+
+                </div>
+
+                <div class="col-lg-6 mb-3">
+
+                    <label class="form-label fw-semibold">
+
+                        Attendance Date
+
+                    </label>
+
+                    <div class="form-control bg-light">
+
+                        {{ attendance_session.attendance_date.strftime("%d %B %Y") }}
+
+                    </div>
+
+                </div>
+
+                <div class="col-lg-6 mb-3">
+
+                    <label class="form-label fw-semibold">
+
+                        Created At
+
+                    </label>
+
+                    <div class="form-control bg-light">
+
+                        {{ attendance_session.created_at.strftime("%d %B %Y %I:%M %p") }}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- Update Attendance Form -->
+    <!-- ========================================== -->
+
+    <form
+
+        method="POST"
+
+        action="{{ url_for(
+            'attendance.update_attendance',
+            attendance_session_id=attendance_session.id
+        ) }}"
+
+        enctype="multipart/form-data"
+    >
+
+        <!-- ========================================== -->
+    <!-- Attendance Summary -->
+    <!-- ========================================== -->
+
+    <div class="row mb-4">
+
+        <div class="col-lg-3 col-md-6 mb-3">
+
+            <div class="card shadow-sm border-0 text-center h-100">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+
+                        Total Students
+
+                    </h6>
+
+                    <h2 class="fw-bold text-primary">
+
+                        {{ total_students }}
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+
+            <div class="card shadow-sm border-0 text-center h-100">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+
+                        Present
+
+                    </h6>
+
+                    <h2 class="fw-bold text-success">
+
+                        {{ present_count }}
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+
+            <div class="card shadow-sm border-0 text-center h-100">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+
+                        Absent
+
+                    </h6>
+
+                    <h2 class="fw-bold text-danger">
+
+                        {{ absent_count }}
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+
+            <div class="card shadow-sm border-0 text-center h-100">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+
+                        Attendance %
+
+                    </h6>
+
+                    <h2 class="fw-bold text-info">
+
+                        {{ attendance_percentage }}%
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- Attendance Proof -->
+    <!-- ========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-success text-white">
+
+            <h5 class="mb-0">
+
+                Attendance Proof
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-lg-6 text-center">
+
+                    <label class="form-label fw-semibold">
+
+                        Current Attendance Proof
+
+                    </label>
+
+                    <br>
+
+                    <img
+
+                        src="{{ photo_url }}"
+
+                        id="currentImage"
+
+                        class="img-fluid rounded border"
+
+                        style="max-height:400px;"
+
+                        alt="Attendance Proof"
+
+                    >
+
+                    <br><br>
+
+                    <a
+
+                        href="{{ photo_url }}"
+
+                        target="_blank"
+
+                        class="btn btn-outline-primary"
+
+                    >
+
+                        View Full Image
+
+                    </a>
+
+                </div>
+
+                <div class="col-lg-6">
+
+                    <label class="form-label fw-semibold">
+
+                        Upload New Attendance Image
+
+                    </label>
+
+                    <input
+
+                        type="file"
+
+                        class="form-control"
+
+                        id="attendance_photo"
+
+                        name="attendance_photo"
+
+                        accept=".jpg,.jpeg,.png"
+
+                    >
+
+                    <div class="form-text">
+
+                        Leave this empty if you don't want to replace the existing attendance proof.
+
+                    </div>
+
+                    <hr>
+
+                    <label class="form-label fw-semibold">
+
+                        New Image Preview
+
+                    </label>
+
+                    <br>
+
+                    <img
+
+                        id="previewImage"
+
+                        src="#"
+
+                        class="img-fluid rounded border"
+
+                        style="
+                            display:none;
+                            max-height:400px;
+                        "
+
+                        alt="Preview"
+
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- Student Attendance -->
+    <!-- ========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-dark">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <h5 class="mb-0 text-white">
+
+                    <i class="bi bi-people-fill me-2"></i>
+
+                    Student Attendance
+
+                </h5>
+
+                <span class="badge bg-light text-dark">
+
+                    {{ students|length }} Students
+
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table
+                    class="table table-hover table-bordered align-middle"
+                >
+
+                    <thead class="table-light">
+
+                        <tr class="text-center">
+
+                            <th style="width:70px;">
+
+                                Sr.
+
+                            </th>
+
+                            <th>
+
+                                Student Name
+
+                            </th>
+
+                            <th style="width:140px;">
+
+                                Standard
+
+                            </th>
+
+                            <th style="width:150px;">
+
+                                Present
+
+                            </th>
+
+                            <th style="width:150px;">
+
+                                Absent
+
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for attendance, student in attendance_list %}
+
+                        <tr>
+
+                            <td class="text-center fw-bold">
+
+                                {{ loop.index }}
+
+                            </td>
+
+                            <td>
+
+                                <strong>
+
+                                    {{ student.student_name }}
+
+                                </strong>
+
+                            </td>
+
+                            <td class="text-center">
+
+                                {{ student.standard }}
+
+                            </td>
+
+                            <td class="text-center">
+
+                                <div
+                                    class="form-check d-flex justify-content-center"
+                                >
+
+                                    <input
+
+                                        class="form-check-input"
+
+                                        type="radio"
+
+                                        name="attendance_{{ student.id }}"
+
+                                        value="Present"
+
+                                        {% if attendance.status == "Present" %}
+                                        checked
+                                        {% endif %}
+
+                                    >
+
+                                </div>
+
+                            </td>
+
+                            <td class="text-center">
+
+                                <div
+                                    class="form-check d-flex justify-content-center"
+                                >
+
+                                    <input
+
+                                        class="form-check-input"
+
+                                        type="radio"
+
+                                        name="attendance_{{ student.id }}"
+
+                                        value="Absent"
+
+                                        {% if attendance.status == "Absent" %}
+                                        checked
+                                        {% endif %}
+
+                                    >
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- Action Buttons -->
+    <!-- ========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between">
+
+                <a
+
+                    href="{{ url_for(
+                        'attendance.view_attendance',
+                        attendance_session_id=attendance_session.id
+                    ) }}"
+
+                    class="btn btn-secondary"
+
+                >
+
+                    <i class="bi bi-arrow-left"></i>
+
+                    Cancel
+
+                </a>
+
+                <button
+
+                    type="submit"
+
+                    class="btn btn-primary"
+
+                >
+
+                    <i class="bi bi-check-circle"></i>
+
+                    Update Attendance
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</form>
+
+<!-- ========================================== -->
+<!-- Image Preview Script -->
+<!-- ========================================== -->
+
+<script>
+
+const attendancePhoto = document.getElementById(
+    "attendance_photo"
+);
+
+const previewImage = document.getElementById(
+    "previewImage"
+);
+
+attendancePhoto.addEventListener(
+
+    "change",
+
+    function () {
+
+        const file = this.files[0];
+
+        if (!file) {
+
+            previewImage.style.display = "none";
+
+            previewImage.src = "#";
+
+            return;
+
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+
+            previewImage.src = e.target.result;
+
+            previewImage.style.display = "block";
+
+        };
+
+        reader.readAsDataURL(file);
+
+    }
+
+);
+
+</script>
+
+{% endblock %}

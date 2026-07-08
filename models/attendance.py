@@ -1,23 +1,45 @@
 from models import db
 
+
 class Attendance(db.Model):
     __tablename__ = "attendance"
+
+    # ==========================================
+    # Primary Key
+    # ==========================================
 
     id = db.Column(
         db.Integer,
         primary_key=True
     )
 
-    student_id = db.Column(
+    # ==========================================
+    # Attendance Session
+    # ==========================================
+
+    attendance_session_id = db.Column(
         db.Integer,
-        db.ForeignKey("students.id"),
+        db.ForeignKey(
+            "attendance_sessions.id"
+        ),
         nullable=False
     )
 
-    attendance_date = db.Column(
-        db.Date,
+    # ==========================================
+    # Student
+    # ==========================================
+
+    student_id = db.Column(
+        db.Integer,
+        db.ForeignKey(
+            "students.id"
+        ),
         nullable=False
     )
+
+    # ==========================================
+    # Attendance Status
+    # ==========================================
 
     status = db.Column(
         db.Enum(
@@ -27,28 +49,51 @@ class Attendance(db.Model):
         nullable=False
     )
 
-    marked_by = db.Column(
-        db.Integer,
-        db.ForeignKey("users.id"),
-        nullable=False
-    )
+    # ==========================================
+    # Created Time
+    # ==========================================
 
     created_at = db.Column(
         db.DateTime,
         server_default=db.func.now()
     )
 
+    # ==========================================
+    # Relationships
+    # ==========================================
+
     student = db.relationship(
         "Student",
         back_populates="attendance_records"
     )
-    
+
+    attendance_session = db.relationship(
+        "AttendanceSession",
+        back_populates="attendance_records"
+    )
+
+    # ==========================================
+    # Unique Constraint
+    # ==========================================
+
     __table_args__ = (
 
         db.UniqueConstraint(
+
+            "attendance_session_id",
+
             "student_id",
-            "attendance_date",
-            name="unique_student_attendance"
+
+            name="unique_student_session"
+
         ),
 
     )
+
+    def __repr__(self):
+
+        return (
+            f"<Attendance "
+            f"{self.student_id} "
+            f"{self.status}>"
+        )

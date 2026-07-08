@@ -1,0 +1,330 @@
+{% extends "base.html" %}
+
+{% block title %}
+Delete Attendance
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid mt-4">
+
+    <!-- ========================================== -->
+    <!-- Page Header -->
+    <!-- ========================================== -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold text-danger mb-1">
+
+                Delete Attendance
+
+            </h2>
+
+            <p class="text-muted mb-0">
+
+                Permanently delete this attendance record.
+
+            </p>
+
+        </div>
+
+        <a
+
+            href="{{ url_for(
+                'attendance.view_attendance',
+                attendance_session_id=attendance_session.id
+            ) }}"
+
+            class="btn btn-secondary"
+
+        >
+
+            <i class="bi bi-arrow-left"></i>
+
+            Back
+
+        </a>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- Flash Messages -->
+    <!-- ========================================== -->
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+                <div class="alert alert-{{ category }} alert-dismissible fade show">
+
+                    {{ message }}
+
+                    <button
+
+                        type="button"
+
+                        class="btn-close"
+
+                        data-bs-dismiss="alert"
+
+                    ></button>
+
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+    <!-- ========================================== -->
+    <!-- Warning Card -->
+    <!-- ========================================== -->
+
+    <div class="card border-danger shadow-sm mb-4">
+
+        <div class="card-header bg-danger text-white">
+
+            <h5 class="mb-0">
+
+                Warning
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="alert alert-danger mb-0">
+
+                <strong>
+
+                    This action cannot be undone.
+
+                </strong>
+
+                <hr>
+
+                Deleting this attendance will permanently remove:
+
+                <ul class="mt-2 mb-0">
+
+                    <li>
+
+                        Attendance Session
+
+                    </li>
+
+                    <li>
+
+                        All Student Attendance Records
+
+                    </li>
+
+                    <li>
+
+                        Attendance Proof Image
+
+                    </li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- Attendance Details -->
+    <!-- ========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-primary text-white">
+
+            <h5 class="mb-0">
+
+                Attendance Information
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-lg-6 mb-3">
+
+                    <label class="form-label fw-semibold">
+
+                        Abhyasika
+
+                    </label>
+
+                    <div class="form-control bg-light">
+
+                        {{ attendance_session.abhyasika.name }}
+
+                    </div>
+
+                </div>
+
+                <div class="col-lg-6 mb-3">
+
+                    <label class="form-label fw-semibold">
+
+                        Teacher
+
+                    </label>
+
+                    <div class="form-control bg-light">
+
+                        {{ attendance_session.teacher.name }}
+
+                    </div>
+
+                </div>
+
+                <div class="col-lg-6 mb-3">
+
+                    <label class="form-label fw-semibold">
+
+                        Attendance Date
+
+                    </label>
+
+                    <div class="form-control bg-light">
+
+                        {{ attendance_session.attendance_date.strftime("%d %B %Y") }}
+
+                    </div>
+
+                </div>
+
+                <div class="col-lg-6 mb-3">
+
+                    <label class="form-label fw-semibold">
+
+                        Created At
+
+                    </label>
+
+                    <div class="form-control bg-light">
+
+                        {{ attendance_session.created_at.strftime("%d %B %Y %I:%M %p") }}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- Attendance Proof -->
+    <!-- ========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-success text-white">
+
+            <h5 class="mb-0">
+
+                Attendance Proof
+
+            </h5>
+
+        </div>
+
+        <div class="card-body text-center">
+
+            {% if attendance_session.attendance_photo %}
+
+            <img
+
+                src="{{ url_for(
+                    'static',
+                    filename='uploads/attendance/' + attendance_session.attendance_photo
+                ) }}"
+
+                class="img-fluid rounded border"
+
+                style="max-height:450px;"
+
+            >
+
+            {% else %}
+
+            <div class="alert alert-warning">
+
+                No attendance proof image available.
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- Delete Form -->
+    <!-- ========================================== -->
+
+    <form method="POST">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between">
+
+                    <a
+
+                        href="{{ url_for(
+                            'attendance.view_attendance',
+                            attendance_session_id=attendance_session.id
+                        ) }}"
+
+                        class="btn btn-secondary"
+
+                    >
+
+                        Cancel
+
+                    </a>
+
+                    <button
+
+                        type="submit"
+
+                        class="btn btn-danger"
+
+                    >
+
+                        <i class="bi bi-trash"></i>
+
+                        Delete Attendance
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

@@ -1,194 +1,990 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
+{% block title %}
+Mark Attendance
+{% endblock %}
 
-    <title>Mark Attendance</title>
+{% block content %}
 
-</head>
+<div class="container-fluid mt-4">
 
-<body>
+    <!-- ========================================== -->
+    <!-- Page Header -->
+    <!-- ========================================== -->
 
-    <h1>Mark Attendance</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-    <!-- ========================= -->
-    <!-- Load Students Form -->
-    <!-- ========================= -->
+        <div>
 
-    <form
-        method="POST"
-        action="{{ url_for('attendance.mark_attendance') }}"
-    >
+            <h2 class="fw-bold mb-1">
 
-        {% if current_user.role == "admin" %}
+                <i class="bi bi-calendar-check"></i>
 
-        <p>
+                Mark Attendance
 
-            Abhyasika
+            </h2>
 
-            <select
-                name="abhyasika_id"
-                required
+            <p class="text-muted mb-0">
+
+                Record today's attendance for students.
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- Flash Messages -->
+    <!-- ========================================== -->
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+            <div
+                class="alert alert-{{ category }} alert-dismissible fade show"
             >
 
-                <option value="">
-                    -- Select Abhyasika --
-                </option>
+                {{ message }}
 
-                {% for abhyasika in abhyasikas %}
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                ></button>
 
-                <option
-                    value="{{ abhyasika.id }}"
-                    {% if selected_abhyasika == abhyasika.id|string %}
-                    selected
-                    {% endif %}
-                >
-
-                    {{ abhyasika.name }}
-
-                </option>
-
-                {% endfor %}
-
-            </select>
-
-        </p>
-
-        {% endif %}
-
-        <p>
-
-            Attendance Date
-
-            <input
-                type="date"
-                name="attendance_date"
-                value="{{ attendance_date }}"
-                required
-            >
-
-        </p>
-
-        <button
-            type="submit"
-            name="action"
-            value="load"
-        >
-
-            Load Students
-
-        </button>
-
-    </form>
-
-    <hr>
-
-    {% if students %}
-
-    <!-- ========================= -->
-    <!-- Save Attendance Form -->
-    <!-- ========================= -->
-
-    <form
-        method="POST"
-        action="{{ url_for('attendance.save_attendance') }}"
-    >
-
-        <input
-            type="hidden"
-            name="attendance_date"
-            value="{{ attendance_date }}"
-        >
-
-        {% if current_user.role == "admin" %}
-
-        <input
-            type="hidden"
-            name="abhyasika_id"
-            value="{{ selected_abhyasika }}"
-        >
-
-        {% endif %}
-
-        <h3>
-
-            Total Students :
-            {{ students|length }}
-
-        </h3>
-
-        <table
-            border="1"
-            cellpadding="8"
-        >
-
-            <tr>
-
-                <th>Student Name</th>
-
-                <th>Standard</th>
-
-                <th>Present</th>
-
-                <th>Absent</th>
-
-            </tr>
-
-            {% for student in students %}
-
-            <tr>
-
-                <td>
-
-                    {{ student.student_name }}
-
-                </td>
-
-                <td>
-
-                    {{ student.standard }}
-
-                </td>
-
-                <td align="center">
-
-                    <input
-                        type="radio"
-                        name="attendance_{{ student.id }}"
-                        value="Present"
-                        checked
-                    >
-
-                </td>
-
-                <td align="center">
-
-                    <input
-                        type="radio"
-                        name="attendance_{{ student.id }}"
-                        value="Absent"
-                    >
-
-                </td>
-
-            </tr>
+            </div>
 
             {% endfor %}
 
-        </table>
+        {% endif %}
 
-        <br>
+    {% endwith %}
 
-        <button type="submit">
+    <!-- ========================================== -->
+    <!-- Attendance Information -->
+    <!-- ========================================== -->
 
-            Save Attendance
+    <div class="card shadow-sm border-0 mb-4">
 
-        </button>
+        <div class="card-header bg-primary text-white">
 
-    </form>
+            <h5 class="mb-0">
+
+                Attendance Information
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <form
+                method="POST"
+                action="{{ url_for('attendance.mark_attendance') }}"
+            >
+
+                <div class="row">
+
+                    {% if current_user.role == "admin" %}
+
+                    <div class="col-lg-5 mb-3">
+
+                        <label class="form-label fw-semibold">
+
+                            Abhyasika
+
+                            <span class="text-danger">*</span>
+
+                        </label>
+
+                        <select
+                            class="form-select"
+                            name="abhyasika_id"
+                            required
+                        >
+
+                            <option value="">
+
+                                -- Select Abhyasika --
+
+                            </option>
+
+                            {% for abhyasika in abhyasikas %}
+
+                            <option
+                                value="{{ abhyasika.id }}"
+                                {% if selected_abhyasika == abhyasika.id|string %}
+                                selected
+                                {% endif %}
+                            >
+
+                                {{ abhyasika.name }}
+
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    {% endif %}
+
+                    <div class="col-lg-4 mb-3">
+
+                        <label class="form-label fw-semibold">
+
+                            Attendance Date
+
+                            <span class="text-danger">*</span>
+
+                        </label>
+
+                        <input
+                            type="date"
+                            class="form-control"
+                            name="attendance_date"
+                            value="{{ attendance_date }}"
+                            required
+                        >
+
+                    </div>
+
+                    <div class="col-lg-3 mb-3 d-grid">
+
+                        <label class="form-label">
+
+                            &nbsp;
+
+                        </label>
+
+                        <button
+                            type="submit"
+                            name="action"
+                            value="load"
+                            class="btn btn-primary"
+                        >
+
+                            <i class="bi bi-search"></i>
+
+                            Load Students
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- Students Loaded -->
+    <!-- ========================================== -->
+
+    {% if students_loaded %}
+
+        {% if students %}
+
+        <!-- ========================================== -->
+        <!-- Attendance Summary -->
+        <!-- ========================================== -->
+
+        <div class="row mb-4">
+
+            <div class="col-lg-4 mb-3">
+
+                <div class="card border-0 shadow-sm h-100">
+
+                    <div class="card-body text-center">
+
+                        <i class="bi bi-people-fill display-5 text-primary"></i>
+
+                        <h6 class="text-muted mt-2">
+
+                            Total Students
+
+                        </h6>
+
+                        <h2
+                            id="totalStudents"
+                            class="fw-bold text-primary"
+                        >
+
+                            {{ students|length }}
+
+                        </h2>
+
+                        <input
+                            type="hidden"
+                            id="totalStudentCount"
+                            value="{{ students|length }}"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-4 mb-3">
+
+                <div class="card border-0 shadow-sm h-100">
+
+                    <div class="card-body text-center">
+
+                        <i class="bi bi-check-circle-fill display-5 text-success"></i>
+
+                        <h6 class="text-muted mt-2">
+
+                            Present
+
+                        </h6>
+
+                        <h2
+                            id="presentCount"
+                            class="fw-bold text-success"
+                        >
+
+                            {{ students|length }}
+
+                        </h2>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-4 mb-3">
+
+                <div class="card border-0 shadow-sm h-100">
+
+                    <div class="card-body text-center">
+
+                        <i class="bi bi-x-circle-fill display-5 text-danger"></i>
+
+                        <h6 class="text-muted mt-2">
+
+                            Absent
+
+                        </h6>
+
+                        <h2
+                            id="absentCount"
+                            class="fw-bold text-danger"
+                        >
+
+                            0
+
+                        </h2>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ========================================== -->
+        <!-- Save Attendance Form -->
+        <!-- ========================================== -->
+
+        <form
+
+            method="POST"
+
+            action="{{ url_for('attendance.save_attendance') }}"
+
+            enctype="multipart/form-data"
+
+        >
+
+            <input
+
+                type="hidden"
+
+                name="attendance_date"
+
+                value="{{ attendance_date }}"
+
+            >
+
+            {% if current_user.role == "admin" %}
+
+            <input
+
+                type="hidden"
+
+                name="abhyasika_id"
+
+                value="{{ selected_abhyasika }}"
+
+            >
+
+            {% endif %}
+
+            <!-- ========================================== -->
+            <!-- Student Attendance -->
+            <!-- ========================================== -->
+
+            <div class="card shadow-sm border-0 mb-4">
+
+                <div class="card-header bg-dark">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <h5 class="mb-0 text-white">
+
+                            <i class="bi bi-people-fill me-2"></i>
+
+                            Student Attendance
+
+                        </h5>
+
+                        <span class="badge bg-light text-dark">
+
+                            {{ students|length }} Students
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row mb-3">
+
+                        <div class="col-md-6">
+
+                            <input
+
+                                type="text"
+
+                                id="studentSearch"
+
+                                class="form-control"
+
+                                placeholder="Search student..."
+
+                            >
+
+                        </div>
+
+                        <div class="col-md-6 text-md-end mt-2 mt-md-0">
+
+                            <button
+
+                                type="button"
+
+                                id="markAllPresent"
+
+                                class="btn btn-success"
+
+                            >
+
+                                <i class="bi bi-check-circle"></i>
+
+                                Mark All Present
+
+                            </button>
+
+                            <button
+
+                                type="button"
+
+                                id="markAllAbsent"
+
+                                class="btn btn-danger"
+
+                            >
+
+                                <i class="bi bi-x-circle"></i>
+
+                                Mark All Absent
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <div class="table-responsive">
+
+                        <table
+
+                            class="table table-hover table-bordered align-middle"
+
+                            id="attendanceTable"
+
+                        >
+
+                            <thead class="table-light">
+
+                                <tr class="text-center">
+
+                                    <th width="70">
+
+                                        Sr.
+
+                                    </th>
+
+                                    <th>
+
+                                        Student Name
+
+                                    </th>
+
+                                    <th width="140">
+
+                                        Standard
+
+                                    </th>
+
+                                    <th width="130">
+
+                                        Present
+
+                                    </th>
+
+                                    <th width="130">
+
+                                        Absent
+
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                {% for student in students %}
+
+                                <tr>
+
+                                    <td class="text-center">
+
+                                        {{ loop.index }}
+
+                                    </td>
+
+                                    <td class="student-name">
+
+                                        <strong>
+
+                                            {{ student.student_name }}
+
+                                        </strong>
+
+                                    </td>
+
+                                    <td class="text-center">
+
+                                        {{ student.standard }}
+
+                                    </td>
+
+                                    <td class="text-center">
+
+                                        <input
+
+                                            class="form-check-input attendance-radio"
+
+                                            type="radio"
+
+                                            name="attendance_{{ student.id }}"
+
+                                            value="Present"
+
+                                            checked
+
+                                        >
+
+                                    </td>
+
+                                    <td class="text-center">
+
+                                        <input
+
+                                            class="form-check-input attendance-radio"
+
+                                            type="radio"
+
+                                            name="attendance_{{ student.id }}"
+
+                                            value="Absent"
+
+                                        >
+
+                                    </td>
+
+                                </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ========================================== -->
+            <!-- Attendance Proof -->
+            <!-- ========================================== -->
+
+            <div class="card shadow-sm border-0 mb-4">
+
+                <div class="card-header bg-success text-white">
+
+                    <h5 class="mb-0">
+
+                        Attendance Proof
+
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row">
+
+                        <!-- Upload -->
+
+                        <div class="col-lg-6 mb-3">
+
+                            <label class="form-label fw-semibold">
+
+                                Upload Attendance Image
+
+                                <span class="text-danger">*</span>
+
+                            </label>
+
+                            <input
+
+                                type="file"
+
+                                class="form-control"
+
+                                id="attendance_photo"
+
+                                name="attendance_photo"
+
+                                accept=".jpg,.jpeg,.png"
+
+                                required
+
+                            >
+
+                            <div class="form-text mt-2">
+
+                                <ul class="mb-0">
+
+                                    <li>Allowed formats: JPG, JPEG, PNG</li>
+
+                                    <li>Maximum file size: 2.5 MB</li>
+
+                                    <li>Only one attendance proof image is allowed.</li>
+
+                                </ul>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Preview -->
+
+                        <div class="col-lg-6 text-center">
+
+                            <label class="form-label fw-semibold">
+
+                                Image Preview
+
+                            </label>
+
+                            <br>
+
+                            <img
+
+                                id="imagePreview"
+
+                                src="#"
+
+                                class="img-fluid rounded border"
+
+                                alt="Attendance Preview"
+
+                                style="
+                                    display:none;
+                                    max-height:350px;
+                                "
+
+                            >
+
+                            <div
+
+                                id="previewPlaceholder"
+
+                                class="text-muted mt-3"
+
+                            >
+
+                                <i class="bi bi-image fs-1 d-block mb-2"></i>
+
+                                No image selected
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ========================================== -->
+            <!-- Action Buttons -->
+            <!-- ========================================== -->
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between">
+
+                        <a
+
+                            href="{{ url_for('attendance.mark_attendance') }}"
+
+                            class="btn btn-secondary"
+
+                        >
+
+                            <i class="bi bi-arrow-clockwise"></i>
+
+                            Reset
+
+                        </a>
+
+                        <button
+
+                            type="submit"
+
+                            class="btn btn-primary"
+
+                        >
+
+                            <i class="bi bi-check-circle"></i>
+
+                            Save Attendance
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </form>
+
+        {% else %}
+
+        <!-- ========================================== -->
+        <!-- No Students Found -->
+        <!-- ========================================== -->
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body text-center py-5">
+
+                <i class="bi bi-people-fill display-3 text-secondary"></i>
+
+                <h4 class="mt-3">
+
+                    No Students Found
+
+                </h4>
+
+                <p class="text-muted mb-1">
+
+                    There are no active students in the selected Abhyasika.
+
+                </p>
+
+                <p class="text-muted">
+
+                    Please add students first or select another Abhyasika.
+
+                </p>
+
+            </div>
+
+        </div>
+
+        {% endif %}
 
     {% endif %}
 
-</body>
+</div>
 
-</html>
+<script>
+
+// ==========================================
+// Image Preview
+// ==========================================
+
+const imageInput = document.getElementById("attendance_photo");
+
+const imagePreview = document.getElementById("imagePreview");
+
+const previewPlaceholder = document.getElementById("previewPlaceholder");
+
+if (imageInput) {
+
+    imageInput.addEventListener("change", function () {
+
+        const file = this.files[0];
+
+        if (!file) {
+
+            imagePreview.style.display = "none";
+
+            previewPlaceholder.style.display = "block";
+
+            return;
+
+        }
+
+        if (file.size > (2.5 * 1024 * 1024)) {
+
+            alert("Maximum image size is 2.5 MB.");
+
+            this.value = "";
+
+            imagePreview.style.display = "none";
+
+            previewPlaceholder.style.display = "block";
+
+            return;
+
+        }
+
+        imagePreview.src = URL.createObjectURL(file);
+
+        imagePreview.style.display = "block";
+
+        previewPlaceholder.style.display = "none";
+
+    });
+
+}
+
+// ==========================================
+// Live Summary
+// ==========================================
+
+function updateSummary() {
+
+    const present = document.querySelectorAll(
+
+        'input[value="Present"]:checked'
+
+    ).length;
+
+    const absent = document.querySelectorAll(
+
+        'input[value="Absent"]:checked'
+
+    ).length;
+
+    const presentCard = document.getElementById("presentCount");
+
+    const absentCard = document.getElementById("absentCount");
+
+    if (presentCard) {
+
+        presentCard.textContent = present;
+
+    }
+
+    if (absentCard) {
+
+        absentCard.textContent = absent;
+
+    }
+
+}
+
+document.querySelectorAll(
+
+    ".attendance-radio"
+
+).forEach(
+
+    radio => {
+
+        radio.addEventListener(
+
+            "change",
+
+            updateSummary
+
+        );
+
+    }
+
+);
+
+updateSummary();
+
+// ==========================================
+// Mark All Present
+// ==========================================
+
+const presentButton = document.getElementById(
+
+    "markAllPresent"
+
+);
+
+if (presentButton) {
+
+    presentButton.addEventListener(
+
+        "click",
+
+        function () {
+
+            document.querySelectorAll(
+
+                'input[value="Present"]'
+
+            ).forEach(
+
+                radio => {
+
+                    radio.checked = true;
+
+                }
+
+            );
+
+            updateSummary();
+
+        }
+
+    );
+
+}
+
+// ==========================================
+// Mark All Absent
+// ==========================================
+
+const absentButton = document.getElementById(
+
+    "markAllAbsent"
+
+);
+
+if (absentButton) {
+
+    absentButton.addEventListener(
+
+        "click",
+
+        function () {
+
+            document.querySelectorAll(
+
+                'input[value="Absent"]'
+
+            ).forEach(
+
+                radio => {
+
+                    radio.checked = true;
+
+                }
+
+            );
+
+            updateSummary();
+
+        }
+
+    );
+
+}
+
+// ==========================================
+// Student Search
+// ==========================================
+
+const studentSearch = document.getElementById(
+
+    "studentSearch"
+
+);
+
+if (studentSearch) {
+
+    studentSearch.addEventListener(
+
+        "keyup",
+
+        function () {
+
+            const keyword = this.value.toLowerCase();
+
+            document.querySelectorAll(
+
+                "#attendanceTable tbody tr"
+
+            ).forEach(
+
+                row => {
+
+                    const name = row.querySelector(
+
+                        ".student-name"
+
+                    ).textContent.toLowerCase();
+
+                    row.style.display =
+
+                        name.includes(keyword)
+
+                        ? ""
+
+                        : "none";
+
+                }
+
+            );
+
+        }
+
+    );
+
+}
+
+</script>
+
+{% endblock %}

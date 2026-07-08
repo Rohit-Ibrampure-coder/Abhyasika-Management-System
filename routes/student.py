@@ -28,7 +28,6 @@ from models.remark import Remark
 from models.teacher_abhyasika import TeacherAbhyasika
 from models.attendance import Attendance
 from models.achievement import Achievement
-from models.achievement import Achievement
 
 student_bp = Blueprint(
     "student",

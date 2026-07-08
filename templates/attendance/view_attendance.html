@@ -1,110 +1,375 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
+{% block title %}
+View Attendance
+{% endblock %}
 
-    <title>
+{% block content %}
 
-        View Attendance
+<div class="container-fluid mt-4">
 
-    </title>
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-</head>
+        <h2 class="fw-bold">
+            Attendance Details
+        </h2>
 
-<body>
+        <a
+            href="{{ url_for('attendance.mark_attendance') }}"
+            class="btn btn-secondary"
+        >
+            ← Back
+        </a>
 
-    <h1>
+    </div>
 
-        View Attendance
+    <!-- Attendance Details -->
+    <div class="card shadow-sm mb-4">
 
-    </h1>
+        <div class="card-header">
 
-    <p>
+            <h5 class="mb-0">
 
-        Attendance Date :
+                Attendance Information
 
-        <b>
+            </h5>
 
-            {{ attendance_date }}
+        </div>
 
-        </b>
+        <div class="card-body">
 
-    </p>
+            <div class="row">
 
-    <table border="1" cellpadding="8">
+                <div class="col-md-6 mb-3">
 
-        <tr>
+                    <strong>Abhyasika</strong>
 
-            <th>
+                    <br>
 
-                Student Name
+                    {{ attendance_session.abhyasika.name }}
 
-            </th>
+                </div>
 
-            <th>
+                <div class="col-md-6 mb-3">
 
-                Standard
+                    <strong>Teacher</strong>
 
-            </th>
+                    <br>
 
-            <th>
+                    {{ attendance_session.teacher.name }}
 
-                Status
+                </div>
 
-            </th>
+                <div class="col-md-6 mb-3">
 
-        </tr>
+                    <strong>Attendance Date</strong>
 
-        {% for attendance, student in attendance_list %}
+                    <br>
 
-        <tr>
+                    {{ attendance_session.attendance_date.strftime("%d %B %Y") }}
 
-            <td>
+                </div>
 
-                {{ student.student_name }}
+                <div class="col-md-6 mb-3">
 
-            </td>
+                    <strong>Created At</strong>
 
-            <td>
+                    <br>
 
-                {{ student.standard }}
+                    {{ attendance_session.created_at.strftime("%d %B %Y %I:%M %p") }}
 
-            </td>
+                </div>
 
-            <td>
+            </div>
 
-                {{ attendance.status }}
+        </div>
 
-            </td>
+    </div>
 
-        </tr>
+    <!-- Summary -->
+    <div class="row mb-4">
 
-        {% endfor %}
+        <div class="col-md-3">
 
-    </table>
+            <div class="card text-center shadow-sm">
 
-    <br>
+                <div class="card-body">
 
-    <a href="{{ url_for(
-        'attendance.edit_attendance',
-        attendance_date=attendance_date,
-        abhyasika_id=abhyasika_id
-        ) }}">
+                    <h6>Total Students</h6>
 
-        Edit Attendance
+                    <h2>{{ total_students }}</h2>
 
-    </a>
+                </div>
 
-    <br><br>
+            </div>
 
-    <a href="{{ url_for(
-'attendance.mark_attendance'
-) }}">
+        </div>
 
-        Back
+        <div class="col-md-3">
 
-    </a>
+            <div class="card text-center shadow-sm">
 
-</body>
+                <div class="card-body">
 
-</html>
+                    <h6>Present</h6>
+
+                    <h2 class="text-success">
+
+                        {{ present_count }}
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card text-center shadow-sm">
+
+                <div class="card-body">
+
+                    <h6>Absent</h6>
+
+                    <h2 class="text-danger">
+
+                        {{ absent_count }}
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card text-center shadow-sm">
+
+                <div class="card-body">
+
+                    <h6>Attendance %</h6>
+
+                    <h2 class="text-primary">
+
+                        {{ attendance_percentage }}%
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- Attendance Proof -->
+    <!-- ========================================== -->
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header">
+
+            <h5 class="mb-0">
+
+                Attendance Proof
+
+            </h5>
+
+        </div>
+
+        <div class="card-body text-center">
+
+            <img
+
+                src="{{ photo_url }}"
+
+                alt="Attendance Proof"
+
+                class="img-fluid rounded border"
+
+                style="
+                    max-height:500px;
+                "
+
+            >
+
+            <br><br>
+
+            <a
+
+                href="{{ photo_url }}"
+
+                target="_blank"
+
+                class="btn btn-outline-primary"
+
+            >
+
+                View Full Image
+
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- Student Attendance -->
+    <!-- ========================================== -->
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header">
+
+            <h5 class="mb-0">
+
+                Student Attendance
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle">
+
+                    <thead class="table-dark">
+
+                        <tr>
+
+                            <th width="60">
+
+                                Sr.
+
+                            </th>
+
+                            <th>
+
+                                Student Name
+
+                            </th>
+
+                            <th width="150">
+
+                                Standard
+
+                            </th>
+
+                            <th width="140">
+
+                                Status
+
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for attendance, student in attendance_list %}
+
+                        <tr>
+
+                            <td>
+
+                                {{ loop.index }}
+
+                            </td>
+
+                            <td>
+
+                                {{ student.student_name }}
+
+                            </td>
+
+                            <td>
+
+                                {{ student.standard }}
+
+                            </td>
+
+                            <td>
+
+                                {% if attendance.status == "Present" %}
+
+                                    <span class="badge bg-success">
+
+                                        Present
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge bg-danger">
+
+                                        Absent
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="d-flex justify-content-between mt-4">
+
+        <a
+            href="{{ url_for('attendance.mark_attendance') }}"
+            class="btn btn-secondary"
+        >
+            <i class="bi bi-arrow-left"></i>
+            Back
+        </a>
+
+        <div>
+
+            <a
+                href="{{ url_for(
+                    'attendance.edit_attendance',
+                    attendance_session_id=attendance_session.id
+                ) }}"
+                class="btn btn-warning me-2"
+            >
+                <i class="bi bi-pencil-square"></i>
+                Edit Attendance
+            </a>
+
+            <a
+                href="{{ url_for(
+                    'attendance.delete_attendance',
+                    attendance_session_id=attendance_session.id
+                ) }}"
+                class="btn btn-danger"
+            >
+                <i class="bi bi-trash"></i>
+                Delete Attendance
+            </a>
+
+        </div>
+
+    </div>
+
+{% endblock %}
