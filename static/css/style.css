@@ -1045,10 +1045,7 @@ small{
 
     transition:var(--transition);
 
-    z-index:1030;
-
 }
-
 
 /*==============================================================
   SIDEBAR BRAND
@@ -1410,16 +1407,18 @@ small{
 
 
 /*==============================================================
-  MOBILE OFFCANVAS
+  MOBILE SIDEBAR
 ==============================================================*/
 
 .offcanvas.sidebar{
+
+    width:270px;
 
     background:var(--sidebar-bg);
 
     color:var(--sidebar-text);
 
-    width:280px;
+    border-right:none;
 
 }
 
@@ -1433,7 +1432,7 @@ small{
 
 .offcanvas-header h5{
 
-    color:var(--white);
+    color:#fff;
 
 }
 
@@ -5375,6 +5374,31 @@ REMARK CARD
     .quick-text {
 
         font-size: 14px;
+
+    }
+
+}
+
+
+/*==============================================================
+  MOBILE
+==============================================================*/
+
+@media (max-width:991.98px){
+
+    .sidebar.desktop-sidebar{
+
+        display:none;
+
+    }
+
+}
+
+@media (min-width:992px){
+
+    #sidebarMenu{
+
+        display:none !important;
 
     }
 

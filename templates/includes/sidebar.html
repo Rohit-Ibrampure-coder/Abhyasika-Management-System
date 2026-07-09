@@ -256,26 +256,32 @@
 ========================== -->
 
 <div
-
     class="offcanvas offcanvas-start sidebar"
-
-    tabindex="-1"
-
     id="sidebarMenu"
-
+    tabindex="-1"
 >
 
-    <div class="offcanvas-header">
+    <!-- Header -->
+
+    <div class="offcanvas-header border-bottom">
 
         <div>
 
-            <h5 class="mb-1">
+            <h5 class="fw-bold mb-0">
 
                 {{ APP_SHORT_NAME }}
 
             </h5>
 
-            <small>
+            <small class="text-muted">
+
+                Shri Laxmikeshav Pratisthan
+
+            </small>
+
+            <br>
+
+            <small class="text-muted">
 
                 Abhyasika Management System
 
@@ -284,107 +290,216 @@
         </div>
 
         <button
-
             type="button"
-
             class="btn-close"
-
-            data-bs-dismiss="offcanvas"
-
         ></button>
 
     </div>
 
-    <div class="offcanvas-body">
+    <!-- Body -->
+
+    <div class="offcanvas-body p-0">
 
         <nav class="sidebar-menu">
 
-        <ul class="nav flex-column">
+            <ul class="nav flex-column">
 
-            <li class="nav-item">
+                <!-- Dashboard -->
 
-                <a
+                <li class="nav-item">
 
-                    href="{% if current_user.role == 'admin' %}{{ url_for('admin.admin_dashboard') }}{% else %}{{ url_for('teacher.teacher_dashboard') }}{% endif %}"
+                    <a
+                        href="{% if current_user.role == 'admin' %}{{ url_for('admin.admin_dashboard') }}{% else %}{{ url_for('teacher.teacher_dashboard') }}{% endif %}"
+                        class="nav-link {% if request.endpoint in ['admin.admin_dashboard','teacher.teacher_dashboard'] %}active{% endif %}"
+                    >
 
-                    class="nav-link {% if request.endpoint in ['admin.admin_dashboard','teacher.teacher_dashboard'] %}active{% endif %}"
+                        <i class="bi bi-speedometer2"></i>
 
-                >
+                        <span class="menu-text">
 
-                    <i class="bi bi-speedometer2"></i>
+                            Dashboard
 
-                    Dashboard
+                        </span>
 
-                </a>
+                    </a>
 
-            </li>
+                </li>
 
-            <li class="nav-item">
+                <!-- Students -->
 
-                <a
-                    href="{{ url_for('student.view_students') }}"
-                    class="nav-link {% if request.endpoint=='student.view_students' %}active{% endif %}"
-                >
+                <li class="nav-item">
 
-                    <i class="bi bi-people-fill"></i>
+                    <a
+                        href="{{ url_for('student.view_students') }}"
+                        class="nav-link"
+                    >
 
-                    Students
+                        <i class="bi bi-people-fill"></i>
 
-                </a>
+                        <span class="menu-text">
 
-            </li>
+                            Students
 
-            <li class="nav-item">
+                        </span>
 
-                <a
+                    </a>
 
-                    href="{{ url_for('attendance.attendance_home') }}"
+                </li>
 
-                    class="nav-link
-                    {% if request.endpoint in [
-                        'attendance.attendance_home',
-                        'attendance.mark_attendance',
-                        'attendance.attendance_history',
-                        'attendance.view_attendance',
-                        'attendance.edit_attendance'
-                    ] %}
-                        active
-                    {% endif %}"
+                <!-- Attendance -->
 
-                >
+                <li class="nav-item">
 
-                    <i class="bi bi-calendar-check"></i>
+                    <a
+                        href="{{ url_for('attendance.attendance_home') }}"
+                        class="nav-link {% if request.endpoint in ['attendance.attendance_home','attendance.mark_attendance','attendance.attendance_history','attendance.view_attendance','attendance.edit_attendance'] %}active{% endif %}"
+                    >
 
-                    Attendance
+                        <i class="bi bi-calendar-check-fill"></i>
 
-                </a>
+                        <span class="menu-text">
 
+                            Attendance
 
-            </li>
+                        </span>
 
-            <li class="nav-item">
+                    </a>
 
-                <a
+                </li>
 
-                    href="{{ url_for('auth.logout') }}"
+                <!-- Marks -->
 
-                    class="nav-link text-danger"
+                <li class="nav-item">
 
-                >
+                    <a
+                        href="#"
+                        class="nav-link"
+                    >
 
-                    <i class="bi bi-box-arrow-right"></i>
+                        <i class="bi bi-journal-bookmark-fill"></i>
 
-                    <span class="menu-text">
+                        <span class="menu-text">
 
-                        Logout
+                            Marks
 
-                    </span>
+                        </span>
 
-                </a>
+                    </a>
 
-            </li>
+                </li>
 
-        </ul>
+                <!-- Admin Only -->
+
+                {% if current_user.role == "admin" %}
+
+                <li class="nav-item">
+
+                    <a
+                        href="{{ url_for('admin.view_abhyasikas') }}"
+                        class="nav-link {% if request.endpoint=='admin.view_abhyasikas' %}active{% endif %}"
+                    >
+
+                        <i class="bi bi-building"></i>
+
+                        <span class="menu-text">
+
+                            Abhyasikas
+
+                        </span>
+
+                    </a>
+
+                </li>
+
+                <li class="nav-item">
+
+                    <a
+                        href="{{ url_for('teacher_management.view_teachers') }}"
+                        class="nav-link {% if request.endpoint=='teacher_management.view_teachers' %}active{% endif %}"
+
+                    >
+
+                        <i class="bi bi-person-badge-fill"></i>
+
+                        <span class="menu-text">
+
+                            Teachers
+
+                        </span>
+
+                    </a>
+
+                </li>
+
+                {% endif %}
+
+                <!-- Reports -->
+
+                <li class="nav-item">
+
+                    <a
+                        href="#"
+                        class="nav-link"
+                    >
+
+                        <i class="bi bi-bar-chart-fill"></i>
+
+                        <span class="menu-text">
+
+                            Reports
+
+                        </span>
+
+                    </a>
+
+                </li>
+
+                <!-- Settings -->
+
+                <li class="nav-item">
+
+                    <a
+                        href="#"
+                        class="nav-link"
+                    >
+
+                        <i class="bi bi-gear-fill"></i>
+
+                        <span class="menu-text">
+
+                            Settings
+
+                        </span>
+
+                    </a>
+
+                </li>
+
+                <hr class="my-2">
+
+                <!-- Logout -->
+
+                <li class="nav-item">
+
+                    <a
+                        href="{{ url_for('auth.logout') }}"
+                        class="nav-link text-danger"
+                    >
+
+                        <i class="bi bi-box-arrow-right"></i>
+
+                        <span class="menu-text">
+
+                            Logout
+
+                        </span>
+
+                    </a>
+
+                </li>
+
+            </ul>
+
         </nav>
 
     </div>

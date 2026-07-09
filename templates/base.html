@@ -117,6 +117,32 @@
         src="{{ url_for('static', filename='js/script.js') }}"
     ></script>
 
+    <script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        document.querySelectorAll("#sidebarMenu .nav-link").forEach(function(link) {
+
+            link.addEventListener("click", function () {
+
+                const sidebarElement = document.getElementById("sidebarMenu");
+
+                const sidebar = bootstrap.Offcanvas.getInstance(sidebarElement);
+
+                if (sidebar) {
+
+                    sidebar.hide();
+
+                }
+
+            });
+
+        });
+
+    });
+
+    </script>
+
     {% block js %}
     {% endblock %}
 
