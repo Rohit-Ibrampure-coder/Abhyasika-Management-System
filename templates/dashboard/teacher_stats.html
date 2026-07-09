@@ -1,0 +1,203 @@
+<div class="row g-4 stats-grid">
+
+    <!-- ========================================= -->
+    <!-- My Students -->
+    <!-- ========================================= -->
+
+    <div class="col-xl-3 col-md-6">
+
+        <a
+
+            href="{{ url_for('student.view_students') }}"
+
+            class="text-decoration-none"
+
+        >
+
+            <div class="card stats-card">
+
+                <div class="card-body">
+
+                    <div class="stats-content">
+
+                        <p class="stats-label">
+
+                            My Students
+
+                        </p>
+
+                        <h2 class="stats-number">
+
+                            {{ my_students }}
+
+                        </h2>
+
+                        <span class="stats-footer">
+
+                            View Students
+
+                            <i class="bi bi-arrow-right"></i>
+
+                        </span>
+
+                    </div>
+
+                    <div class="stats-icon students-icon">
+
+                        <i class="bi bi-people-fill"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </a>
+
+    </div>
+
+    <!-- ========================================= -->
+    <!-- Present Today -->
+    <!-- ========================================= -->
+
+    <div class="col-xl-3 col-md-6">
+
+        <div class="card stats-card">
+
+            <div class="card-body">
+
+                <div class="stats-content">
+
+                    <p class="stats-label">
+
+                        Present Today
+
+                    </p>
+
+                    <h2 class="stats-number text-success">
+
+                        {{ today_present }}
+
+                    </h2>
+
+                    <span class="stats-footer">
+
+                        Today's Attendance
+
+                    </span>
+
+                </div>
+
+                <div class="stats-icon attendance-icon">
+
+                    <i class="bi bi-check-circle-fill"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ========================================= -->
+    <!-- Absent Today -->
+    <!-- ========================================= -->
+
+    <div class="col-xl-3 col-md-6">
+
+        <div class="card stats-card">
+
+            <div class="card-body">
+
+                <div class="stats-content">
+
+                    <p class="stats-label">
+
+                        Absent Today
+
+                    </p>
+
+                    <h2 class="stats-number text-danger">
+
+                        {{ today_absent }}
+
+                    </h2>
+
+                    <span class="stats-footer">
+
+                        Today's Attendance
+
+                    </span>
+
+                </div>
+
+                <div class="stats-icon attendance-icon">
+
+                    <i class="bi bi-x-circle-fill"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ========================================= -->
+    <!-- Attendance Rate -->
+    <!-- ========================================= -->
+
+    <div class="col-xl-3 col-md-6">
+
+        <a
+
+            href="{{ url_for('attendance.attendance_home') }}"
+
+            class="text-decoration-none"
+
+        >
+
+            <div class="card stats-card">
+
+                <div class="card-body">
+
+                    <div class="stats-content">
+
+                        <p class="stats-label">
+
+                            Attendance Rate
+
+                        </p>
+
+                        <h2 class="stats-number">
+
+                            {{ attendance_rate }}%
+
+                        </h2>
+
+                        <span class="stats-footer">
+
+                            View Attendance
+
+                            <i class="bi bi-arrow-right"></i>
+
+                        </span>
+
+                    </div>
+
+                    <div class="stats-icon attendance-icon">
+
+                        <i class="bi bi-bar-chart-fill"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </a>
+
+    </div>
+
+</div>

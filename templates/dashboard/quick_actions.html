@@ -1,42 +1,77 @@
 <div class="section quick-actions-section">
 
     <h4 class="quick-actions-title">
+
         <i class="bi bi-lightning-charge-fill"></i>
+
         Quick Actions
+
     </h4>
 
     <div class="row g-4 quick-grid">
 
-        <!-- Add Student -->
+        <!-- ========================================== -->
+        <!-- Students -->
+        <!-- ========================================== -->
+
         <div class="col-12 col-md-6 col-xl-4">
 
             <a
-                href="{{ url_for('student.add_student') }}"
+
+                href="{{ url_for('student.view_students') }}"
+
                 class="text-decoration-none"
-                aria-label="Add Student"
+
             >
 
                 <div class="quick-card">
 
                     <div class="quick-icon quick-blue">
-                        <i class="bi bi-person-plus-fill"></i>
+
+                        <i class="bi bi-people-fill"></i>
+
                     </div>
 
                     <div class="quick-content">
 
+                        {% if current_user.role == "admin" %}
+
                         <h5 class="quick-title">
-                            Add Student
+
+                            Students
+
                         </h5>
 
                         <p class="quick-text">
-                            Register a new student in the system.
+
+                            Manage all students in every Abhyasika.
+
                         </p>
+
+                        {% else %}
+
+                        <h5 class="quick-title">
+
+                            My Students
+
+                        </h5>
+
+                        <p class="quick-text">
+
+                            Manage students of your assigned Abhyasika.
+
+                        </p>
+
+                        {% endif %}
 
                     </div>
 
                     <div class="quick-link">
+
                         Open
+
                         <i class="bi bi-arrow-right"></i>
+
                     </div>
 
                 </div>
@@ -45,32 +80,50 @@
 
         </div>
 
+        <!-- ========================================== -->
         <!-- Attendance -->
+        <!-- ========================================== -->
+
         <div class="col-12 col-md-6 col-xl-4">
 
-            <a href="{{ url_for('attendance.mark_attendance') }}" class="text-decoration-none">
+            <a
+
+                href="{{ url_for('attendance.attendance_home') }}"
+
+                class="text-decoration-none"
+
+            >
 
                 <div class="quick-card">
 
                     <div class="quick-icon quick-green">
+
                         <i class="bi bi-calendar-check-fill"></i>
+
                     </div>
 
                     <div class="quick-content">
 
                         <h5 class="quick-title">
+
                             Attendance
+
                         </h5>
 
                         <p class="quick-text">
-                            Mark today's attendance quickly.
+
+                            Mark attendance and view attendance history.
+
                         </p>
 
                     </div>
 
                     <div class="quick-link">
+
                         Open
+
                         <i class="bi bi-arrow-right"></i>
+
                     </div>
 
                 </div>
@@ -79,32 +132,52 @@
 
         </div>
 
-        <!-- Teachers -->
+        <!-- ========================================== -->
+        <!-- Teachers (Admin Only) -->
+        <!-- ========================================== -->
+
+        {% if current_user.role == "admin" %}
+
         <div class="col-12 col-md-6 col-xl-4">
 
-            <a href="{{ url_for('teacher_management.view_teachers') }}" class="text-decoration-none">
+            <a
+
+                href="{{ url_for('teacher_management.view_teachers') }}"
+
+                class="text-decoration-none"
+
+            >
 
                 <div class="quick-card">
 
                     <div class="quick-icon quick-cyan">
+
                         <i class="bi bi-person-workspace"></i>
+
                     </div>
 
                     <div class="quick-content">
 
                         <h5 class="quick-title">
+
                             Teachers
+
                         </h5>
 
                         <p class="quick-text">
+
                             Manage teacher accounts and permissions.
+
                         </p>
 
                     </div>
 
                     <div class="quick-link">
+
                         Open
+
                         <i class="bi bi-arrow-right"></i>
+
                     </div>
 
                 </div>
@@ -113,32 +186,52 @@
 
         </div>
 
+        {% endif %}
+
+        <!-- ========================================== -->
         <!-- Marks -->
+        <!-- ========================================== -->
+
         <div class="col-12 col-md-6 col-xl-4">
 
-            <a href="#" class="text-decoration-none">
+            <a
+
+                href="#"
+
+                class="text-decoration-none"
+
+            >
 
                 <div class="quick-card">
 
                     <div class="quick-icon quick-yellow">
+
                         <i class="bi bi-journal-bookmark-fill"></i>
+
                     </div>
 
                     <div class="quick-content">
 
                         <h5 class="quick-title">
+
                             Marks
+
                         </h5>
 
                         <p class="quick-text">
+
                             Manage and update student marks.
+
                         </p>
 
                     </div>
 
                     <div class="quick-link">
+
                         Open
+
                         <i class="bi bi-arrow-right"></i>
+
                     </div>
 
                 </div>
@@ -147,32 +240,52 @@
 
         </div>
 
-        <!-- Reports -->
+        <!-- ========================================== -->
+        <!-- Reports (Admin Only) -->
+        <!-- ========================================== -->
+
+        {% if current_user.role == "admin" %}
+
         <div class="col-12 col-md-6 col-xl-4">
 
-            <a href="#" class="text-decoration-none">
+            <a
+
+                href="#"
+
+                class="text-decoration-none"
+
+            >
 
                 <div class="quick-card">
 
                     <div class="quick-icon quick-red">
+
                         <i class="bi bi-bar-chart-fill"></i>
+
                     </div>
 
                     <div class="quick-content">
 
                         <h5 class="quick-title">
+
                             Reports
+
                         </h5>
 
                         <p class="quick-text">
+
                             View attendance and student reports.
+
                         </p>
 
                     </div>
 
                     <div class="quick-link">
+
                         Open
+
                         <i class="bi bi-arrow-right"></i>
+
                     </div>
 
                 </div>
@@ -181,32 +294,54 @@
 
         </div>
 
-        <!-- Abhyasikas -->
+        {% endif %}
+
+        <!-- ========================================== -->
+        <!-- Abhyasikas (Admin Only) -->
+        <!-- ========================================== -->
+
+        {% if current_user.role == "admin" %}
+
         <div class="col-12 col-md-6 col-xl-4">
 
-            <a href="{{ url_for('admin.view_abhyasikas') }}" class="text-decoration-none">
+            <a
+
+                href="{{ url_for('admin.view_abhyasikas') }}"
+
+                class="text-decoration-none"
+
+            >
 
                 <div class="quick-card">
 
                     <div class="quick-icon quick-gray">
+
                         <i class="bi bi-building-fill"></i>
+
                     </div>
 
                     <div class="quick-content">
 
                         <h5 class="quick-title">
+
                             Abhyasikas
+
                         </h5>
 
                         <p class="quick-text">
+
                             Manage study centres and their details.
+
                         </p>
 
                     </div>
 
                     <div class="quick-link">
+
                         Open
+
                         <i class="bi bi-arrow-right"></i>
+
                     </div>
 
                 </div>
@@ -214,6 +349,8 @@
             </a>
 
         </div>
+
+        {% endif %}
 
     </div>
 

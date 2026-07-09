@@ -14,27 +14,58 @@
 
                 </h4>
 
+                {% if current_user.role == "admin" %}
+
                 <p class="attendance-subtitle">
 
                     Attendance summary by Abhyasika
 
                 </p>
 
+                {% else %}
+
+                <p class="attendance-subtitle">
+
+                    {{ abhyasika.name }} • Today's attendance summary
+
+                </p>
+
+                {% endif %}
+
+                <small class="text-muted">
+
+                    <i class="bi bi-clock-history"></i>
+
+                    Updated Today
+
+                </small>
+
             </div>
+
+            {% if current_user.role == "admin" %}
 
             <form method="GET">
 
                 <select
+
                     class="form-select attendance-select"
+
                     name="abhyasika_id"
+
                     onchange="this.form.submit()"
+
                 >
 
                     {% for abhyasika in abhyasikas %}
 
                     <option
+
                         value="{{ abhyasika.id }}"
-                        {% if selected_abhyasika and selected_abhyasika.id == abhyasika.id %}selected{% endif %}
+
+                        {% if selected_abhyasika and selected_abhyasika.id == abhyasika.id %}
+                        selected
+                        {% endif %}
+
                     >
 
                         {{ abhyasika.name }}
@@ -46,6 +77,22 @@
                 </select>
 
             </form>
+
+            {% else %}
+
+            <div class="attendance-center-name">
+
+                <span class="badge bg-primary fs-6 px-3 py-2">
+
+                    <i class="bi bi-building"></i>
+
+                    {{ abhyasika.name }}
+
+                </span>
+
+            </div>
+
+            {% endif %}
 
         </div>
 
@@ -71,11 +118,17 @@
 
                         </h2>
 
-                        <p>
+                        <p class="mb-0">
 
                             Present Students
 
                         </p>
+
+                        <small class="text-muted">
+
+                            Today
+
+                        </small>
 
                     </div>
 
@@ -103,11 +156,17 @@
 
                         </h2>
 
-                        <p>
+                        <p class="mb-0">
 
                             Absent Students
 
                         </p>
+
+                        <small class="text-muted">
+
+                            Today
+
+                        </small>
 
                     </div>
 
@@ -135,11 +194,17 @@
 
                         </h2>
 
-                        <p>
+                        <p class="mb-0">
 
                             Attendance Rate
 
                         </p>
+
+                        <small class="text-muted">
+
+                            Today
+
+                        </small>
 
                     </div>
 

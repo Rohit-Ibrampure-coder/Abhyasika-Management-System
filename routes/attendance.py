@@ -494,15 +494,36 @@ def attendance_history():
     # Filter Values
     # ==========================================
 
-    selected_abhyasika = request.args.get(
-        "abhyasika_id",
-        type=int
-    )
-
     selected_teacher = request.args.get(
         "teacher_id",
         type=int
     )
+
+    # ------------------------------------------
+    # Admin
+    # ------------------------------------------
+
+    if current_user.role == "admin":
+
+        selected_abhyasika = request.args.get(
+
+            "abhyasika_id",
+
+            type=int
+
+        )
+
+    # ------------------------------------------
+    # Teacher
+    # ------------------------------------------
+
+    else:
+
+        selected_abhyasika = session.get(
+
+            "abhyasika_id"
+
+        )
 
     # ==========================================
     # Date Range Filters
@@ -521,6 +542,19 @@ def attendance_history():
     # ==========================================
 
     query = AttendanceSession.query
+
+    # ==========================================
+    # Teacher can see only own Abhyasika
+    # ==========================================
+
+    if current_user.role == "teacher":
+
+        query = query.filter(
+
+            AttendanceSession.abhyasika_id ==
+            selected_abhyasika
+
+        )
 
     if selected_abhyasika:
 
@@ -598,11 +632,11 @@ def attendance_history():
 
     history = []
 
-    for session in attendance_sessions.items:
+    for attendance_session in attendance_sessions.items:
 
         present_count = Attendance.query.filter_by(
 
-            attendance_session_id=session.id,
+            attendance_session_id=attendance_session.id,
 
             status="Present"
 
@@ -610,7 +644,7 @@ def attendance_history():
 
         absent_count = Attendance.query.filter_by(
 
-            attendance_session_id=session.id,
+            attendance_session_id=attendance_session.id,
 
             status="Absent"
 
@@ -626,7 +660,7 @@ def attendance_history():
 
         history.append({
 
-            "session": session,
+            "session": attendance_session,
 
             "present": present_count,
 
@@ -663,14 +697,26 @@ def attendance_history():
     ).count()
 
     # ==========================================
-    # Dropdown Data
+    # Abhyasika Dropdown
     # ==========================================
 
-    abhyasikas = Abhyasika.query.order_by(
+    if current_user.role == "admin":
 
-        Abhyasika.name
+        abhyasikas = Abhyasika.query.order_by(
 
-    ).all()
+            Abhyasika.name
+
+        ).all()
+
+    else:
+
+        abhyasikas = []
+
+        abhyasika = Abhyasika.query.get(
+
+            selected_abhyasika
+
+        )
 
     teachers = User.query.filter_by(
 
@@ -714,7 +760,8 @@ def attendance_history():
         from_date=from_date,
 
         to_date=to_date,
-        pagination=attendance_sessions
+        pagination=attendance_sessions,
+        abhyasika=abhyasika,
 
     )
 

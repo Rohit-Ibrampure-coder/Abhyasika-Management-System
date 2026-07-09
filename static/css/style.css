@@ -5355,3 +5355,27 @@ REMARK CARD
     margin-right:8px;
 
 }
+
+
+@media (max-width: 992px) {
+
+    .quick-card {
+
+        min-height: 180px;
+        padding: 20px;
+
+    }
+
+    .quick-title {
+
+        font-size: 18px;
+
+    }
+
+    .quick-text {
+
+        font-size: 14px;
+
+    }
+
+}

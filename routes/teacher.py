@@ -13,6 +13,11 @@ from flask_login import (
     current_user,
     logout_user
 )
+from datetime import date
+from models.student import Student
+from models.attendance_session import AttendanceSession
+from models.attendance import Attendance
+
 
 from models.teacher_abhyasika import (
     TeacherAbhyasika
@@ -60,18 +65,22 @@ def select_abhyasika():
 @login_required
 def teacher_dashboard():
 
-    # Get all Abhyasikas assigned to this teacher
+    # ==========================================
+    # Get Assigned Abhyasikas
+    # ==========================================
+
     assignments = TeacherAbhyasika.query.filter_by(
         teacher_id=current_user.id
     ).all()
 
-    # -------------------------------------------------
-    # No Abhyasika Assigned
-    # -------------------------------------------------
+    # ==========================================
+    # No Assignment
+    # ==========================================
+
     if len(assignments) == 0:
 
         flash(
-            "Your account has not been assigned to any Abhyasika. Please contact the administrator to gain access."
+            "Your account has not been assigned to any Abhyasika. Please contact the administrator."
         )
 
         logout_user()
@@ -82,32 +91,32 @@ def teacher_dashboard():
             url_for("auth.login")
         )
 
-    # -------------------------------------------------
-    # Only One Abhyasika Assigned
-    # -------------------------------------------------
+    # ==========================================
+    # One Assignment
+    # ==========================================
+
     if len(assignments) == 1:
 
-        # Always use the assigned Abhyasika
         session["abhyasika_id"] = assignments[0].abhyasika_id
 
-    # -------------------------------------------------
-    # Multiple Abhyasikas Assigned
-    # -------------------------------------------------
+    # ==========================================
+    # Multiple Assignments
+    # ==========================================
+
     else:
 
-        # If teacher hasn't selected one yet
         if "abhyasika_id" not in session:
 
             return redirect(
                 url_for("teacher.select_abhyasika")
             )
 
-        # Safety check:
-        # If the selected Abhyasika is no longer assigned,
-        # clear it and ask the teacher to select again.
         assigned_ids = [
+
             assignment.abhyasika_id
+
             for assignment in assignments
+
         ]
 
         if session["abhyasika_id"] not in assigned_ids:
@@ -118,14 +127,120 @@ def teacher_dashboard():
                 url_for("teacher.select_abhyasika")
             )
 
-    # -------------------------------------------------
-    # Load Selected Abhyasika
-    # -------------------------------------------------
+    # ==========================================
+    # Selected Abhyasika
+    # ==========================================
+
     abhyasika = Abhyasika.query.get_or_404(
+
         session["abhyasika_id"]
+
     )
 
+    # ==========================================
+    # Date
+    # ==========================================
+
+    today = date.today()
+
+    # ==========================================
+    # Students
+    # ==========================================
+
+    my_students = Student.query.filter_by(
+
+        abhyasika_id=abhyasika.id,
+
+        status="Active"
+
+    ).count()
+
+    # ==========================================
+    # Today's Attendance Session
+    # ==========================================
+
+    today_session = AttendanceSession.query.filter_by(
+
+        abhyasika_id=abhyasika.id,
+
+        attendance_date=today
+
+    ).first()
+
+    today_present = 0
+
+    today_absent = 0
+
+    if today_session:
+
+        today_present = Attendance.query.filter_by(
+
+            attendance_session_id=today_session.id,
+
+            status="Present"
+
+        ).count()
+
+        today_absent = Attendance.query.filter_by(
+
+            attendance_session_id=today_session.id,
+
+            status="Absent"
+
+        ).count()
+
+    # ==========================================
+    # Attendance Rate
+    # ==========================================
+
+    attendance_rate = 0
+
+    if my_students > 0:
+
+        attendance_rate = round(
+
+            (today_present / my_students) * 100,
+
+            1
+
+        )
+
+    # ==========================================
+    # Attendance Summary Variables
+    # ==========================================
+
+    present_count = today_present
+
+    absent_count = today_absent
+
+    attendance_percentage = attendance_rate
+
+    selected_abhyasika = abhyasika
+
+    abhyasikas = [abhyasika]
+
+    # ==========================================
+    # Render
+    # ==========================================
+
     return render_template(
+
         "dashboard/dashboard.html",
-        abhyasika=abhyasika
+
+        # Current Abhyasika
+        abhyasika=abhyasika,
+
+        # Teacher Stats
+        my_students=my_students,
+        today_present=today_present,
+        today_absent=today_absent,
+        attendance_rate=attendance_rate,
+
+        # Attendance Summary
+        present_count=present_count,
+        absent_count=absent_count,
+        attendance_percentage=attendance_percentage,
+        selected_abhyasika=selected_abhyasika,
+        abhyasikas=abhyasikas
+
     )

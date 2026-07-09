@@ -180,6 +180,8 @@ Attendance History
 
                         </label>
 
+                        {% if current_user.role == "admin" %}
+
                         <select
                             name="abhyasika_id"
                             class="form-select"
@@ -194,13 +196,10 @@ Attendance History
                             {% for abhyasika in abhyasikas %}
 
                             <option
-
                                 value="{{ abhyasika.id }}"
-
                                 {% if selected_abhyasika == abhyasika.id %}
                                 selected
                                 {% endif %}
-
                             >
 
                                 {{ abhyasika.name }}
@@ -211,6 +210,17 @@ Attendance History
 
                         </select>
 
+                        {% else %}
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            value="{{ abhyasika.name }}"
+                            readonly
+                        >
+
+                        {% endif %}
+
                     </div>
 
                     <div class="col-lg-3 mb-3">
@@ -220,6 +230,8 @@ Attendance History
                             Teacher
 
                         </label>
+
+                        {% if current_user.role == "admin" %}
 
                         <select
                             name="teacher_id"
@@ -235,13 +247,10 @@ Attendance History
                             {% for teacher in teachers %}
 
                             <option
-
                                 value="{{ teacher.id }}"
-
                                 {% if selected_teacher == teacher.id %}
                                 selected
                                 {% endif %}
-
                             >
 
                                 {{ teacher.name }}
@@ -251,6 +260,17 @@ Attendance History
                             {% endfor %}
 
                         </select>
+
+                        {% else %}
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            value="{{ current_user.name }}"
+                            readonly
+                        >
+
+                        {% endif %}
 
                     </div>
 
