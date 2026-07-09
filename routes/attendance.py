@@ -7,6 +7,7 @@ from flask import (
     url_for,
     flash
 )
+from sqlalchemy import func
 
 from utils.file_upload import (
     allowed_attendance_file,
@@ -24,6 +25,7 @@ from datetime import datetime
 from models.achievement import Achievement
 from models.attendance_session import AttendanceSession
 from models.teacher_abhyasika import TeacherAbhyasika
+from models.user import User
 
 from flask_login import (
     login_required,
@@ -36,7 +38,19 @@ attendance_bp = Blueprint(
 )
 
 @attendance_bp.route(
-    "/attendance",
+    "/attendance"
+)
+@login_required
+def attendance_home():
+
+    return render_template(
+
+        "attendance/attendance_home.html"
+
+    )
+
+@attendance_bp.route(
+    "/attendance/mark",
     methods=["GET", "POST"]
 )
 @login_required
@@ -467,6 +481,240 @@ def save_attendance():
             attendance_session_id=attendance_session.id
 
         )
+
+    )
+
+@attendance_bp.route(
+    "/attendance/history"
+)
+@login_required
+def attendance_history():
+
+    # ==========================================
+    # Filter Values
+    # ==========================================
+
+    selected_abhyasika = request.args.get(
+        "abhyasika_id",
+        type=int
+    )
+
+    selected_teacher = request.args.get(
+        "teacher_id",
+        type=int
+    )
+
+    # ==========================================
+    # Date Range Filters
+    # ==========================================
+
+    from_date = request.args.get(
+        "from_date"
+    )
+
+    to_date = request.args.get(
+        "to_date"
+    )
+
+    # ==========================================
+    # Attendance Session Query
+    # ==========================================
+
+    query = AttendanceSession.query
+
+    if selected_abhyasika:
+
+        query = query.filter(
+
+            AttendanceSession.abhyasika_id ==
+            selected_abhyasika
+
+        )
+
+    if selected_teacher:
+
+        query = query.filter(
+
+            AttendanceSession.teacher_id ==
+            selected_teacher
+
+        )
+
+    # ==========================================
+    # From Date
+    # ==========================================
+
+    if from_date:
+
+        query = query.filter(
+
+            AttendanceSession.attendance_date >= from_date
+
+        )
+
+    # ==========================================
+    # To Date
+    # ==========================================
+
+    if to_date:
+
+        query = query.filter(
+
+            AttendanceSession.attendance_date <= to_date
+
+        )
+
+    attendance_sessions = (
+
+        query
+
+        .order_by(
+
+            AttendanceSession.attendance_date.desc(),
+
+            AttendanceSession.created_at.desc()
+
+        )
+
+        .paginate(
+
+            page=request.args.get(
+                "page",
+                1,
+                type=int
+            ),
+
+            per_page=10,
+
+            error_out=False
+
+        )
+
+    )
+
+    # ==========================================
+    # Attendance History List
+    # ==========================================
+
+    history = []
+
+    for session in attendance_sessions.items:
+
+        present_count = Attendance.query.filter_by(
+
+            attendance_session_id=session.id,
+
+            status="Present"
+
+        ).count()
+
+        absent_count = Attendance.query.filter_by(
+
+            attendance_session_id=session.id,
+
+            status="Absent"
+
+        ).count()
+
+        total_students = (
+
+            present_count +
+
+            absent_count
+
+        )
+
+        history.append({
+
+            "session": session,
+
+            "present": present_count,
+
+            "absent": absent_count,
+
+            "total": total_students
+
+        })
+
+    # ==========================================
+    # Dashboard Statistics
+    # ==========================================
+
+    total_sessions = query.count()
+
+    today = date.today()
+
+    today_sessions = AttendanceSession.query.filter_by(
+
+        attendance_date=today
+
+    ).count()
+
+    total_present = Attendance.query.filter_by(
+
+        status="Present"
+
+    ).count()
+
+    total_absent = Attendance.query.filter_by(
+
+        status="Absent"
+
+    ).count()
+
+    # ==========================================
+    # Dropdown Data
+    # ==========================================
+
+    abhyasikas = Abhyasika.query.order_by(
+
+        Abhyasika.name
+
+    ).all()
+
+    teachers = User.query.filter_by(
+
+        role="teacher"
+
+    ).order_by(
+
+        User.name
+
+    ).all()
+
+    # ==========================================
+    # Render
+    # ==========================================
+
+    return render_template(
+
+        "attendance/attendance_history.html",
+
+        # Table
+        history=history,
+
+        # Dashboard
+        total_sessions=total_sessions,
+
+        today_sessions=today_sessions,
+
+        total_present=total_present,
+
+        total_absent=total_absent,
+
+        # Filters
+        abhyasikas=abhyasikas,
+
+        teachers=teachers,
+
+        selected_abhyasika=selected_abhyasika,
+
+        selected_teacher=selected_teacher,
+
+        from_date=from_date,
+
+        to_date=to_date,
+        pagination=attendance_sessions
 
     )
 

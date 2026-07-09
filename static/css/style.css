@@ -5322,3 +5322,36 @@ REMARK CARD
     padding-top:15px;
 
 }
+
+/* ==========================================
+   Bootstrap Card Header
+========================================== */
+
+.card-header{
+
+    display:flex;
+
+    align-items:center;
+
+    min-height:60px;
+
+}
+
+.card-header h3,
+.card-header h4,
+.card-header h5,
+.card-header h6{
+
+    color:#ffffff !important;
+
+    margin:0;
+
+    font-weight:600;
+
+}
+
+.card-header i{
+
+    margin-right:8px;
+
+}

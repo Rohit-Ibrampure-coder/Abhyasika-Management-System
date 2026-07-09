@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}
+Attendance
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid mt-4">
+
+    <!-- ========================================== -->
+    <!-- Page Header -->
+    <!-- ========================================== -->
+
+    <div class="mb-4">
+
+        <h2 class="fw-bold">
+
+            Attendance Module
+
+        </h2>
+
+        <p class="text-muted">
+
+            Manage daily attendance and attendance history.
+
+        </p>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- Cards -->
+    <!-- ========================================== -->
+
+    <div class="row">
+
+        <!-- Mark Attendance -->
+
+        <div class="col-lg-6 mb-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body text-center p-5">
+
+                    <i
+                        class="bi bi-pencil-square display-1 text-primary"
+                    ></i>
+
+                    <h3 class="mt-4">
+
+                        Mark Attendance
+
+                    </h3>
+
+                    <p class="text-muted">
+
+                        Record today's attendance for students.
+
+                    </p>
+
+                    <a
+            href="{{ url_for('attendance.mark_attendance') }}"
+            class="btn btn-primary btn-lg mt-3"
+        >
+
+            <i class="bi bi-arrow-right-circle"></i>
+
+            Open
+
+        </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Attendance History -->
+
+        <div class="col-lg-6 mb-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body text-center p-5">
+
+                    <i
+                        class="bi bi-clock-history display-1 text-success"
+                    ></i>
+
+                    <h3 class="mt-4">
+
+                        Attendance History
+
+                    </h3>
+
+                    <p class="text-muted">
+
+                        View, search, edit and delete attendance records.
+
+                    </p>
+
+                    <a
+
+                        href="{{ url_for('attendance.attendance_history') }}"
+
+                        class="btn btn-success btn-lg mt-3"
+
+                    >
+
+                        <i class="bi bi-arrow-right-circle"></i>
+
+                        Open
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
