@@ -700,32 +700,32 @@ def attendance_history():
     # Abhyasika Dropdown
     # ==========================================
 
+    abhyasika = None
+
     if current_user.role == "admin":
 
         abhyasikas = Abhyasika.query.order_by(
-
             Abhyasika.name
-
         ).all()
 
     else:
 
         abhyasikas = []
 
-        abhyasika = Abhyasika.query.get(
+        if selected_abhyasika:
 
-            selected_abhyasika
+            abhyasika = Abhyasika.query.get(
+                selected_abhyasika
+            )
 
-        )
+    # ==========================================
+    # Teacher Dropdown
+    # ==========================================
 
     teachers = User.query.filter_by(
-
         role="teacher"
-
     ).order_by(
-
         User.name
-
     ).all()
 
     # ==========================================
@@ -736,10 +736,8 @@ def attendance_history():
 
         "attendance/attendance_history.html",
 
-        # Table
         history=history,
 
-        # Dashboard
         total_sessions=total_sessions,
 
         today_sessions=today_sessions,
@@ -748,7 +746,6 @@ def attendance_history():
 
         total_absent=total_absent,
 
-        # Filters
         abhyasikas=abhyasikas,
 
         teachers=teachers,
@@ -760,8 +757,10 @@ def attendance_history():
         from_date=from_date,
 
         to_date=to_date,
+
         pagination=attendance_sessions,
-        abhyasika=abhyasika,
+
+        abhyasika=abhyasika
 
     )
 

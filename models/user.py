@@ -1,23 +1,31 @@
 from flask_login import UserMixin
 from models import db
 
-class User(UserMixin,db.Model):
+
+class User(UserMixin, db.Model):
+
     __tablename__ = "users"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
-    name = db.Column(db.String(100), nullable=False)
+    name = db.Column(
+        db.String(100),
+        nullable=False
+    )
 
     mobile = db.Column(
-    db.String(15)
+        db.String(15)
     )
-    
+
     username = db.Column(
         db.String(50),
         unique=True,
         nullable=False
     )
-    
+
     email = db.Column(
         db.String(120),
         unique=True
@@ -28,9 +36,23 @@ class User(UserMixin,db.Model):
         nullable=False
     )
 
-
     role = db.Column(
         db.Enum("admin", "teacher"),
+        nullable=False
+    )
+
+    # ==========================================
+    # New Fields
+    # ==========================================
+
+    profile_photo = db.Column(
+        db.String(255),
+        default="default.png"
+    )
+
+    is_active_account = db.Column(
+        db.Boolean,
+        default=True,
         nullable=False
     )
 
@@ -38,6 +60,14 @@ class User(UserMixin,db.Model):
         db.DateTime,
         server_default=db.func.now()
     )
+
+    last_login = db.Column(
+        db.DateTime
+    )
+
+    # ==========================================
+    # Relationships
+    # ==========================================
 
     teacher_assignments = db.relationship(
         "TeacherAbhyasika",

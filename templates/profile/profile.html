@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+
+{% block title %}
+My Profile
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- ========================================== -->
+    <!-- Page Header -->
+    <!-- ========================================== -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold">
+
+                My Profile
+
+            </h2>
+
+            <p class="text-muted mb-0">
+
+                View your account information.
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <!-- ========================================== -->
+        <!-- Profile Card -->
+        <!-- ========================================== -->
+
+        <div class="col-lg-4 mb-4">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body text-center">
+
+                    <div
+                        class="rounded-circle bg-primary text-white
+                        d-flex align-items-center justify-content-center
+                        mx-auto mb-3"
+                        style="width:110px;height:110px;font-size:42px;font-weight:700;"
+                    >
+
+                        {{ current_user.name[0]|upper }}
+
+                    </div>
+
+                    <h3 class="fw-bold">
+
+                        {{ current_user.name }}
+
+                    </h3>
+
+                    <p class="text-muted">
+
+                        {{ current_user.role|title }}
+
+                    </p>
+
+                    <span class="badge bg-success">
+
+                        Active
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ========================================== -->
+        <!-- Information -->
+        <!-- ========================================== -->
+
+        <div class="col-lg-8">
+
+            <!-- Personal -->
+
+            <div class="card shadow-sm border-0 mb-4">
+
+                <div class="card-header bg-primary text-white">
+
+                    <h5 class="mb-0">
+
+                        <i class="bi bi-person-fill me-2"></i>
+
+                        Personal Information
+
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row gy-3">
+
+                        <div class="col-md-6">
+
+                            <strong>Full Name</strong>
+
+                            <div>{{ current_user.name }}</div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <strong>Username</strong>
+
+                            <div>{{ current_user.username }}</div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <strong>Email</strong>
+
+                            <div>
+
+                                {{ current_user.email or "-" }}
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <strong>Mobile</strong>
+
+                            <div>
+
+                                {{ current_user.mobile or "-" }}
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <strong>Role</strong>
+
+                            <div>
+
+                                {{ current_user.role|title }}
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <strong>Account Created</strong>
+
+                            <div>
+
+                                {{ current_user.created_at.strftime("%d %b %Y") }}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Work Information -->
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-header bg-success text-white">
+
+                    <h5 class="mb-0">
+
+                        <i class="bi bi-briefcase-fill me-2"></i>
+
+                        Work Information
+
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    {% if current_user.role == "admin" %}
+
+                    <div class="row gy-3">
+
+                        <div class="col-md-4">
+
+                            <strong>Total Students</strong>
+
+                            <div>{{ total_students }}</div>
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <strong>Total Teachers</strong>
+
+                            <div>{{ total_teachers }}</div>
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <strong>Total Abhyasikas</strong>
+
+                            <div>{{ total_abhyasikas }}</div>
+
+                        </div>
+
+                    </div>
+
+                    {% else %}
+
+                    <div class="row gy-3">
+
+                        <div class="col-md-6">
+
+                            <strong>Assigned Abhyasika</strong>
+
+                            <div>
+
+                                {% if assigned_abhyasika %}
+
+                                    {{ assigned_abhyasika.name }}
+
+                                {% else %}
+
+                                    -
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <strong>Total Students</strong>
+
+                            <div>{{ total_students }}</div>
+
+                        </div>
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            <!-- Action -->
+
+            <div class="mt-4 text-end">
+
+                <a
+                    href="{{ url_for('profile.edit_profile') }}"
+                    class="btn btn-primary"
+                >
+
+                    <i class="bi bi-pencil-square me-2"></i>
+
+                    Edit Profile
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
