@@ -13,6 +13,8 @@ from routes.attendance import attendance_bp
 from routes.remark import remark_bp
 from routes.achievement import achievement_bp
 from routes.profile import profile_bp
+from routes.reports import reports_bp
+from routes.daily_report import daily_report_bp
 
 from branding import (
     APP_NAME,
@@ -70,6 +72,8 @@ app.register_blueprint(attendance_bp)
 app.register_blueprint(remark_bp)
 app.register_blueprint(achievement_bp)
 app.register_blueprint(profile_bp)
+app.register_blueprint(reports_bp)
+app.register_blueprint(daily_report_bp)
 
 
 

@@ -26,6 +26,7 @@ from models.remark import Remark
 from models.achievement import Achievement
 from models.teacher_abhyasika import TeacherAbhyasika
 from models.attendance_session import AttendanceSession
+from models.daily_report import DailyReport
 
 admin_bp = Blueprint(
     "admin",
@@ -189,6 +190,46 @@ def admin_dashboard():
         ).count()
 
     # ==========================================
+    # Daily Report Statistics
+    # ==========================================
+
+    today_sessions = AttendanceSession.query.filter_by(
+        attendance_date=today
+    ).all()
+
+    total_reports = len(today_sessions)
+
+    completed_reports = DailyReport.query.filter_by(
+        report_date=today
+    ).count()
+
+    pending_reports = max(0, total_reports - completed_reports)
+
+    # ------------------------------------------
+    # Pending Daily Reports
+    # ------------------------------------------
+
+    pending_daily_reports = []
+
+    for attendance_session in today_sessions:
+
+        report = DailyReport.query.filter_by(
+            attendance_session_id=attendance_session.id
+        ).first()
+
+        if not report:
+
+            pending_daily_reports.append({
+
+                "abhyasika": attendance_session.abhyasika,
+
+                "teacher": attendance_session.teacher,
+
+                "attendance_session": attendance_session
+
+            })
+
+    # ==========================================
     # Render Template
     # ==========================================
 
@@ -214,7 +255,15 @@ def admin_dashboard():
 
         absent_count=absent_count,
 
-        attendance_percentage=attendance_percentage
+        attendance_percentage=attendance_percentage,
+
+        total_reports=total_reports,
+
+        completed_reports=completed_reports,
+
+        pending_reports=pending_reports,
+
+        pending_daily_reports=pending_daily_reports,
 
     )
 

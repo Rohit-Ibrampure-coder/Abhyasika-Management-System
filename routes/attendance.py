@@ -466,22 +466,23 @@ def save_attendance():
 
     flash(
 
-        "Attendance saved successfully.",
+        "उपस्थिती यशस्वीरित्या जतन करण्यात आली. आता कृपया दैनंदिन अहवाल भरा.",
 
         "success"
 
     )
 
-    return redirect(
+    if current_user.role == "teacher":
 
-        url_for(
-
-            "attendance.view_attendance",
-
-            attendance_session_id=attendance_session.id
-
+        return redirect(
+            url_for(
+                "daily_report.create_daily_report",
+                session_id=attendance_session.id
+            )
         )
 
+    return redirect(
+        url_for("admin.admin_dashboard")
     )
 
 @attendance_bp.route(

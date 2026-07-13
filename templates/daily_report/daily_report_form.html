@@ -1,0 +1,466 @@
+{% extends "base.html" %}
+
+{% block css %}
+
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/report.css') }}"
+>
+
+{% endblock %}
+
+{% block js %}
+
+<script src="{{ url_for('static', filename='js/daily_report.js') }}"></script>
+
+{% endblock %}
+
+{% block title %}
+दैनंदिन अहवाल
+{% endblock %}
+
+{% block page_title %}
+दैनंदिन अहवाल
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header mb-4">
+
+    <h2 class="page-title">
+
+        दैनंदिन अहवाल
+
+    </h2>
+
+    <p class="text-muted">
+
+        आजचा दैनंदिन अहवाल भरा.
+
+    </p>
+
+</div>
+
+<form method="POST" class="daily-report-form">
+
+    <!-- Information Card -->
+
+    <div class="report-card mb-4">
+
+        <div class="report-card-header">
+
+            <h5 class="report-card-title">
+
+                मूलभूत माहिती
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="info-grid">
+
+                <div class="info-item">
+
+                    <span class="info-label">
+
+                        <i class="bi bi-calendar-event"></i>
+
+                        दिनांक
+
+                    </span>
+
+                    <span class="info-value">
+
+                        {{ report_date.strftime('%d-%m-%Y') }}
+
+                    </span>
+
+                </div>
+
+                <div class="info-item">
+
+                    <span class="info-label">
+
+                        <i class="bi bi-person"></i>
+
+                        शिक्षक
+
+                    </span>
+
+                    <span class="info-value">
+
+                        {{ teacher.name }}
+
+                    </span>
+
+                </div>
+
+                <div class="info-item">
+
+                    <span class="info-label">
+
+                        <i class="bi bi-building"></i>
+
+                        अभ्यासिका
+
+                    </span>
+
+                    <span class="info-value">
+
+                        {{ abhyasika.name }}
+
+                    </span>
+
+                </div>
+
+                <div class="info-item">
+
+                    <span class="info-label">
+
+                        <i class="bi bi-people"></i>
+
+                        एकूण
+
+                    </span>
+
+                    <span class="info-value">
+
+                        {{ total_students }}
+
+                    </span>
+
+                </div>
+
+                <div class="info-item">
+
+                    <span class="info-label text-success">
+
+                        <i class="bi bi-check-circle-fill"></i>
+
+                        उपस्थित
+
+                    </span>
+
+                    <span class="info-value text-success">
+
+                        {{ present_students }}
+
+                    </span>
+
+                </div>
+
+                <div class="info-item">
+
+                    <span class="info-label text-danger">
+
+                        <i class="bi bi-x-circle-fill"></i>
+
+                        अनुपस्थित
+
+                    </span>
+
+                    <span class="info-value text-danger">
+
+                        {{ absent_students }}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Attendance Photo -->
+
+    <div class="report-card mb-4">
+
+        <div class="report-card-header">
+
+            <h5 class="report-card-title">
+
+                आजचा फोटो
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="photo-preview">
+
+                {% if attendance_photo %}
+
+                    <img
+                        src="{{ url_for('static', filename='uploads/attendance/' ~ attendance_photo) }}"
+                        alt="Attendance Photo"
+                        class="attendance-photo"
+                    >
+
+                {% else %}
+
+                    <div class="photo-placeholder">
+
+                        <i class="bi bi-image fs-1"></i>
+
+                        <p class="mt-2 mb-0">
+
+                            फोटो उपलब्ध नाही
+
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Physical Activities -->
+
+    <div class="report-card mb-4">
+
+        <div class="report-card-header">
+
+            <h5 class="report-card-title">
+
+                शारीरिक व बौद्धिक दैनिक कार्यक्रम
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="activities-grid">
+
+                {% for activity in physical_activities %}
+
+                <div class="form-check">
+
+                    <input
+                        class="form-check-input physical-checkbox"
+                        type="checkbox"
+                        name="physical_activity"
+                        value="{{ activity }}"
+                        id="physical_{{ loop.index }}"
+                    >
+
+                    <label
+                        class="form-check-label"
+                        for="physical_{{ loop.index }}"
+                    >
+
+                        {{ activity }}
+
+                    </label>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Study Activities -->
+
+    <div class="report-card mb-4">
+
+        <div class="report-card-header">
+
+            <h5 class="report-card-title">
+
+                अभ्यासक्रम दैनिक कार्यक्रम
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="activities-grid">
+
+                {% for activity in study_activities %}
+
+                <div class="form-check">
+
+                    <input
+                        class="form-check-input study-checkbox"
+                        type="checkbox"
+                        name="study_activity"
+                        value="{{ activity }}"
+                        id="study_{{ loop.index }}"
+                    >
+
+                    <label
+                        class="form-check-label"
+                        for="study_{{ loop.index }}"
+                    >
+
+                        {{ activity }}
+
+                    </label>
+
+                </div>
+
+                {% endfor %}
+
+                <div
+                    id="study-other-box"
+                    class="other-activity-box"
+                    style="display:none;"
+                >
+
+                    <label class="form-label mt-3">
+
+                        इतर अभ्यासक्रम
+
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        name="study_other"
+                        placeholder="इतर अभ्यासक्रम लिहा..."
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Special Activities -->
+
+    <div class="report-card mb-4">
+
+        <div class="report-card-header">
+
+            <h5 class="report-card-title">
+
+                विशेष कार्यक्रम
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="activities-grid">
+
+                {% for activity in special_activities %}
+
+                <div class="form-check">
+
+                    <input
+                        class="form-check-input special-checkbox"
+                        type="checkbox"
+                        name="special_activity"
+                        value="{{ activity }}"
+                        id="special_{{ loop.index }}"
+                    >
+
+                    <label
+                        class="form-check-label"
+                        for="special_{{ loop.index }}"
+                    >
+
+                        {{ activity }}
+
+                    </label>
+
+                </div>
+
+                {% endfor %}
+
+                <div
+                    id="special-other-box"
+                    class="other-activity-box"
+                    style="display:none;"
+                >
+
+                    <label class="form-label mt-3">
+
+                        इतर विशेष कार्यक्रम
+
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        name="special_other"
+                        placeholder="इतर विशेष कार्यक्रम लिहा..."
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Remarks -->
+
+    <div class="report-card mb-4">
+
+        <div class="report-card-header">
+
+            <h5 class="report-card-title">
+
+                विशेष नोंद
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <label class="form-label">
+
+                आज अभ्यासिकेत कोणी भेट दिली असल्यास, विशेष कार्यक्रम, घडलेल्या महत्त्वाच्या घटना किंवा इतर आवश्यक माहिती येथे नमूद करा.
+
+            </label>
+
+            <textarea
+                class="form-control remarks-textarea"
+                name="remarks"
+                rows="5"
+                placeholder="आज अभ्यासिकेत कोणी भेट दिली असल्यास, विशेष कार्यक्रम, घडलेल्या महत्त्वाच्या घटना किंवा इतर आवश्यक माहिती येथे नमूद करा..."
+            ></textarea>
+
+        </div>
+
+    </div>
+
+    <div class="text-end">
+
+        <button
+            class="btn btn-primary btn-lg report-submit-btn"
+            type="submit"
+        >
+
+            <i class="bi bi-check-circle"></i>
+
+           Save 
+
+        </button>
+
+    </div>
+
+</form>
+
+{% endblock %}

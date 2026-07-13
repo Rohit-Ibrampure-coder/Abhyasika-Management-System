@@ -17,7 +17,7 @@ from datetime import date
 from models.student import Student
 from models.attendance_session import AttendanceSession
 from models.attendance import Attendance
-
+from models.daily_report import DailyReport
 
 from models.teacher_abhyasika import (
     TeacherAbhyasika
@@ -167,6 +167,32 @@ def teacher_dashboard():
 
     ).first()
 
+    # ==========================================
+    # Daily Report Status
+    # ==========================================
+
+    today_report = None
+
+    daily_report_pending = False
+
+    daily_report_completed = False
+
+    if today_session:
+
+        today_report = DailyReport.query.filter_by(
+
+            attendance_session_id=today_session.id
+
+        ).first()
+
+        if today_report:
+
+            daily_report_completed = True
+
+        else:
+
+            daily_report_pending = True
+
     today_present = 0
 
     today_absent = 0
@@ -241,6 +267,11 @@ def teacher_dashboard():
         absent_count=absent_count,
         attendance_percentage=attendance_percentage,
         selected_abhyasika=selected_abhyasika,
-        abhyasikas=abhyasikas
+        abhyasikas=abhyasikas,
+
+        today_session=today_session,
+        today_report=today_report,
+        daily_report_pending=daily_report_pending,
+        daily_report_completed=daily_report_completed
 
     )

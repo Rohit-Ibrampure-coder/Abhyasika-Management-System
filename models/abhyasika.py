@@ -73,3 +73,9 @@ class Abhyasika(db.Model):
         back_populates="abhyasika",
         cascade="all, delete-orphan"
     )
+
+    daily_reports = db.relationship(
+        "DailyReport",
+        backref="report_abhyasika",
+        cascade="all, delete-orphan"
+    )

@@ -620,6 +620,7 @@ small{
 }
 
 
+
 /*=========================================
   Card Title
 =========================================*/
@@ -5401,5 +5402,476 @@ REMARK CARD
         display:none !important;
 
     }
+
+}
+
+/* ==========================================
+   Attendance Summary
+========================================== */
+
+.info-table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+.info-table td{
+
+    padding:10px 8px;
+
+    border-bottom:1px solid #d9d9d9;
+
+    font-size:15px;
+
+}
+
+.label{
+
+    width:220px;
+
+    font-weight:bold;
+
+}
+
+/* ==========================================
+   Attendance Photo
+========================================== */
+
+.attendance-photo-container{
+
+    text-align:center;
+
+    margin-top:15px;
+
+    margin-bottom:30px;
+
+}
+
+.attendance-photo{
+
+    width:100%;
+
+    max-height:420px;
+
+    object-fit:contain;
+
+    border:1px solid #000;
+
+    padding:6px;
+
+}
+
+.no-photo{
+
+    border:1px dashed #999;
+
+    padding:50px;
+
+    font-size:16px;
+
+    color:#666;
+
+}
+
+
+.timeline-icon{
+
+    width:48px;
+
+    height:48px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    color:#fff;
+
+    font-size:20px;
+
+    flex-shrink:0;
+
+}
+
+.timeline-line{
+
+    width:2px;
+
+    height:35px;
+
+    background:#dbe4f0;
+
+    margin:10px 23px;
+
+}
+
+/* ==========================================
+   Activity Sections
+========================================== */
+
+.activity-box{
+
+    border:1px solid #000;
+
+    border-radius:4px;
+
+    padding:14px 18px;
+
+    margin-bottom:22px;
+
+    min-height:70px;
+
+}
+
+.activity-list{
+
+    margin:0;
+
+    padding-left:24px;
+
+}
+
+.activity-list li{
+
+    margin-bottom:8px;
+
+    font-size:15px;
+
+}
+
+.empty-text{
+
+    color:#666;
+
+    font-style:italic;
+
+    margin:0;
+
+}
+
+/* ==========================================
+   Remarks
+========================================== */
+
+.remarks-box{
+
+    border:1px solid #000;
+
+    border-radius:4px;
+
+    padding:18px;
+
+    min-height:120px;
+
+    white-space:pre-wrap;
+
+    line-height:1.8;
+
+    margin-bottom:25px;
+
+}
+
+/* ==========================================
+   Footer
+========================================== */
+
+.footer{
+
+    margin-top:18px;
+
+    text-align:center;
+
+}
+
+.footer-line{
+
+    border-top:2px solid #000;
+
+    margin-bottom:8px;
+
+}
+
+.footer p{
+
+    font-size:16px;
+
+    font-weight:700;
+
+    letter-spacing:.4px;
+
+}
+
+/* ==========================================
+   Print Optimization
+========================================== */
+
+@media print{
+
+    body{
+
+        margin:0;
+
+        background:#fff;
+
+    }
+
+    .page{
+
+        width:100%;
+
+    }
+
+    img{
+
+        -webkit-print-color-adjust:exact;
+
+        print-color-adjust:exact;
+
+    }
+
+}
+
+/* ==========================================
+   Attendance Layout
+========================================== */
+
+.attendance-table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    margin-bottom:18px;
+
+}
+
+.attendance-table td{
+
+    border:1px solid #000;
+
+    vertical-align:top;
+
+}
+
+.summary-column{
+
+    width:35%;
+
+    padding:12px;
+
+}
+
+.photo-column{
+
+    width:65%;
+
+    padding:12px;
+
+    text-align:center;
+
+}
+
+/* ==========================================
+   Section Heading
+========================================== */
+
+.section-heading{
+
+    text-align:center;
+
+    font-size:16px;
+
+    font-weight:bold;
+
+    margin-bottom:12px;
+
+    border-bottom:1px solid #bdbdbd;
+
+    padding-bottom:6px;
+
+}
+
+/* ==========================================
+   Summary Table
+========================================== */
+
+.summary-table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+.summary-table td{
+
+    border:none;
+
+    padding:8px 0;
+
+    font-size:14px;
+
+}
+
+.summary-table .value{
+
+    text-align:right;
+
+    font-weight:bold;
+
+}
+
+/* ==========================================
+   Attendance Photo
+========================================== */
+
+.attendance-photo{
+
+    width:100%;
+
+    max-width:320px;
+
+    height:210px;
+
+    object-fit:cover;
+
+    border:1px solid #000;
+
+    padding:4px;
+
+    background:#fff;
+
+}
+
+.photo-placeholder{
+
+    width:320px;
+
+    height:210px;
+
+    border:1px dashed #888;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    margin:auto;
+
+    color:#777;
+
+    font-size:15px;
+
+}
+
+/* ==========================================
+   Activity Table
+========================================== */
+
+.activity-table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    margin-top:15px;
+
+}
+
+.activity-table th{
+
+    border:1px solid #000;
+
+    background:#f3f3f3;
+
+    padding:8px;
+
+    text-align:left;
+
+    font-size:15px;
+
+}
+
+.activity-table td{
+
+    border:1px solid #000;
+
+    padding:10px;
+
+}
+
+/* ==========================================
+   Activity Grid
+========================================== */
+
+.activity-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:8px 20px;
+
+}
+
+.activity-item{
+
+    font-size:14px;
+
+}
+
+.empty-message{
+
+    color:#777;
+
+    font-style:italic;
+
+}
+
+/* ==========================================
+   Remarks
+========================================== */
+
+.remarks-table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    margin-top:15px;
+
+}
+
+.remarks-table th{
+
+    border:1px solid #000;
+
+    background:#f3f3f3;
+
+    padding:8px;
+
+    text-align:left;
+
+}
+
+.remarks-table td{
+
+    border:1px solid #000;
+
+    min-height:70px;
+
+    padding:12px;
+
+    vertical-align:top;
+
+    white-space:pre-wrap;
+
+    line-height:1.6;
 
 }

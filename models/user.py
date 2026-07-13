@@ -81,5 +81,11 @@ class User(UserMixin, db.Model):
         cascade="all, delete-orphan"
     )
 
+    daily_reports = db.relationship(
+        "DailyReport",
+        backref="report_teacher",
+        cascade="all, delete-orphan"
+    )
+
     def __repr__(self):
         return f"<User {self.username}>"

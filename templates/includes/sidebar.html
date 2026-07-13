@@ -124,21 +124,6 @@
 
         </li>
 
-        <li class="nav-item">
-
-            <a href="#" class="nav-link">
-
-                <i class="bi bi-journal-bookmark-fill"></i>
-
-                <span class="menu-text">
-
-                    Marks
-
-                </span>
-
-            </a>
-
-        </li>
 
         {% if current_user.role=="admin" %}
 
@@ -188,7 +173,13 @@
 
         <li class="nav-item">
 
-            <a href="#" class="nav-link">
+            <a
+                href="{{ url_for('reports.reports_home') }}"
+                class="nav-link
+                {% if request.endpoint and request.endpoint.startswith('reports.') %}
+                    active
+                {% endif %}"
+            >
 
                 <i class="bi bi-bar-chart-fill"></i>
 
@@ -367,27 +358,6 @@
 
                 </li>
 
-                <!-- Marks -->
-
-                <li class="nav-item">
-
-                    <a
-                        href="#"
-                        class="nav-link"
-                    >
-
-                        <i class="bi bi-journal-bookmark-fill"></i>
-
-                        <span class="menu-text">
-
-                            Marks
-
-                        </span>
-
-                    </a>
-
-                </li>
-
                 <!-- Admin Only -->
 
                 {% if current_user.role == "admin" %}
@@ -438,8 +408,11 @@
                 <li class="nav-item">
 
                     <a
-                        href="#"
-                        class="nav-link"
+                        href="{{ url_for('reports.reports_home') }}"
+                        class="nav-link
+                        {% if request.endpoint and request.endpoint.startswith('reports.') %}
+                            active
+                        {% endif %}"
                     >
 
                         <i class="bi bi-bar-chart-fill"></i>

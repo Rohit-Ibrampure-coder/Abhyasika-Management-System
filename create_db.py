@@ -10,6 +10,7 @@ from models.remark import Remark
 from models.achievement import Achievement
 from models.teacher_abhyasika import TeacherAbhyasika
 from models.attendance_session import AttendanceSession
+from models.daily_report import DailyReport
 
 with app.app_context():
     db.create_all()

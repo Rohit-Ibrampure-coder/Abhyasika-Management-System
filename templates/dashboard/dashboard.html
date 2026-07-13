@@ -22,7 +22,25 @@ Dashboard
 
     {% include "dashboard/quick_actions.html" %}
 
-    {% include "dashboard/attendance_summary.html" %}
+    {% if current_user.role == "admin" %}
+
+        {% include "dashboard/attendance_summary.html" %}
+
+    {% endif %}
+
+    <!-- ==========================================
+        Daily Report Status
+    ========================================== -->
+
+    {% if current_user.role == "teacher" %}
+
+        {% include "dashboard/teacher_daily_report_status.html" %}
+
+    {% elif current_user.role == "admin" %}
+
+        {% include "dashboard/admin_daily_report_status.html" %}
+
+    {% endif %}
 
     {% include "dashboard/attendance_chart.html" %}
 

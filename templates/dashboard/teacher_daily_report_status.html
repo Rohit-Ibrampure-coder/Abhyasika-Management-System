@@ -1,0 +1,144 @@
+<div class="dashboard-section mt-4">
+
+    <div class="section-header">
+
+        <h5>
+
+            <i class="bi bi-journal-check me-2"></i>
+
+            आजचे काम
+
+        </h5>
+
+    </div>
+
+    <div class="card dashboard-card">
+
+        <div class="card-body">
+
+            <!-- Attendance -->
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+
+                <div>
+
+                    <h6 class="mb-1">
+
+                        उपस्थिती
+
+                    </h6>
+
+                    {% if today_session %}
+
+                        <span class="badge bg-success">
+
+                            पूर्ण
+
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge bg-danger">
+
+                            बाकी
+
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+                <i class="bi bi-calendar-check display-6 text-primary"></i>
+
+            </div>
+
+            <hr>
+
+            <!-- Daily Report -->
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+
+                <div>
+
+                    <h6 class="mb-1">
+
+                        दैनंदिन अहवाल
+
+                    </h6>
+
+                    {% if daily_report_completed %}
+
+                        <span class="badge bg-success">
+
+                            पूर्ण
+
+                        </span>
+
+                    {% elif daily_report_pending %}
+
+                        <span class="badge bg-warning text-dark">
+
+                            प्रलंबित
+
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge bg-secondary">
+
+                            उपलब्ध नाही
+
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+                <i class="bi bi-journal-richtext display-6 text-success"></i>
+
+            </div>
+
+            {% if daily_report_pending %}
+
+                <a
+                    href="{{ url_for('daily_report.create_daily_report', session_id=today_session.id) }}"
+                    class="btn btn-warning w-100"
+                >
+
+                    <i class="bi bi-pencil-square me-2"></i>
+
+                    दैनंदिन अहवाल भरा
+
+                </a>
+
+            {% elif daily_report_completed %}
+
+                <a
+                    href="{{ url_for('daily_report.view_daily_report', report_id=today_report.id) }}"
+                    class="btn btn-success w-100"
+                >
+
+                    <i class="bi bi-eye me-2"></i>
+
+                    अहवाल पहा
+
+                </a>
+
+            {% else %}
+
+                <button
+                    class="btn btn-secondary w-100"
+                    disabled
+                >
+
+                    प्रथम उपस्थिती घ्या
+
+                </button>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>

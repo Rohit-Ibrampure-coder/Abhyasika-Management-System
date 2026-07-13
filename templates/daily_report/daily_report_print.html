@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>दैनंदिन अभ्यासिका अहवाल</title>
+
+    <!-- ==========================================================
+         PRINT CSS
+    =========================================================== -->
+
+    <style>
+
+        /* ==========================================================
+           PAGE SETTINGS
+        =========================================================== */
+
+        @page{
+            size:A4 portrait;
+            margin:12mm;
+        }
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+            font-family:"Nirmala UI","Mangal","Arial",sans-serif;
+            background:#f3f3f3;
+            color:#000;
+            font-size:15px;
+            line-height:1.5;
+        }  
+
+        /* ==========================================================
+            PRINT
+        ========================================================== */
+
+        @media print{
+
+            @page{
+                size:A4 portrait;
+                margin:10mm;
+            }
+
+            *{
+                -webkit-print-color-adjust:exact;
+                print-color-adjust:exact;
+            }
+
+            html,
+            body{
+                width:210mm;
+                height:297mm;
+                background:#fff;
+            }
+
+            body{
+                margin:0;
+                padding:0;
+            }
+
+            .report-container{
+                width:100%;
+                min-height:auto;
+                margin:0;
+                border:1px solid #000;
+                box-shadow:none;
+            }
+
+        }
+
+        /* ==========================================================
+           DOCUMENT
+        =========================================================== */
+
+        .report-container{
+
+            width:100%;
+
+            min-height:auto;
+
+            margin:0;
+
+            background:#fff;
+
+            border:1px solid #000;
+
+            overflow:hidden;
+
+        }
+
+        /* ==========================================================
+           COMMON SECTION
+        =========================================================== */
+
+        .section{
+
+            border-top:1px solid #000;
+
+            padding:14px 18px;
+
+            page-break-inside:avoid;
+            break-inside:avoid;
+
+        }
+
+        .section-title{
+
+            text-align:center;
+
+            font-size:17px;
+
+            font-weight:700;
+
+            margin-bottom:10px;
+
+        }
+
+        /* ==========================================================
+            HEADER
+        ========================================================== */
+
+        .report-header{
+
+            text-align:center;
+
+            padding:14px 20px 16px;
+
+        }
+
+        .logo-container{
+
+            margin-bottom:8px;
+
+        }
+
+        .ngo-logo{
+
+            width:55px;
+
+            height:55px;
+
+            object-fit:contain;
+
+        }
+
+        .ngo-title{
+
+            font-size:22px;
+
+            font-weight:700;
+
+            color:#000;
+
+            margin-bottom:6px;
+
+            line-height:1.2;
+
+        }
+
+        .report-title{
+
+            font-size:17px;
+
+            font-weight:600;
+
+            color:#000;
+
+        }
+
+        /* ==========================================================
+            BASIC INFORMATION
+        ========================================================== */
+
+        .basic-info{
+
+            padding:14px 22px;
+
+        }
+
+        .info-row{
+
+            display:flex;
+
+            justify-content:space-between;
+
+            align-items:center;
+
+            gap:40px;
+
+            margin-bottom:12px;
+
+        }
+
+        .info-row:last-child{
+
+            margin-bottom:0;
+
+        }
+
+        .info-item{
+
+            display:flex;
+
+            align-items:center;
+
+            font-size:16px;
+
+        }
+
+        .info-label{
+
+            font-weight:700;
+
+            margin-right:10px;
+
+        }
+
+        .info-value{
+
+            font-weight:500;
+
+        }
+
+        .full-width{
+
+            width:100%;
+
+        }
+
+        /* ==========================================================
+            ATTENDANCE
+        ========================================================== */
+
+        .attendance-section{
+
+            padding:0;
+
+        }
+
+        .attendance-grid{
+
+            display:grid;
+
+            grid-template-columns:42% 58%;
+
+        }
+
+        .attendance-summary{
+
+            border-right:1px solid #000;
+
+            padding:16px 20px;
+
+        }
+
+        .attendance-photo{
+
+            padding:16px 20px;
+
+            text-align:center;
+
+        }
+
+        .summary-table{
+
+            width:100%;
+
+            border-collapse:collapse;
+
+            margin-top:18px;
+
+        }
+
+        .summary-table td{
+
+            padding:12px 0;
+
+            font-size:16px;
+
+        }
+
+        .summary-table td:nth-child(2){
+
+            width:20px;
+
+            text-align:center;
+
+        }
+
+        .summary-table td:last-child{
+
+            width:60px;
+
+            text-align:left;
+
+            font-weight:600;
+
+        }
+
+        .photo{
+
+            width:100%;
+
+            max-width:420px;
+
+            height:220px;
+
+            object-fit:cover;
+
+            border:1px solid #000;
+
+            page-break-inside:avoid;
+
+            break-inside:avoid;
+
+        }
+
+        .photo-placeholder{
+
+            width:100%;
+
+            height:220px;
+
+            border:1px dashed #666;
+
+            display:flex;
+
+            justify-content:center;
+
+            align-items:center;
+
+            font-size:16px;
+
+        }
+
+        /* ==========================================================
+            DAILY PROGRAM SECTIONS
+        ========================================================== */
+
+        .physical-section,
+        .study-section{
+
+        }
+
+        .activity-list{
+
+            margin-top:12px;
+
+        }
+
+
+        .activity-row{
+
+            display:flex;
+
+            justify-content:space-between;
+
+            align-items:center;
+
+            margin-bottom:8px;
+
+            page-break-inside:avoid;
+            break-inside:avoid;
+
+        }
+
+        .activity-row:last-child{
+
+            margin-bottom:0;
+
+        }
+
+        .activity-column{
+
+            width:48%;
+
+            font-size:16px;
+
+            font-weight:500;
+
+            line-height:1.6;
+
+        }
+
+        /* ==========================================================
+            REMARKS
+        ========================================================== */
+
+        .remarks-section{
+
+            page-break-inside: avoid;
+
+            break-inside: avoid;
+
+        }
+
+        .remarks-content{
+
+            min-height:100px;
+
+            margin-top:12px;
+
+            padding:8px 12px;
+
+            font-size:17px;
+
+            line-height:1.8;
+
+            white-space:pre-wrap;
+
+            overflow-wrap:break-word;
+
+            text-align:left;
+
+            display:flex;
+
+            align-items:flex-start;
+
+        }
+
+        /* ==========================================================
+            FOOTER
+        ========================================================== */
+
+        .report-footer{
+
+            border-top:1px solid #000;
+
+            padding:14px;
+
+            text-align:center;
+
+            page-break-inside:avoid;
+
+            break-inside:avoid;
+
+        }
+
+        .footer-title{
+
+            font-size:16px;
+
+            font-weight:700;
+
+            letter-spacing:0.5px;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="report-container">
+
+    <!-- ==========================================================
+        HEADER
+    ========================================================== -->
+
+    <header class="report-header">
+
+        <div class="logo-container">
+            <img
+                src="{{ url_for('static', filename='images/logo.png') }}"
+                alt="NGO Logo"
+                class="ngo-logo">
+        </div>
+
+        <h1 class="ngo-title">
+            श्री लक्ष्मीकेशव प्रतिष्ठान, सातारा
+        </h1>
+
+        <h2 class="report-title">
+            दैनंदिन अभ्यासिका अहवाल
+        </h2>
+
+    </header>
+
+
+
+    <!-- ==========================================================
+        BASIC INFORMATION
+    ========================================================== -->
+
+    <section class="section basic-info">
+
+        <div class="info-row">
+
+            <div class="info-item">
+                <span class="info-label">दिनांक :</span>
+                <span class="info-value">
+                    {{ report.report_date.strftime('%d-%m-%Y') }}
+                </span>
+            </div>
+
+            <div class="info-item">
+                <span class="info-label">शिक्षक :</span>
+                <span class="info-value">
+                    {{ report.teacher.name }}
+                </span>
+            </div>
+
+        </div>
+
+        <div class="info-row">
+
+            <div class="info-item full-width">
+                <span class="info-label">अभ्यासिका :</span>
+                <span class="info-value">
+                    {{ report.abhyasika.name }}
+                </span>
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ==========================================================
+        ATTENDANCE
+    ========================================================== -->
+
+    <section class="section attendance-section">
+
+        <div class="attendance-grid">
+
+            <!-- Attendance Summary -->
+
+            <div class="attendance-summary">
+
+                <h3 class="section-title">
+                    उपस्थितीचा सारांश
+                </h3>
+
+                <table class="summary-table">
+
+                    <tr>
+                        <td>एकूण विद्यार्थी</td>
+                        <td>:</td>
+                        <td>{{ present_count + absent_count }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>उपस्थित</td>
+                        <td>:</td>
+                        <td>{{ present_count }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>अनुपस्थित</td>
+                        <td>:</td>
+                        <td>{{ absent_count }}</td>
+                    </tr>
+
+                </table>
+
+            </div>
+
+            <!-- Attendance Photo -->
+
+            <div class="attendance-photo">
+
+                <h3 class="section-title">
+                    उपस्थितीचा छायाचित्र
+                </h3>
+
+                {% if attendance_session.attendance_photo %}
+
+                <img
+                    src="{{ url_for(
+                        'static',
+                        filename='uploads/attendance/' ~ attendance_session.attendance_photo
+                    ) }}"
+                    class="photo">
+
+                {% else %}
+
+                <div class="photo-placeholder">
+                    उपस्थितीचा फोटो उपलब्ध नाही
+                </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ==========================================================
+        PHYSICAL & INTELLECTUAL DAILY PROGRAM
+    ========================================================== -->
+
+    <section class="section physical-section">
+
+        <h3 class="section-title">
+            शारीरिक व बौद्धिक दैनिक कार्यक्रम
+        </h3>
+
+       <div class="activity-list">
+
+            {% for i in range(0, physical_activity|length, 2) %}
+
+            <div class="activity-row">
+
+                <div class="activity-column">
+                    {% if i < physical_activity|length %}
+                        ✓ {{ physical_activity[i] }}
+                    {% endif %}
+                </div>
+
+                <div class="activity-column">
+                    {% if i + 1 < physical_activity|length %}
+                        ✓ {{ physical_activity[i + 1] }}
+                    {% endif %}
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ==========================================================
+        STUDY DAILY PROGRAM
+    ========================================================== -->
+
+    <section class="section study-section">
+
+        <h3 class="section-title">
+            अभ्यासक्रम दैनिक कार्यक्रम
+        </h3>
+
+        <div class="activity-list">
+
+            {% for i in range(0, study_activity|length, 2) %}
+
+            <div class="activity-row">
+
+                <div class="activity-column">
+
+                    {% if i < study_activity|length %}
+
+                        {% if study_activity[i] == "इतर" %}
+
+                            ✓ इतर{% if report.study_other %} : {{ report.study_other }}{% endif %}
+
+                        {% else %}
+
+                            ✓ {{ study_activity[i] }}
+
+                        {% endif %}
+
+                    {% endif %}
+
+                </div>
+
+                <div class="activity-column">
+
+                    {% if i + 1 < study_activity|length %}
+
+                        {% if study_activity[i + 1] == "इतर" %}
+
+                            ✓ इतर{% if report.study_other %} : {{ report.study_other }}{% endif %}
+
+                        {% else %}
+
+                            ✓ {{ study_activity[i + 1] }}
+
+                        {% endif %}
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+    <!-- ==========================================================
+        SPECIAL PROGRAM
+    ========================================================== -->
+
+    {% if special_activity and special_activity|length > 0 %}
+
+    <section class="section special-section">
+
+        <h3 class="section-title">
+            विशेष कार्यक्रम
+        </h3>
+
+        <div class="activity-list">
+
+            {% for i in range(0, special_activity|length, 2) %}
+
+            <div class="activity-row">
+
+                <div class="activity-column">
+
+                    {% if i < special_activity|length %}
+
+                        {% if special_activity[i] == "इतर" %}
+
+                            ✓ इतर{% if report.special_other %} : {{ report.special_other }}{% endif %}
+
+                        {% else %}
+
+                            ✓ {{ special_activity[i] }}
+
+                        {% endif %}
+
+                    {% endif %}
+
+                </div>
+
+                <div class="activity-column">
+
+                    {% if i + 1 < special_activity|length %}
+
+                        {% if special_activity[i + 1] == "इतर" %}
+
+                            ✓ इतर{% if report.special_other %} : {{ report.special_other }}{% endif %}
+
+                        {% else %}
+
+                            ✓ {{ special_activity[i + 1] }}
+
+                        {% endif %}
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+    {% endif %}
+
+
+    <!-- ==========================================================
+        REMARKS
+    ========================================================== -->
+
+    {% if report.remarks and report.remarks.strip() %}
+
+    <section class="section remarks-section">
+
+        <h3 class="section-title">
+            विशेष नोंद
+        </h3>
+
+        <div class="remarks-content">
+            {{ report.remarks }}
+        </div>
+
+    </section>
+
+    {% endif %}
+
+    <!-- ==========================================================
+        FOOTER
+    ========================================================== -->
+
+    <footer class="report-footer">
+
+        <div class="footer-title">
+            श्री लक्ष्मीकेशव प्रतिष्ठान, सातारा
+        </div>
+
+    </footer>
+
+</div>
+
+<script>
+window.onload = function () {
+    window.print();
+};
+
+window.onafterprint = function () {
+    window.close();
+};
+</script>
+
+</body>
+</html>

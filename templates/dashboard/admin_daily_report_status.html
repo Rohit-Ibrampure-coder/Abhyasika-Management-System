@@ -1,0 +1,189 @@
+<div class="dashboard-section mt-4">
+
+    <div class="section-header d-flex justify-content-between align-items-center">
+
+        <h5 class="mb-0">
+
+            <i class="bi bi-clipboard-data me-2 text-primary"></i>
+
+            आजचे दैनंदिन अहवाल
+
+        </h5>
+
+        <span class="badge bg-primary">
+
+            {{ total_reports }} अभ्यासिका
+
+        </span>
+
+    </div>
+
+    <div class="card dashboard-card border-0 shadow-sm">
+
+        <div class="card-body">
+
+            <!-- Statistics -->
+
+            <div class="row text-center g-3">
+
+                <div class="col-md-4">
+
+                    <div class="p-3 rounded bg-light">
+
+                        <h2 class="fw-bold mb-1">
+
+                            {{ total_reports }}
+
+                        </h2>
+
+                        <small class="text-muted">
+
+                            एकूण अहवाल
+
+                        </small>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div class="p-3 rounded bg-success bg-opacity-10">
+
+                        <h2 class="fw-bold text-success mb-1">
+
+                            {{ completed_reports }}
+
+                        </h2>
+
+                        <small class="text-success">
+
+                            पूर्ण
+
+                        </small>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div class="p-3 rounded bg-danger bg-opacity-10">
+
+                        <h2 class="fw-bold text-danger mb-1">
+
+                            {{ pending_reports }}
+
+                        </h2>
+
+                        <small class="text-danger">
+
+                            प्रलंबित
+
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <hr class="my-4">
+
+            <!-- Pending List -->
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+
+                <h6 class="fw-bold mb-0">
+
+                    <i class="bi bi-exclamation-circle-fill text-warning me-2"></i>
+
+                    प्रलंबित दैनंदिन अहवाल
+
+                </h6>
+
+            </div>
+
+            {% if pending_daily_reports %}
+
+                <div class="list-group list-group-flush">
+
+                    {% for item in pending_daily_reports %}
+
+                        <div class="list-group-item px-0">
+
+                            <div class="d-flex justify-content-between align-items-center">
+
+                                <div>
+
+                                    <h6 class="mb-1">
+
+                                        {{ item.abhyasika.name }}
+
+                                    </h6>
+
+                                    <small class="text-muted">
+
+                                        शिक्षक : {{ item.teacher.name }}
+
+                                    </small>
+
+                                </div>
+
+                                <span class="badge bg-warning text-dark">
+
+                                    प्रलंबित
+
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <div class="alert alert-success text-center mb-0">
+
+                    <i class="bi bi-check-circle-fill fs-3 d-block mb-2"></i>
+
+                    <strong>
+
+                        अभिनंदन!
+
+                    </strong>
+
+                    <br>
+
+                    आजचे सर्व दैनंदिन अहवाल पूर्ण झाले आहेत.
+
+                </div>
+
+            {% endif %}
+
+            <div class="mt-4">
+
+                <a
+
+                    href="{{ url_for('daily_report.daily_report_history') }}"
+
+                    class="btn btn-primary w-100"
+
+                >
+
+                    <i class="bi bi-eye me-2"></i>
+
+                    सर्व दैनंदिन अहवाल पहा
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

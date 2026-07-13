@@ -1,0 +1,701 @@
+{% extends "base.html" %}
+
+{% block title %}
+दैनंदिन अहवाल
+{% endblock %}
+
+{% block page_title %}
+दैनंदिन अहवाल
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- ==========================================
+         Action Buttons
+    ========================================== -->
+
+    <div class="d-flex justify-content-center gap-3 mb-5">
+
+        <!-- Back -->
+
+        <a
+            href="{{ url_for('daily_report.daily_report_history') }}"
+            class="btn btn-secondary"
+        >
+
+            <i class="bi bi-arrow-left me-2"></i>
+
+            Back
+
+        </a>
+
+        <!-- Edit -->
+
+        {% if current_user.role == "admin" %}
+
+        <a
+            href="{{ url_for('daily_report.edit_daily_report', report_id=report.id) }}"
+            class="btn btn-warning"
+        >
+            <i class="bi bi-pencil-square me-2"></i>
+            Edit
+        </a>
+
+        {% elif current_user.role == "teacher"
+            and report.teacher_id == current_user.id
+            and report.report_date == today %}
+
+        <a
+            href="{{ url_for('daily_report.edit_daily_report', report_id=report.id) }}"
+            class="btn btn-warning"
+        >
+            <i class="bi bi-pencil-square me-2"></i>
+             Edit
+        </a>
+
+        {% endif %}
+
+
+        <!-- Print -->
+
+        <a
+
+            href="{{ url_for(
+                'daily_report.print_daily_report',
+                report_id=report.id
+            ) }}"
+            
+            target="_blank"
+
+            class="btn btn-primary"
+
+        >
+
+            <i class="bi bi-printer me-2"></i>
+
+            Print
+
+        </a>
+
+    </div>
+
+    <!-- ==========================================
+         NGO Header
+    ========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-body text-center">
+
+            <h2 class="fw-bold text-primary mb-2">
+
+                श्री लक्ष्मीकेशव प्रतिष्ठान, सातारा
+
+            </h2>
+
+            <h4 class="mb-0">
+
+                अभ्यासिका दैनंदिन अहवाल
+
+            </h4>
+
+        </div>
+
+    </div>
+
+    <!-- ==========================================
+         Basic Information
+    ========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-primary text-white">
+
+            <h5 class="mb-0">
+
+                <i class="bi bi-info-circle me-2"></i>
+
+                मूलभूत माहिती
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row g-4">
+
+                <div class="col-lg-3">
+
+                    <label class="fw-semibold text-muted">
+
+                        दिनांक
+
+                    </label>
+
+                    <p class="fs-5 mb-0">
+
+                        {{ report.report_date.strftime('%d-%m-%Y') }}
+
+                    </p>
+
+                </div>
+
+                <div class="col-lg-3">
+
+                    <label class="fw-semibold text-muted">
+
+                        शिक्षक
+
+                    </label>
+
+                    <p class="fs-5 mb-0">
+
+                        {{ report.teacher.name }}
+
+                    </p>
+
+                </div>
+
+                <div class="col-lg-3">
+
+                    <label class="fw-semibold text-muted">
+
+                        अभ्यासिका
+
+                    </label>
+
+                    <p class="fs-5 mb-0">
+
+                        {{ report.abhyasika.name }}
+
+                    </p>
+
+                </div>
+
+                <div class="col-lg-3">
+
+                    <label class="fw-semibold text-muted">
+
+                        अहवाल क्रमांक
+
+                    </label>
+
+                    <p class="fs-5 mb-0">
+
+                        #{{ report.id }}
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ==========================================
+         Attendance Summary
+    ========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-success text-white">
+
+            <h5 class="mb-0">
+
+                <i class="bi bi-bar-chart-fill me-2"></i>
+
+                उपस्थिती सारांश
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row text-center">
+
+                <div class="col-md-4">
+
+                    <div class="border rounded p-4 h-100">
+
+                        <h2 class="fw-bold">
+
+                            {{ present_count + absent_count }}
+
+                        </h2>
+
+                        <p class="text-muted mb-0">
+
+                            एकूण विद्यार्थी
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div class="border rounded p-4 h-100">
+
+                        <h2 class="fw-bold text-success">
+
+                            {{ present_count }}
+
+                        </h2>
+
+                        <p class="text-success mb-0">
+
+                            उपस्थित
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div class="border rounded p-4 h-100">
+
+                        <h2 class="fw-bold text-danger">
+
+                            {{ absent_count }}
+
+                        </h2>
+
+                        <p class="text-danger mb-0">
+
+                            अनुपस्थित
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ==========================================
+         Attendance Photo
+    ========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-info text-white">
+
+            <h5 class="mb-0">
+
+                <i class="bi bi-camera-fill me-2"></i>
+
+                उपस्थितीचा फोटो
+
+            </h5>
+
+        </div>
+
+        <div class="card-body text-center">
+
+            {% if attendance_session.attendance_photo %}
+
+                <img
+
+                    src="{{ url_for('static', filename='uploads/attendance/' ~ attendance_session.attendance_photo) }}"
+
+                    class="img-fluid rounded shadow"
+
+                    style="max-height:500px;"
+
+                    alt="Attendance Photo"
+
+                >
+
+            {% else %}
+
+                <div class="alert alert-secondary mb-0">
+
+                    <i class="bi bi-image me-2"></i>
+
+                    उपस्थितीचा फोटो उपलब्ध नाही.
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- ==========================================
+         Activities
+    ========================================== -->
+
+    <div class="row">
+
+        <!-- Physical Activities -->
+
+        <div class="col-lg-4 mb-4">
+
+            <div class="card shadow-sm border-0 h-100">
+
+                <div class="card-header bg-primary text-white">
+
+                    <h5 class="mb-0">
+
+                        <i class="bi bi-person-walking me-2"></i>
+
+                        शारीरिक कार्यक्रम
+
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    {% if physical_activity %}
+
+                        {% for activity in physical_activity %}
+
+                            <span class="badge bg-primary fs-6 me-2 mb-2 p-2">
+
+                                {{ activity }}
+
+                            </span>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <p class="text-muted mb-0">
+
+                            कोणतीही नोंद नाही.
+
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Study Activities -->
+
+        <div class="col-lg-4 mb-4">
+
+            <div class="card shadow-sm border-0 h-100">
+
+                <div class="card-header bg-success text-white">
+
+                    <h5 class="mb-0">
+
+                        <i class="bi bi-book-fill me-2"></i>
+
+                        अभ्यासक्रम
+
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    {% if study_activity %}
+
+                        {% for activity in study_activity %}
+
+                            {% if activity == "इतर" %}
+
+                                <li>
+
+                                    ✓ इतर
+
+                                    {% if report.study_other %}
+
+                                        : {{ report.study_other }}
+
+                                    {% endif %}
+
+                                </li>
+
+                            {% else %}
+
+                                <li>
+
+                                    ✓ {{ activity }}
+
+                                </li>
+
+                            {% endif %}
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <p class="text-muted mb-0">
+
+                            कोणतीही नोंद नाही.
+
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Special Activities -->
+
+        <div class="col-lg-4 mb-4">
+
+            <div class="card shadow-sm border-0 h-100">
+
+                <div class="card-header bg-warning text-dark">
+
+                    <h5 class="mb-0">
+
+                        <i class="bi bi-stars me-2"></i>
+
+                        विशेष कार्यक्रम
+
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    {% if special_activity %}
+
+                        {% for activity in special_activity %}
+
+                            {% if activity == "इतर" %}
+
+                                <li>
+
+                                    ✓ इतर
+
+                                    {% if report.special_other %}
+
+                                        : {{ report.special_other }}
+
+                                    {% endif %}
+
+                                </li>
+
+                            {% else %}
+
+                                <li>
+
+                                    ✓ {{ activity }}
+
+                                </li>
+
+                            {% endif %}
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <p class="text-muted mb-0">
+
+                            कोणतीही नोंद नाही.
+
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ==========================================
+    Special Remarks
+    ========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-secondary text-white">
+
+            <h5 class="mb-0">
+
+                <i class="bi bi-chat-left-text-fill me-2"></i>
+
+                विशेष नोंद
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            {% if report.remarks %}
+
+                <p class="mb-0 fs-5">
+
+                    {{ report.remarks }}
+
+                </p>
+
+            {% else %}
+
+                <div class="alert alert-light border mb-0">
+
+                    <i class="bi bi-info-circle me-2"></i>
+
+                    विशेष नोंद उपलब्ध नाही.
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- ==========================================
+         Report Information
+    ========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header">
+
+            <h5 class="mb-0">
+
+                <i class="bi bi-clock-history me-2"></i>
+
+                अहवाल माहिती
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-6">
+
+                    <strong>
+
+                        अहवाल तयार करणारे शिक्षक
+
+                    </strong>
+
+                    <p class="mb-0 mt-2">
+
+                        {{ report.teacher.name }}
+
+                    </p>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <strong>
+
+                        अहवाल तयार करण्याची वेळ
+
+                    </strong>
+
+                    <p class="mb-0 mt-2">
+
+                        {{ report.created_at.strftime('%d-%m-%Y %I:%M %p') }}
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==========================================
+         Footer
+    ========================================== -->
+
+    <div class="card border-0 bg-light mb-4">
+
+        <div class="card-body text-center">
+
+            <p class="mb-2 fw-semibold">
+
+                श्री लक्ष्मीकेशव प्रतिष्ठान, सातारा
+
+            </p>
+
+            <small class="text-muted">
+
+                हा दैनंदिन अहवाल अभ्यासिकेच्या दैनंदिन नोंदीसाठी तयार करण्यात आला आहे.
+
+            </small>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==========================================
+         Action Buttons
+    ========================================== -->
+
+    <div class="d-flex justify-content-center gap-3 mb-5">
+
+        <a
+
+            href="{{ url_for('daily_report.daily_report_history') }}"
+
+            class="btn btn-secondary"
+
+        >
+
+            <i class="bi bi-arrow-left me-2"></i>
+
+            Back
+
+        </a>
+
+        <a
+
+            href="{{ url_for(
+                'daily_report.print_daily_report',
+                report_id=report.id
+            ) }}"
+
+            class="btn btn-primary"
+
+        >
+
+            <i class="bi bi-printer me-2"></i>
+
+            Print
+
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -45,7 +45,7 @@ class AttendanceSession(db.Model):
 
     attendance_photo = db.Column(
         db.String(255),
-        nullable=False
+        nullable=True
     )
 
     # Optional future note
@@ -67,6 +67,13 @@ class AttendanceSession(db.Model):
     attendance_records = db.relationship(
         "Attendance",
         back_populates="attendance_session",
+        cascade="all, delete-orphan"
+    )
+
+    daily_report = db.relationship(
+        "DailyReport",
+        back_populates="attendance_session",
+        uselist=False,
         cascade="all, delete-orphan"
     )
 

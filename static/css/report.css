@@ -1,0 +1,717 @@
+/* ==========================================================
+   SHRI LAXMIKESHAV PRATISHTHAN, SATARA
+   DAILY REPORT MODULE
+   report.css
+========================================================== */
+
+
+/* ==========================================================
+   PAGE LAYOUT
+========================================================== */
+
+.daily-report-page{
+
+    max-width:1100px;
+
+    margin:0 auto;
+
+}
+
+.daily-report-form{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:24px;
+
+}
+
+/* ==========================================================
+   REPORT CARD
+========================================================== */
+
+.report-card{
+
+    background:#FFFFFF;
+
+    border:1px solid #E2E8F0;
+
+    border-radius:12px;
+
+    overflow:hidden;
+
+    box-shadow:0 4px 12px rgba(0,0,0,.05);
+
+    transition:.25s ease;
+
+}
+
+.report-card:hover{
+
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+
+}
+
+/* ==========================================================
+   CARD HEADER
+========================================================== */
+
+.report-card-header{
+
+    background:#F8FAFC;
+
+    border-bottom:1px solid #E2E8F0;
+
+    padding:14px 20px;
+
+}
+
+.report-card-title{
+
+    margin:0;
+
+    color:#1F2937;
+
+    font-size:17px;
+
+    font-weight:700;
+
+    line-height:1.4;
+
+}
+
+/* ==========================================================
+   CARD BODY
+========================================================== */
+
+.report-card .card-body{
+
+    padding:22px;
+
+}
+
+/* ==========================================================
+   FORM LABEL
+========================================================== */
+
+.daily-report-form .form-label{
+
+    color:#374151;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    margin-bottom:6px;
+
+}
+
+/* ==========================================================
+   FORM CONTROL
+========================================================== */
+
+.daily-report-form .form-control{
+
+    height:46px;
+
+    border:1px solid #CBD5E1;
+
+    border-radius:10px;
+
+    font-size:15px;
+
+    box-shadow:none;
+
+}
+
+.daily-report-form .form-control:focus{
+
+    border-color:#2563EB;
+
+    box-shadow:0 0 0 3px rgba(37,99,235,.12);
+
+}
+
+/* ==========================================================
+   READONLY INPUTS
+========================================================== */
+
+.daily-report-form input[readonly]{
+
+    background:#F8FAFC;
+
+    color:#374151;
+
+    font-weight:600;
+
+}
+
+/* ==========================================================
+   ATTENDANCE PHOTO
+========================================================== */
+
+.photo-preview{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    padding:10px;
+
+}
+
+.attendance-photo{
+
+    width:100%;
+
+    max-width:650px;
+
+    height:380px;
+
+    object-fit:cover;
+
+    border:1px solid #D1D5DB;
+
+    border-radius:12px;
+
+    background:#FFFFFF;
+
+    box-shadow:0 4px 12px rgba(0,0,0,.08);
+
+}
+
+/* ==========================================================
+   PHOTO PLACEHOLDER
+========================================================== */
+
+.photo-placeholder{
+
+    width:100%;
+
+    max-width:650px;
+
+    height:380px;
+
+    border:2px dashed #CBD5E1;
+
+    border-radius:12px;
+
+    background:#F8FAFC;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    color:#6B7280;
+
+}
+
+.photo-placeholder i{
+
+    font-size:64px;
+
+    margin-bottom:12px;
+
+}
+
+.photo-placeholder p{
+
+    font-size:16px;
+
+    margin:0;
+
+}
+
+/* ==========================================================
+   ACTIVITIES GRID
+========================================================== */
+
+.activities-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,minmax(220px,1fr));
+
+    gap:14px 50px;
+
+}
+
+/* ==========================================================
+   CHECKBOX
+========================================================== */
+
+.activities-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,minmax(240px,1fr));
+
+    gap:14px 40px;
+
+}
+
+.activities-grid .form-check{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    padding-left:0;
+
+    margin:0;
+
+    min-height:32px;
+
+}
+
+.activities-grid .form-check-input{
+
+    position:static;
+
+    margin:0;
+
+    width:20px;
+
+    height:20px;
+
+    flex-shrink:0;
+
+    cursor:pointer;
+
+}
+
+.activities-grid .form-check-label{
+
+    margin:0;
+
+    padding:0;
+
+    font-size:15px;
+
+    font-weight:500;
+
+    color:#374151;
+
+    cursor:pointer;
+
+}
+
+/* ==========================================================
+   REMARKS
+========================================================== */
+
+.remarks-textarea{
+
+    min-height:160px;
+
+    resize:vertical;
+
+    border:1px solid #CBD5E1;
+
+    border-radius:10px;
+
+    padding:14px;
+
+    font-size:15px;
+
+    line-height:1.7;
+
+    box-shadow:none;
+
+}
+
+.remarks-textarea:focus{
+
+    border-color:#2563EB;
+
+    box-shadow:0 0 0 3px rgba(37,99,235,.12);
+
+}
+
+.remarks-textarea::placeholder{
+
+    color:#94A3B8;
+
+    font-size:14px;
+
+}
+
+/* ==========================================================
+   SAVE BUTTON
+========================================================== */
+
+.report-submit-btn{
+
+    min-width:220px;
+
+    height:52px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#2563EB;
+
+    font-size:16px;
+
+    font-weight:600;
+
+    transition:all .25s ease;
+
+}
+
+.report-submit-btn:hover{
+
+    background:#1D4ED8;
+
+    transform:translateY(-2px);
+
+    box-shadow:0 8px 20px rgba(37,99,235,.20);
+
+}
+
+.report-submit-btn:active{
+
+    transform:translateY(0);
+
+}
+
+/* ==========================================================
+   FORM SPACING
+========================================================== */
+
+.report-card{
+
+    margin-bottom:24px;
+
+}
+
+.report-card:last-child{
+
+    margin-bottom:0;
+
+}
+
+/* ==========================================================
+   READONLY COLORS
+========================================================== */
+
+.text-success{
+
+    font-weight:700;
+
+}
+
+.text-danger{
+
+    font-weight:700;
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width: 992px) {
+
+    /* Information Section */
+
+    .info-grid{
+
+        grid-template-columns:1fr;
+
+        gap:16px;
+
+    }
+
+    /* Activity Sections */
+
+    .activities-grid{
+
+        grid-template-columns:1fr;
+
+        gap:12px;
+
+    }
+
+    /* Attendance Photo */
+
+    .attendance-photo,
+    .photo-placeholder{
+
+        max-width:100%;
+
+        height:300px;
+
+    }
+
+}
+
+@media (max-width: 768px) {
+
+    /* Page */
+
+    .daily-report-page{
+
+        padding:0 10px;
+
+    }
+
+    /* Card */
+
+    .report-card{
+
+        border-radius:10px;
+
+    }
+
+    .report-card .card-body{
+
+        padding:18px;
+
+    }
+
+    .report-card-header{
+
+        padding:14px 18px;
+
+    }
+
+    .report-card-title{
+
+        font-size:16px;
+
+    }
+
+    /* Information */
+
+    .info-item{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:6px;
+
+    }
+
+    .info-value{
+
+        width:100%;
+
+        text-align:left;
+
+    }
+
+    /* Attendance Photo */
+
+    .attendance-photo,
+    .photo-placeholder{
+
+        height:240px;
+
+    }
+
+    /* Activities */
+
+    .activities-grid{
+
+        grid-template-columns:1fr;
+
+        gap:10px;
+
+    }
+
+    .activities-grid .form-check-label{
+
+        font-size:14px;
+
+    }
+
+    /* Remarks */
+
+    .remarks-textarea{
+
+        min-height:140px;
+
+    }
+
+    /* Save Button */
+
+    .report-submit-btn{
+
+        width:100%;
+
+        min-width:100%;
+
+        height:48px;
+
+    }
+
+}
+
+@media (max-width: 576px) {
+
+    /* Page Header */
+
+    .page-title{
+
+        font-size:24px;
+
+    }
+
+    .page-header p{
+
+        font-size:14px;
+
+    }
+
+    /* Card Header */
+
+    .report-card-title{
+
+        font-size:15px;
+
+    }
+
+    /* Labels */
+
+    .form-label{
+
+        font-size:14px;
+
+    }
+
+    /* Readonly Values */
+
+    .info-label,
+    .info-value{
+
+        font-size:14px;
+
+    }
+
+    /* Attendance Photo */
+
+    .attendance-photo,
+    .photo-placeholder{
+
+        height:200px;
+
+    }
+
+    /* Textarea */
+
+    .remarks-textarea{
+
+        min-height:120px;
+
+        font-size:14px;
+
+    }
+
+    /* Button */
+
+    .report-submit-btn{
+
+        font-size:15px;
+
+    }
+
+}
+
+/* ==========================================================
+   TRANSITIONS
+========================================================== */
+
+.report-card,
+.form-control,
+.report-submit-btn,
+.form-check{
+
+    transition:all .25s ease;
+
+}
+
+/* ==========================================================
+   INFORMATION GRID
+========================================================== */
+
+.info-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:18px 30px;
+
+}
+
+.info-item{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:14px 18px;
+
+    background:#F8FAFC;
+
+    border:1px solid #E2E8F0;
+
+    border-radius:10px;
+
+}
+
+.info-label{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    font-weight:600;
+
+    color:#374151;
+
+}
+
+.info-value{
+
+    font-weight:700;
+
+    color:#111827;
+
+}
+
+/* ==========================================================
+   OTHER ACTIVITY INPUT
+========================================================== */
+
+.other-activity-box{
+
+    margin-top:20px;
+
+    padding-top:16px;
+
+    border-top:1px dashed #CBD5E1;
+
+}
+
+.other-activity-box .form-control{
+
+    margin-top:8px;
+
+}

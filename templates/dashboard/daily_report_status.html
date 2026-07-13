@@ -1,0 +1,191 @@
+<div class="dashboard-section mt-4">
+
+    <div class="section-header">
+
+        <h5>
+
+            <i class="bi bi-journal-check me-2"></i>
+
+            आजचे काम
+
+        </h5>
+
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Attendance -->
+
+        <div class="col-lg-6">
+
+            <div class="card dashboard-card h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+
+                            <small class="text-muted">
+
+                                उपस्थिती
+
+                            </small>
+
+                            <h4 class="mt-2">
+
+                                {% if today_session %}
+
+                                    <span class="text-success">
+
+                                        <i class="bi bi-check-circle-fill"></i>
+
+                                        पूर्ण
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="text-danger">
+
+                                        <i class="bi bi-x-circle-fill"></i>
+
+                                        बाकी
+
+                                    </span>
+
+                                {% endif %}
+
+                            </h4>
+
+                        </div>
+
+                        <i class="bi bi-calendar-check display-5 text-primary"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Daily Report -->
+
+        <div class="col-lg-6">
+
+            <div class="card dashboard-card h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+
+                            <small class="text-muted">
+
+                                दैनंदिन अहवाल
+
+                            </small>
+
+                            <h4 class="mt-2">
+
+                                {% if daily_report_completed %}
+
+                                    <span class="text-success">
+
+                                        <i class="bi bi-check-circle-fill"></i>
+
+                                        पूर्ण
+
+                                    </span>
+
+                                {% elif daily_report_pending %}
+
+                                    <span class="text-warning">
+
+                                        <i class="bi bi-exclamation-circle-fill"></i>
+
+                                        प्रलंबित
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="text-secondary">
+
+                                        <i class="bi bi-dash-circle-fill"></i>
+
+                                        उपलब्ध नाही
+
+                                    </span>
+
+                                {% endif %}
+
+                            </h4>
+
+                        </div>
+
+                        <i class="bi bi-journal-richtext display-5 text-success"></i>
+
+                    </div>
+
+                    <hr>
+
+                    {% if daily_report_pending %}
+
+                        <a
+
+                            href="{{ url_for('daily_report.create_daily_report', session_id=today_session.id) }}"
+
+                            class="btn btn-warning w-100"
+
+                        >
+
+                            <i class="bi bi-pencil-square"></i>
+
+                            दैनंदिन अहवाल भरा
+
+                        </a>
+
+                    {% elif daily_report_completed %}
+
+                        <a
+
+                            href="{{ url_for('daily_report.view_daily_report', report_id=today_report.id) }}"
+
+                            class="btn btn-success w-100"
+
+                        >
+
+                            <i class="bi bi-eye"></i>
+
+                            अहवाल पहा
+
+                        </a>
+
+                    {% else %}
+
+                        <button
+
+                            class="btn btn-secondary w-100"
+
+                            disabled
+
+                        >
+
+                            प्रथम उपस्थिती घ्या
+
+                        </button>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

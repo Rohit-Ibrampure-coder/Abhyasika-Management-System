@@ -1,0 +1,775 @@
+{% extends "base.html" %}
+
+{% block title %}
+दैनंदिन अभ्यासिका अहवाल
+{% endblock %}
+
+{% block page_title %}
+दैनंदिन अभ्यासिका अहवाल
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- ==========================================
+         Page Header
+    ========================================== -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold mb-1">
+
+                <i class="bi bi-journal-richtext text-primary me-2"></i>
+
+                दैनंदिन अभ्यासिका अहवाल
+
+            </h2>
+
+            <p class="text-muted mb-0">
+
+                अभ्यासिकेचे सर्व दैनंदिन अहवाल येथे पाहता येतील.
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- ==========================================
+         Summary Cards
+    ========================================== -->
+
+    <div class="row g-4 mb-4">
+
+        <!-- Total Reports -->
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="card shadow-sm border-0 h-100">
+
+                <div class="card-body text-center">
+
+                    <i class="bi bi-journal-check display-5 text-primary"></i>
+
+                    <h3 class="fw-bold mt-3">
+
+                        {{ pagination.total }}
+
+                    </h3>
+
+                    <small class="text-muted">
+
+                        एकूण अहवाल
+
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Total Present -->
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="card shadow-sm border-0 h-100">
+
+                <div class="card-body text-center">
+
+                    <i class="bi bi-person-check-fill display-5 text-success"></i>
+
+                    <h3 class="fw-bold mt-3">
+
+                        {{ history|sum(attribute='present') }}
+
+                    </h3>
+
+                    <small class="text-muted">
+
+                        उपस्थित विद्यार्थी
+
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Total Absent -->
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="card shadow-sm border-0 h-100">
+
+                <div class="card-body text-center">
+
+                    <i class="bi bi-person-x-fill display-5 text-danger"></i>
+
+                    <h3 class="fw-bold mt-3">
+
+                        {{ history|sum(attribute='absent') }}
+
+                    </h3>
+
+                    <small class="text-muted">
+
+                        अनुपस्थित विद्यार्थी
+
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Current Page -->
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="card shadow-sm border-0 h-100">
+
+                <div class="card-body text-center">
+
+                    <i class="bi bi-files display-5 text-warning"></i>
+
+                    <h3 class="fw-bold mt-3">
+
+                        {{ pagination.page }}
+
+                    </h3>
+
+                    <small class="text-muted">
+
+                        वर्तमान पृष्ठ
+
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ==========================================
+         Filter Card
+    ========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-light">
+
+            <h5 class="mb-0">
+
+                <i class="bi bi-funnel-fill me-2"></i>
+
+                शोध फिल्टर
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <form method="GET">
+
+                <div class="row g-3">
+
+                    <div class="col-lg-3">
+
+                        <label class="form-label">
+
+                            पासून दिनांक
+
+                        </label>
+
+                        <input
+                            type="date"
+                            name="from_date"
+                            class="form-control"
+                            value="{{ from_date or '' }}"
+                        >
+
+                    </div>
+
+                    <div class="col-lg-3">
+
+                        <label class="form-label">
+
+                            पर्यंत दिनांक
+
+                        </label>
+
+                        <input
+                            type="date"
+                            name="to_date"
+                            class="form-control"
+                            value="{{ to_date or '' }}"
+                        >
+
+                    </div>
+
+                    {% if current_user.role == "admin" %}
+
+                    <div class="col-lg-3">
+
+                        <label class="form-label">
+
+                            अभ्यासिका
+
+                        </label>
+
+                        <select
+                            class="form-select"
+                            name="abhyasika_id"
+                        >
+
+                            <option value="">
+
+                                सर्व अभ्यासिका
+
+                            </option>
+
+                            {% for abhyasika in abhyasikas %}
+
+                                <option
+                                    value="{{ abhyasika.id }}"
+                                    {% if selected_abhyasika == abhyasika.id %}selected{% endif %}
+                                >
+
+                                    {{ abhyasika.name }}
+
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-lg-3">
+
+                        <label class="form-label">
+
+                            शिक्षक
+
+                        </label>
+
+                        <select
+                            class="form-select"
+                            name="teacher_id"
+                        >
+
+                            <option value="">
+
+                                सर्व शिक्षक
+
+                            </option>
+
+                            {% for teacher in teachers %}
+
+                                <option
+                                    value="{{ teacher.id }}"
+                                    {% if selected_teacher == teacher.id %}selected{% endif %}
+                                >
+
+                                    {{ teacher.name }}
+
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+                <div class="mt-4 d-flex gap-2">
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+
+                        <i class="bi bi-search me-2"></i>
+
+                        शोधा
+
+                    </button>
+
+                    <a
+                        href="{{ url_for('daily_report.daily_report_history') }}"
+                        class="btn btn-outline-secondary"
+                    >
+
+                        <i class="bi bi-arrow-clockwise me-2"></i>
+
+                        रीसेट
+
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <!-- ==========================================
+         Daily Report Table
+    ========================================== -->
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-light">
+
+            <h5 class="mb-0">
+
+                <i class="bi bi-table me-2"></i>
+
+                दैनंदिन अहवाल सूची
+
+            </h5>
+
+        </div>
+
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th style="width:70px;">क्र.</th>
+
+                            <th>दिनांक</th>
+
+                            {% if current_user.role == "admin" %}
+
+                            <th>शिक्षक</th>
+
+                            {% endif %}
+
+                            <th>अभ्यासिका</th>
+
+                            <th class="text-center">उपस्थित</th>
+
+                            <th class="text-center">अनुपस्थित</th>
+
+                            <th class="text-center">स्थिती</th>
+
+                            <th class="text-center">कृती</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% if history %}
+
+                            {% for item in history %}
+
+                            <tr>
+
+                                <!-- Serial Number -->
+
+                                <td class="text-center fw-semibold">
+
+                                    {{ loop.index + ((pagination.page - 1) * pagination.per_page) }}
+
+                                </td>
+
+                                <!-- Report Date -->
+
+                                <td>
+
+                                    <div class="fw-semibold">
+
+                                        {{ item.report.report_date.strftime('%d-%m-%Y') }}
+
+                                    </div>
+
+                                    <small class="text-muted">
+
+                                        {{ item.report.created_at.strftime('%I:%M %p') }}
+
+                                    </small>
+
+                                </td>
+
+                                <!-- Teacher -->
+
+                                {% if current_user.role == "admin" %}
+
+                                <td>
+
+                                    <div class="fw-semibold">
+
+                                        {{ item.report.teacher.name }}
+
+                                    </div>
+
+                                </td>
+
+                                {% endif %}
+
+                                <!-- Abhyasika -->
+
+                                <td>
+
+                                    <span class="fw-semibold">
+
+                                        {{ item.report.abhyasika.name }}
+
+                                    </span>
+
+                                </td>
+
+                                <!-- Present -->
+
+                                <td class="text-center">
+
+                                    <span class="badge bg-success fs-6 px-3 py-2">
+
+                                        {{ item.present }}
+
+                                    </span>
+
+                                </td>
+
+                                <!-- Absent -->
+
+                                <td class="text-center">
+
+                                    <span class="badge bg-danger fs-6 px-3 py-2">
+
+                                        {{ item.absent }}
+
+                                    </span>
+
+                                </td>
+
+                                <!-- Status -->
+
+                                <td class="text-center">
+
+                                    <span class="badge bg-primary">
+
+                                        पूर्ण
+
+                                    </span>
+
+                                </td>
+
+                                <!-- Action -->
+
+                                <td class="text-center">
+
+                                    <div class="btn-group" role="group">
+
+                                        <!-- View -->
+
+                                        <a
+
+                                            href="{{ url_for(
+                                                'daily_report.view_daily_report',
+                                                report_id=item.report.id
+                                            ) }}"
+
+                                            class="btn btn-sm btn-outline-primary"
+
+                                            title="अहवाल पहा"
+
+                                        >
+
+                                            <i class="bi bi-eye"></i>
+
+                                        </a>
+
+                                        <!-- Edit -->
+
+                                        {% if current_user.role == "admin" %}
+
+                                        <a
+
+                                            href="{{ url_for(
+                                                'daily_report.edit_daily_report',
+                                                report_id=item.report.id
+                                            ) }}"
+
+                                            class="btn btn-sm btn-outline-warning"
+
+                                            title="Edit"
+
+                                        >
+
+                                            <i class="bi bi-pencil-square"></i>
+
+                                        </a>
+
+                                        {% elif current_user.role == "teacher"
+                                            and item.report.teacher_id == current_user.id
+                                            and item.report.report_date == today %}
+
+                                        <a
+
+                                            href="{{ url_for(
+                                                'daily_report.edit_daily_report',
+                                                report_id=item.report.id
+                                            ) }}"
+
+                                            class="btn btn-sm btn-outline-warning"
+
+                                            title="Edit"
+
+                                        >
+
+                                            <i class="bi bi-pencil-square"></i>
+
+                                        </a>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                            {% endfor %}
+
+                        {% else %}
+
+                        <tr>
+
+                            <td
+
+                                colspan="{% if current_user.role == 'admin' %}8{% else %}7{% endif %}"
+
+                                class="text-center py-5"
+
+                            >
+
+                                <div class="my-4">
+
+                                    <i
+
+                                        class="bi bi-journal-x"
+
+                                        style="font-size:70px;color:#c7c7c7;"
+
+                                    ></i>
+
+                                </div>
+
+                                <h4 class="fw-bold text-secondary">
+
+                                    कोणताही दैनंदिन अहवाल उपलब्ध नाही
+
+                                </h4>
+
+                                <p class="text-muted mb-0">
+
+                                    निवडलेल्या निकषानुसार कोणताही अहवाल आढळला नाही.
+
+                                </p>
+
+                            </td>
+
+                        </tr>
+
+                        {% endif %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ==========================================
+        Pagination
+    ========================================== -->
+
+    {% if pagination.pages > 1 %}
+
+    <div class="card border-0 shadow-sm mt-4">
+
+        <div class="card-body">
+
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-center">
+
+                <!-- Report Count -->
+
+                <div class="text-muted mb-3 mb-lg-0">
+
+                    Showing
+
+                    <strong>
+
+                        {{ ((pagination.page - 1) * pagination.per_page) + 1 }}
+
+                    </strong>
+
+                    to
+
+                    <strong>
+
+                        {{ ((pagination.page - 1) * pagination.per_page) + history|length }}
+
+                    </strong>
+
+                    of
+
+                    <strong>
+
+                        {{ pagination.total }}
+
+                    </strong>
+
+                    reports
+
+                </div>
+
+                <!-- Pagination -->
+
+                <nav>
+
+                    <ul class="pagination mb-0">
+
+                        <!-- Previous -->
+
+                        <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+
+                            <a
+
+                                class="page-link"
+
+                                href="{% if pagination.has_prev %}
+                                {{ url_for(
+                                    'daily_report.daily_report_history',
+                                    page=pagination.prev_num,
+                                    from_date=from_date,
+                                    to_date=to_date,
+                                    teacher_id=selected_teacher,
+                                    abhyasika_id=selected_abhyasika
+                                ) }}
+                                {% else %}
+                                #
+                                {% endif %}"
+
+                            >
+
+                                <i class="bi bi-chevron-left"></i>
+
+                            </a>
+
+                        </li>
+
+                        <!-- Page Numbers -->
+
+                        {% for page in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+
+                            {% if page %}
+
+                                <li class="page-item {% if page == pagination.page %}active{% endif %}">
+
+                                    <a
+
+                                        class="page-link"
+
+                                        href="{{ url_for(
+                                            'daily_report.daily_report_history',
+                                            page=page,
+                                            from_date=from_date,
+                                            to_date=to_date,
+                                            teacher_id=selected_teacher,
+                                            abhyasika_id=selected_abhyasika
+                                        ) }}"
+
+                                    >
+
+                                        {{ page }}
+
+                                    </a>
+
+                                </li>
+
+                            {% else %}
+
+                                <li class="page-item disabled">
+
+                                    <span class="page-link">
+
+                                        ...
+
+                                    </span>
+
+                                </li>
+
+                            {% endif %}
+
+                        {% endfor %}
+
+                        <!-- Next -->
+
+                        <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+
+                            <a
+
+                                class="page-link"
+
+                                href="{% if pagination.has_next %}
+                                {{ url_for(
+                                    'daily_report.daily_report_history',
+                                    page=pagination.next_num,
+                                    from_date=from_date,
+                                    to_date=to_date,
+                                    teacher_id=selected_teacher,
+                                    abhyasika_id=selected_abhyasika
+                                ) }}
+                                {% else %}
+                                #
+                                {% endif %}"
+
+                            >
+
+                                <i class="bi bi-chevron-right"></i>
+
+                            </a>
+
+                        </li>
+
+                    </ul>
+
+                </nav>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+    </div>
+
+    {% endblock %}

@@ -1,0 +1,235 @@
+<div class="dashboard-section mt-4">
+
+    <div class="section-header">
+
+        <h5>
+
+            <i class="bi bi-clipboard2-check me-2"></i>
+
+            आजचे काम
+
+        </h5>
+
+    </div>
+
+    <div class="card dashboard-card border-0 shadow-sm">
+
+        <div class="card-body">
+
+            <!-- Attendance -->
+
+            <div class="d-flex align-items-center">
+
+                {% if today_session %}
+
+                    <div class="timeline-icon bg-success">
+
+                        <i class="bi bi-check-lg"></i>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="timeline-icon bg-secondary">
+
+                        <i class="bi bi-circle"></i>
+
+                    </div>
+
+                {% endif %}
+
+                <div class="ms-3">
+
+                    <h6 class="mb-1">
+
+                        उपस्थिती
+
+                    </h6>
+
+                    <small class="text-muted">
+
+                        {% if today_session %}
+
+                            उपस्थिती पूर्ण झाली आहे.
+
+                        {% else %}
+
+                            आजची उपस्थिती बाकी आहे.
+
+                        {% endif %}
+
+                    </small>
+
+                </div>
+
+            </div>
+
+            <div class="timeline-line"></div>
+
+            <!-- Daily Report -->
+
+            <div class="d-flex align-items-center">
+
+                {% if daily_report_completed %}
+
+                    <div class="timeline-icon bg-success">
+
+                        <i class="bi bi-check-lg"></i>
+
+                    </div>
+
+                {% elif daily_report_pending %}
+
+                    <div class="timeline-icon bg-warning">
+
+                        <i class="bi bi-exclamation"></i>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="timeline-icon bg-secondary">
+
+                        <i class="bi bi-circle"></i>
+
+                    </div>
+
+                {% endif %}
+
+                <div class="ms-3">
+
+                    <h6 class="mb-1">
+
+                        दैनंदिन अहवाल
+
+                    </h6>
+
+                    <small class="text-muted">
+
+                        {% if daily_report_completed %}
+
+                            दैनंदिन अहवाल पूर्ण झाला आहे.
+
+                        {% elif daily_report_pending %}
+
+                            दैनंदिन अहवाल भरायचा आहे.
+
+                        {% else %}
+
+                            उपस्थितीनंतर उपलब्ध होईल.
+
+                        {% endif %}
+
+                    </small>
+
+                </div>
+
+            </div>
+
+            <div class="timeline-line"></div>
+
+            <!-- Completed -->
+
+            <div class="d-flex align-items-center">
+
+                {% if daily_report_completed %}
+
+                    <div class="timeline-icon bg-primary">
+
+                        <i class="bi bi-trophy-fill"></i>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="timeline-icon bg-light">
+
+                        <i class="bi bi-flag"></i>
+
+                    </div>
+
+                {% endif %}
+
+                <div class="ms-3">
+
+                    <h6 class="mb-1">
+
+                        आजचे काम
+
+                    </h6>
+
+                    <small class="text-muted">
+
+                        {% if daily_report_completed %}
+
+                            🎉 आजचे सर्व काम पूर्ण झाले.
+
+                        {% else %}
+
+                            अजून काम बाकी आहे.
+
+                        {% endif %}
+
+                    </small>
+
+                </div>
+
+            </div>
+
+            <hr>
+
+            {% if daily_report_pending %}
+
+                <a
+
+                    href="{{ url_for('daily_report.create_daily_report', session_id=today_session.id) }}"
+
+                    class="btn btn-warning w-100"
+
+                >
+
+                    <i class="bi bi-pencil-square"></i>
+
+                    दैनंदिन अहवाल भरा
+
+                </a>
+
+            {% elif daily_report_completed %}
+
+                <a
+
+                    href="{{ url_for('daily_report.view_daily_report', report_id=today_report.id) }}"
+
+                    class="btn btn-success w-100"
+
+                >
+
+                    <i class="bi bi-eye"></i>
+
+                    अहवाल पहा
+
+                </a>
+
+            {% else %}
+
+                <a
+
+                    href="{{ url_for('attendance.attendance_home') }}"
+
+                    class="btn btn-primary w-100"
+
+                >
+
+                    <i class="bi bi-calendar-check"></i>
+
+                    उपस्थिती घ्या
+
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>

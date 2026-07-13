@@ -1,0 +1,310 @@
+{% extends "base.html" %}
+
+{% block title %}
+दैनंदिन अहवाल संपादन
+{% endblock %}
+
+{% block page_title %}
+दैनंदिन अहवाल संपादन
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- ==========================================
+         Page Header
+    ========================================== -->
+
+    <div class="page-header mb-4">
+
+        <h2 class="fw-bold">
+
+            <i class="bi bi-pencil-square text-warning me-2"></i>
+
+            दैनंदिन अहवाल संपादन
+
+        </h2>
+
+        <p class="text-muted">
+
+            आवश्यक बदल करून अहवाल पुन्हा जतन करा.
+
+        </p>
+
+    </div>
+
+    <form method="POST">
+
+        <!-- ==========================================
+             Basic Information
+        ========================================== -->
+
+        <div class="card shadow-sm border-0 mb-4">
+
+            <div class="card-header">
+
+                <h5 class="mb-0">
+
+                    मूलभूत माहिती
+
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="row">
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+
+                            दिनांक
+
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            value="{{ report.report_date.strftime('%d-%m-%Y') }}"
+                            readonly
+                        >
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+
+                            अभ्यासिका
+
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            value="{{ report.abhyasika.name }}"
+                            readonly
+                        >
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+
+                            शिक्षक
+
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            value="{{ report.teacher.name }}"
+                            readonly
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ==========================================
+             Physical Activity
+        ========================================== -->
+
+        <div class="card shadow-sm border-0 mb-4">
+
+            <div class="card-header">
+
+                <h5 class="mb-0">
+
+                    शारीरिक कार्यक्रम
+
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                {% for activity in physical_activities %}
+
+                <div class="form-check mb-2">
+
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        name="physical_activity"
+                        value="{{ activity }}"
+                        {% if activity in selected_physical %}checked{% endif %}
+                    >
+
+                    <label class="form-check-label">
+
+                        {{ activity }}
+
+                    </label>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+        <!-- ==========================================
+             Study Activity
+        ========================================== -->
+
+        <div class="card shadow-sm border-0 mb-4">
+
+            <div class="card-header">
+
+                <h5 class="mb-0">
+
+                    अभ्यास
+
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                {% for activity in study_activities %}
+
+                <div class="form-check mb-2">
+
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        name="study_activity"
+                        value="{{ activity }}"
+                        {% if activity in selected_study %}checked{% endif %}
+                    >
+
+                    <label class="form-check-label">
+
+                        {{ activity }}
+
+                    </label>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+        <!-- ==========================================
+             Special Activity
+        ========================================== -->
+
+        <div class="card shadow-sm border-0 mb-4">
+
+            <div class="card-header">
+
+                <h5 class="mb-0">
+
+                    विशेष कार्यक्रम
+
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                {% for activity in special_activities %}
+
+                <div class="form-check mb-2">
+
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        name="special_activity"
+                        value="{{ activity }}"
+                        {% if activity in selected_special %}checked{% endif %}
+                    >
+
+                    <label class="form-check-label">
+
+                        {{ activity }}
+
+                    </label>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+        <!-- ==========================================
+             Remarks
+        ========================================== -->
+
+        <div class="card shadow-sm border-0 mb-4">
+
+            <div class="card-header">
+
+                <h5 class="mb-0">
+
+                    विशेष नोंद
+
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                <textarea
+                    name="remarks"
+                    rows="5"
+                    class="form-control"
+                >{{ report.remarks }}</textarea>
+
+            </div>
+
+        </div>
+
+        <!-- ==========================================
+             Buttons
+        ========================================== -->
+
+        <div class="d-flex justify-content-center gap-3 mb-5">
+
+            <a
+                href="{{ url_for('daily_report.view_daily_report', report_id=report.id) }}"
+                class="btn btn-secondary"
+            >
+
+                <i class="bi bi-arrow-left me-2"></i>
+
+                रद्द करा
+
+            </a>
+
+            <button
+                type="submit"
+                class="btn btn-warning"
+            >
+
+                <i class="bi bi-check-circle me-2"></i>
+
+                बदल जतन करा
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}
