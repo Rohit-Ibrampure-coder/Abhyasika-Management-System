@@ -78,7 +78,23 @@ STUDENT CARD
 
                 <div class="profile-avatar">
 
-                    <i class="bi bi-person-fill"></i>
+                    {% if student.photo %}
+
+                        <img
+                            src="{{ url_for('static', filename='uploads/students/' ~ student.photo) }}"
+                            alt="{{ student.student_name }}"
+                            class="profile-avatar-img"
+                        >
+
+                    {% else %}
+
+                        <div class="profile-avatar-letter">
+
+                            {{ student.student_name[0]|upper }}
+
+                        </div>
+
+                    {% endif %}
 
                 </div>
 

@@ -26,7 +26,13 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # ==========================================
-    # Attendance Photo Upload Configuration
+    # Global Upload Limit
+    # ==========================================
+
+    MAX_CONTENT_LENGTH = int(2.5 * 1024 * 1024)
+
+    # ==========================================
+    # Attendance Photo Upload
     # ==========================================
 
     ATTENDANCE_UPLOAD_FOLDER = os.path.join(
@@ -41,8 +47,27 @@ class Config:
         "png"
     }
 
-    # Maximum Upload Size (2.5 MB)
-
-    MAX_CONTENT_LENGTH = int(
+    MAX_ATTENDANCE_PHOTO_SIZE = int(
         2.5 * 1024 * 1024
+    )
+
+    # ==========================================
+    # Student Photo Upload
+    # ==========================================
+
+    STUDENT_UPLOAD_FOLDER = os.path.join(
+        "static",
+        "uploads",
+        "students"
+    )
+
+    ALLOWED_STUDENT_EXTENSIONS = {
+        "jpg",
+        "jpeg",
+        "png",
+        "webp"
+    }
+
+    MAX_STUDENT_PHOTO_SIZE = int(
+        2 * 1024 * 1024
     )

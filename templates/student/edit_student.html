@@ -73,7 +73,83 @@ Edit Student
 
 </div>
 
-<form method="POST">
+<form
+    method="POST"
+    enctype="multipart/form-data"
+>
+
+<div class="report-card mb-4">
+
+    <div class="report-card-header">
+
+        <h5 class="report-card-title">
+
+            Student Photo
+
+        </h5>
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="row align-items-center">
+
+            <div class="col-md-3 text-center">
+
+                {% if student.photo %}
+
+                    <img
+                        src="{{ url_for('static', filename='uploads/students/' ~ student.photo) }}"
+                        class="attendance-photo"
+                        id="studentPreview"
+                    >
+
+                {% else %}
+
+                    <div
+                        class="student-photo-preview has-letter"
+                        id="studentPreview"
+                    >
+
+                        {{ student.student_name[0]|upper }}
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+            <div class="col-md-9">
+
+                <label class="form-label">
+
+                    Change Photo
+
+                </label>
+
+                <input
+                    type="file"
+                    class="form-control"
+                    name="photo"
+                    id="photo"
+                    accept=".jpg,.jpeg,.png,.webp"
+                >
+
+                <div class="form-text">
+
+                    Recommended:
+                    <strong>500 × 500 px</strong>,
+                    Maximum 2 MB.
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 <!-- ==========================================================
      PERSONAL INFORMATION
@@ -262,7 +338,7 @@ Edit Student
 
             <!-- Standard -->
 
-            <div class="col-lg-3">
+            <div class="col-lg-6">
 
                 <label class="form-label">
 
@@ -300,28 +376,6 @@ Edit Student
                     {% endfor %}
 
                 </select>
-
-            </div>
-
-            <!-- Admission Date -->
-
-            <div class="col-lg-3">
-
-                <label class="form-label">
-
-                    Admission Date
-
-                    <span class="required">*</span>
-
-                </label>
-
-                <input
-                    type="date"
-                    name="admission_date"
-                    class="form-control"
-                    value="{{ student.admission_date }}"
-                    required
-                >
 
             </div>
 
@@ -574,13 +628,13 @@ Edit Student
 
             <h3 class="section-title">
 
-                Admission Details
+                Abhyasika Information
 
             </h3>
 
             <p class="section-description">
 
-                Select the student's Abhyasika and current admission status.
+                Abhyasika, admission date and current student status.
 
             </p>
 
@@ -641,6 +695,34 @@ Edit Student
 
             </div>
 
+            <!-- Admission Date -->
+
+            <div class="col-lg-3">
+
+                <label class="form-label">
+
+                    Admission Date
+
+                    <span class="required">*</span>
+
+                </label>
+
+                <input
+                    type="date"
+                    name="admission_date"
+                    class="form-control"
+                    value="{{ student.admission_date.strftime('%Y-%m-%d') if student.admission_date else '' }}"
+                    required
+                >
+
+                <div class="form-text">
+
+                    Student joining date in Abhyasika.
+
+                </div>
+
+            </div>
+
             {% else %}
 
             <!-- Teacher -->
@@ -668,11 +750,39 @@ Edit Student
 
             </div>
 
+            <!-- Admission Date -->
+
+            <div class="col-lg-3">
+
+                <label class="form-label">
+
+                    Admission Date
+
+                    <span class="required">*</span>
+
+                </label>
+
+                <input
+                    type="date"
+                    name="admission_date"
+                    class="form-control"
+                    value="{{ student.admission_date.strftime('%Y-%m-%d') if student.admission_date else '' }}"
+                    required
+                >
+
+                <div class="form-text">
+
+                    Student joining date in Abhyasika.
+
+                </div>
+
+            </div>
+
             {% endif %}
 
             <!-- Status -->
 
-            <div class="col-lg-6">
+            <div class="col-lg-3">
 
                 <label class="form-label">
 

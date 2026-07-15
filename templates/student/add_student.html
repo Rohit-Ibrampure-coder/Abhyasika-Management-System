@@ -75,7 +75,103 @@ Add Student
 
 </div>
 
-<form method="POST">
+<form
+    method="POST"
+    enctype="multipart/form-data"
+>
+
+<!-- ==========================================================
+     STUDENT PHOTO
+========================================================== -->
+
+<div class="card form-card section-card mb-4">
+
+    <div class="section-header">
+
+        <div class="section-icon">
+
+            <i class="bi bi-camera-fill"></i>
+
+        </div>
+
+        <div>
+
+            <h3 class="section-title">
+
+                Student Photo
+
+            </h3>
+
+            <p class="section-description">
+
+                Upload a clear passport-size photograph of the student (optional).
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="row align-items-center">
+
+            <div class="col-lg-3 text-center">
+
+                <div
+                    class="student-photo-preview"
+                    id="studentPreview"
+                >
+
+                    <i class="bi bi-person-fill"></i>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-9">
+
+                <label class="form-label">
+
+                    Choose Photo
+
+                </label>
+
+                <input
+                    type="file"
+                    name="photo"
+                    id="photo"
+                    class="form-control"
+                    accept=".jpg,.jpeg,.png,.webp"
+                >
+
+                <div class="form-text mt-3">
+
+                    <i class="bi bi-camera-fill me-2 text-primary"></i>
+
+                    <strong>Photo Guidelines</strong>
+
+                    <ul class="mt-2 mb-0">
+
+                        <li>Passport-size photo</li>
+
+                        <li>Resolution: <strong>500 × 500 px</strong></li>
+
+                        <li>Maximum file size: <strong>2 MB</strong></li>
+
+                        <li>Supported formats: JPG, JPEG, PNG, WEBP</li>
+
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 <!-- ==========================================================
      PERSONAL INFORMATION
@@ -296,27 +392,6 @@ Add Student
                     {% endfor %}
 
                 </select>
-
-            </div>
-
-            <!-- Admission Date -->
-
-            <div class="col-lg-3">
-
-                <label class="form-label">
-
-                    Admission Date
-
-                    <span class="required">*</span>
-
-                </label>
-
-                <input
-                    type="date"
-                    name="admission_date"
-                    class="form-control"
-                    required
-                >
 
             </div>
 
@@ -574,13 +649,13 @@ Add Student
 
             <h3 class="section-title">
 
-                Admission Details
+                Abhyasika Information
 
             </h3>
 
             <p class="section-description">
 
-                Select the student's Abhyasika and current admission status.
+                Abhyasika enrollment, admission date and current student status.
 
             </p>
 
@@ -638,6 +713,33 @@ Add Student
 
             </div>
 
+            <!-- Admission Date -->
+
+            <div class="col-lg-3">
+
+                <label class="form-label">
+
+                    Admission Date
+
+                    <span class="required">*</span>
+
+                </label>
+
+                <input
+                    type="date"
+                    name="admission_date"
+                    class="form-control"
+                    required
+                >
+
+                <div class="form-text">
+
+                    Student joining date.
+
+                </div>
+
+            </div>
+
             {% else %}
 
             <!-- Teacher -->
@@ -665,11 +767,38 @@ Add Student
 
             </div>
 
+            <!-- Admission Date -->
+
+            <div class="col-lg-3">
+
+                <label class="form-label">
+
+                    Admission Date
+
+                    <span class="required">*</span>
+
+                </label>
+
+                <input
+                    type="date"
+                    name="admission_date"
+                    class="form-control"
+                    required
+                >
+
+                <div class="form-text">
+
+                    Student joining date.
+
+                </div>
+
+            </div>
+
             {% endif %}
 
             <!-- Status -->
 
-            <div class="col-lg-6">
+            <div class="col-lg-3">
 
                 <label class="form-label">
 
@@ -868,6 +997,90 @@ if(admissionDate && admissionDate.value === ""){
         .split("T")[0];
 
 }
+
+/* ==========================================================
+   Student Photo Preview
+========================================================== */
+
+const photoInput = document.getElementById("photo");
+
+const preview = document.getElementById("studentPreview");
+
+const studentInput = document.querySelector(
+    'input[name="student_name"]'
+);
+
+
+/* ==========================================
+   First Letter Avatar
+========================================== */
+
+function updateAvatar(){
+
+    if(preview.classList.contains("has-image")){
+
+        return;
+
+    }
+
+    const name = studentInput.value.trim();
+
+    if(name.length > 0){
+
+        preview.classList.add("has-letter");
+
+        preview.innerHTML = name.charAt(0).toUpperCase();
+
+    }else{
+
+        preview.classList.remove("has-letter");
+
+        preview.innerHTML = '<i class="bi bi-person-fill"></i>';
+
+    }
+
+}
+
+
+/* ==========================================
+   Live Photo Preview
+========================================== */
+
+photoInput.addEventListener("change", function(){
+
+    const file = this.files[0];
+
+    if(!file){
+
+        updateAvatar();
+
+        return;
+
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function(e){
+
+        preview.classList.add("has-image");
+
+        preview.innerHTML =
+
+            `<img src="${e.target.result}" alt="Student Photo">`;
+
+    };
+
+    reader.readAsDataURL(file);
+
+});
+
+
+studentInput.addEventListener(
+    "input",
+    updateAvatar
+);
+
+updateAvatar();
 
 </script>
 

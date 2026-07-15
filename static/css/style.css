@@ -4351,17 +4351,25 @@ TABLE
 
 }
 
+/*==================================================
+STUDENT AVATAR
+==================================================*/
+
 .student-avatar{
 
-    width:48px;
+    width:52px;
 
-    height:48px;
+    height:52px;
 
-    border-radius:14px;
+    border-radius:50%;
 
-    background:#EAF2FF;
+    background:linear-gradient(
+        135deg,
+        #2563EB,
+        #3B82F6
+    );
 
-    color:var(--primary);
+    color:#FFFFFF;
 
     display:flex;
 
@@ -4369,7 +4377,31 @@ TABLE
 
     justify-content:center;
 
+    font-size:22px;
+
     font-weight:700;
+
+    text-transform:uppercase;
+
+    flex-shrink:0;
+
+}
+
+/* Uploaded Student Photo */
+
+.student-avatar-img{
+
+    width:52px;
+
+    height:52px;
+
+    border-radius:50%;
+
+    object-fit:cover;
+
+    border:2px solid #E2E8F0;
+
+    flex-shrink:0;
 
 }
 
@@ -4965,17 +4997,25 @@ STUDENT PROFILE CARD
 
 }
 
+/*==================================================
+STUDENT PROFILE AVATAR
+==================================================*/
+
 .profile-avatar{
 
-    width:140px;
+    width:160px;
 
-    height:140px;
+    height:160px;
 
     margin:auto;
 
     border-radius:50%;
 
-    background:linear-gradient(135deg,#2563eb,#3b82f6);
+    overflow:hidden;
+
+    border:4px solid #2563EB;
+
+    background:#EFF6FF;
 
     display:flex;
 
@@ -4983,9 +5023,49 @@ STUDENT PROFILE CARD
 
     justify-content:center;
 
-    color:#fff;
+    box-shadow:0 12px 28px rgba(15,23,42,.15);
 
-    font-size:4rem;
+}
+
+/* Uploaded Photo */
+
+.profile-avatar-img{
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:cover;
+
+}
+
+/* First Letter Avatar */
+
+.profile-avatar-letter{
+
+    width:100%;
+
+    height:100%;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:linear-gradient(
+        135deg,
+        #2563EB,
+        #3B82F6
+    );
+
+    color:#FFFFFF;
+
+    font-size:72px;
+
+    font-weight:700;
+
+    text-transform:uppercase;
 
 }
 
@@ -5873,5 +5953,71 @@ REMARK CARD
     white-space:pre-wrap;
 
     line-height:1.6;
+
+}
+
+
+
+/* ==========================================================
+   STUDENT PHOTO
+========================================================== */
+
+.student-photo-preview{
+
+    width:160px;
+    height:160px;
+
+    margin:0 auto;
+
+    border:3px solid #E2E8F0;
+    border-radius:50%;
+
+    background:#EFF6FF;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    overflow:hidden;
+
+    font-size:64px;
+    font-weight:700;
+
+    color:#2563EB;
+
+    transition:.3s;
+
+}
+
+.student-photo-preview img{
+
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+
+}
+
+.student-photo-preview i{
+
+    font-size:64px;
+
+}
+
+.student-photo-preview.has-letter{
+
+    background:#2563EB;
+
+    color:#FFFFFF;
+
+    font-size:56px;
+
+}
+
+.student-photo-preview.has-image{
+
+    background:#FFFFFF;
+
+    border-color:#2563EB;
 
 }

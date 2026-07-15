@@ -28,6 +28,18 @@ from models.remark import Remark
 from models.teacher_abhyasika import TeacherAbhyasika
 from models.attendance import Attendance
 from models.achievement import Achievement
+import os
+from datetime import datetime
+from utils.student_photo import (
+
+    allowed_student_photo,
+
+    save_student_photo,
+
+    delete_student_photo
+
+)
+from flask import current_app
 
 student_bp = Blueprint(
     "student",
@@ -146,6 +158,56 @@ def add_student():
             "date_of_birth"
         )
 
+        student_photo = request.files.get(
+            "photo"
+        )
+
+        # ==========================================
+        # Validate Student Photo (Optional)
+        # ==========================================
+
+        if student_photo and student_photo.filename != "":
+
+            # ------------------------------
+            # Validate Extension
+            # ------------------------------
+
+            if not allowed_student_photo(
+                student_photo.filename
+            ):
+
+                flash(
+                    "Only JPG, JPEG, PNG and WEBP images are allowed.",
+                    "danger"
+                )
+
+                return redirect(
+                    url_for("student.add_student")
+                )
+
+            # ------------------------------
+            # Validate Size
+            # ------------------------------
+
+            student_photo.seek(0, os.SEEK_END)
+
+            file_size = student_photo.tell()
+
+            student_photo.seek(0)
+
+            if file_size > current_app.config[
+                "MAX_STUDENT_PHOTO_SIZE"
+            ]:
+
+                flash(
+                    "Student photo must not exceed 2 MB.",
+                    "danger"
+                )
+
+                return redirect(
+                    url_for("student.add_student")
+                )
+
         school_college_name = request.form.get(
             "school_college_name"
         ).strip()
@@ -200,22 +262,144 @@ def add_student():
 
             address=address,
 
+            photo=None,
+
             admission_date=admission_date,
 
             abhyasika_id=abhyasika_id
 
         )
 
+        # ==========================================
+        # Save Student
+        # ==========================================
+
         db.session.add(student)
+
         db.session.commit()
 
+
+        # ==========================================
+        # Upload Student Photo (Optional)
+        # ==========================================
+
+        if student_photo and student_photo.filename != "":
+
+            # ------------------------------
+            # Validate Image Extension
+            # ------------------------------
+
+            if not allowed_student_photo(
+
+                student_photo.filename
+
+            ):
+
+                delete_student_photo(
+                    student.photo
+                )
+
+                db.session.delete(student)
+
+                db.session.commit()
+
+                flash(
+
+                    "Only JPG, JPEG, PNG and WEBP images are allowed.",
+
+                    "danger"
+
+                )
+
+                return redirect(
+
+                    url_for(
+
+                        "student.add_student"
+
+                    )
+
+                )
+
+            # ------------------------------
+            # Validate File Size
+            # ------------------------------
+
+            student_photo.seek(
+
+                0,
+
+                os.SEEK_END
+
+            )
+
+            file_size = student_photo.tell()
+
+            student_photo.seek(0)
+
+            if file_size > current_app.config[
+                "MAX_STUDENT_PHOTO_SIZE"
+            ]:
+
+                db.session.delete(student)
+
+                db.session.commit()
+
+                flash(
+
+                    "Student photo must not exceed 2 MB.",
+
+                    "danger"
+
+                )
+
+                return redirect(
+
+                    url_for(
+
+                        "student.add_student"
+
+                    )
+
+                )
+
+            # ------------------------------
+            # Save Student Photo
+            # ------------------------------
+
+            filename = save_student_photo(
+
+                student_photo,
+
+                student.id
+
+            )
+
+            student.photo = filename
+
+            db.session.commit()
+
+
+        # ==========================================
+        # Success
+        # ==========================================
+
         flash(
+
             "Student added successfully.",
+
             "success"
+
         )
 
         return redirect(
-            url_for("student.view_students")
+
+            url_for(
+
+                "student.view_students"
+
+            )
+
         )
 
     return render_template(
@@ -518,6 +702,10 @@ def edit_student(student_id):
             "status"
         )
 
+        student_photo = request.files.get(
+            "photo"
+        )
+
         if current_user.role == "admin":
 
             abhyasika_id = request.form.get(
@@ -564,6 +752,57 @@ def edit_student(student_id):
                     student_id=student.id
                 )
             )
+        
+        # ==========================================
+        # Validate Student Photo
+        # ==========================================
+
+        if student_photo and student_photo.filename != "":
+
+            # Validate Extension
+
+            if not allowed_student_photo(
+                student_photo.filename
+            ):
+
+                flash(
+                    "Only JPG, JPEG, PNG and WEBP images are allowed.",
+                    "danger"
+                )
+
+                return redirect(
+                    url_for(
+                        "student.edit_student",
+                        student_id=student.id
+                    )
+                )
+
+            # Validate File Size
+
+            student_photo.seek(
+                0,
+                os.SEEK_END
+            )
+
+            file_size = student_photo.tell()
+
+            student_photo.seek(0)
+
+            if file_size > current_app.config[
+                "MAX_STUDENT_PHOTO_SIZE"
+            ]:
+
+                flash(
+                    "Student photo must not exceed 2 MB.",
+                    "danger"
+                )
+
+                return redirect(
+                    url_for(
+                        "student.edit_student",
+                        student_id=student.id
+                    )
+                )
 
         # Update Student
 
@@ -601,6 +840,34 @@ def edit_student(student_id):
         student.abhyasika_id = abhyasika_id
 
         db.session.commit()
+
+        # ==========================================
+        # Update Student Photo
+        # ==========================================
+
+        if student_photo and student_photo.filename != "":
+
+            # Delete Old Photo
+
+            delete_student_photo(
+                student.photo
+            )
+
+            # Save New Photo
+
+            filename = save_student_photo(
+
+                student_photo,
+
+                student.id
+
+            )
+
+            # Update Database
+
+            student.photo = filename
+
+            db.session.commit()
 
         flash(
             "Student updated successfully.",

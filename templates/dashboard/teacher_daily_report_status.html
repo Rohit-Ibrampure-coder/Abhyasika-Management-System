@@ -86,7 +86,7 @@
 
                         <span class="badge bg-secondary">
 
-                            उपलब्ध नाही
+                            उपस्थितीनंतर उपलब्ध
 
                         </span>
 
@@ -126,14 +126,16 @@
 
             {% else %}
 
-                <button
-                    class="btn btn-secondary w-100"
-                    disabled
+                <a
+                    href="{{ url_for('attendance.mark_attendance') }}"
+                    class="btn btn-primary w-100"
                 >
 
-                    प्रथम उपस्थिती घ्या
+                    <i class="bi bi-calendar-check me-2"></i>
 
-                </button>
+                    उपस्थिती घ्या
+
+                </a>
 
             {% endif %}
 

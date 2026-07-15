@@ -80,7 +80,23 @@ Student Profile
 
                     <div class="profile-avatar">
 
-                        <i class="bi bi-person-fill"></i>
+                        {% if student.photo %}
+
+                            <img
+                                src="{{ url_for('static', filename='uploads/students/' ~ student.photo) }}"
+                                alt="{{ student.student_name }}"
+                                class="profile-avatar-img"
+                            >
+
+                        {% else %}
+
+                            <div class="profile-avatar-letter">
+
+                                {{ student.student_name[0]|upper }}
+
+                            </div>
+
+                        {% endif %}
 
                     </div>
 
@@ -310,17 +326,29 @@ Student Profile
 
                     </div>
 
-                    <div class="info-row">
+                </div>
 
-                        <span>Admission Date</span>
+            </div>
 
-                        <strong>
+        </div>
 
-                            {{ student.admission_date }}
+        <!-- ==========================================================
+            Abhyasika Information
+        ========================================================== -->
 
-                        </strong>
+        <div class="col-lg-6">
 
-                    </div>
+            <div class="card info-card h-100">
+
+                <div class="card-header info-header">
+
+                    <i class="bi bi-building-fill me-2"></i>
+
+                    Abhyasika Information
+
+                </div>
+
+                <div class="card-body">
 
                     <div class="info-row">
 
@@ -329,6 +357,26 @@ Student Profile
                         <strong>
 
                             {{ student.abhyasika.name }}
+
+                        </strong>
+
+                    </div>
+
+                    <div class="info-row">
+
+                        <span>Admission Date</span>
+
+                        <strong>
+
+                            {% if student.admission_date %}
+
+                                {{ student.admission_date.strftime("%d-%m-%Y") }}
+
+                            {% else %}
+
+                                -
+
+                            {% endif %}
 
                         </strong>
 
@@ -407,108 +455,6 @@ Student Profile
                         {{ student.address }}
 
                     </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- =======================================================
-        ATTENDANCE SUMMARY
-    ======================================================= -->
-
-    <div class="card attendance-card mb-4">
-
-        <div class="card-header attendance-header">
-
-            <i class="bi bi-calendar-check-fill me-2"></i>
-
-            Attendance Summary
-
-        </div>
-
-        <div class="card-body">
-
-            <div class="row g-4">
-
-                <div class="col-md-4">
-
-                    <div class="attendance-box">
-
-                        <div class="attendance-icon present-icon">
-
-                            <i class="bi bi-check-circle-fill"></i>
-
-                        </div>
-
-                        <h3>
-
-                            0
-
-                        </h3>
-
-                        <p>
-
-                            Present Days
-
-                        </p>
-
-                    </div>
-
-                </div>
-
-                <div class="col-md-4">
-
-                    <div class="attendance-box">
-
-                        <div class="attendance-icon absent-icon">
-
-                            <i class="bi bi-x-circle-fill"></i>
-
-                        </div>
-
-                        <h3>
-
-                            0
-
-                        </h3>
-
-                        <p>
-
-                            Absent Days
-
-                        </p>
-
-                    </div>
-
-                </div>
-
-                <div class="col-md-4">
-
-                    <div class="attendance-box">
-
-                        <div class="attendance-icon percentage-icon">
-
-                            <i class="bi bi-graph-up-arrow"></i>
-
-                        </div>
-
-                        <h3>
-
-                            0%
-
-                        </h3>
-
-                        <p>
-
-                            Attendance Percentage
-
-                        </p>
-
-                    </div>
 
                 </div>
 

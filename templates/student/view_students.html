@@ -480,17 +480,31 @@ Students
 
                     <tr>
 
-                        <!-- Student -->
+                        <!-- ==========================================================
+                            Student
+                        ========================================================== -->
 
                         <td>
 
                             <div class="student-info">
 
-                                <div class="student-avatar">
+                                {% if student.photo %}
 
-                                    {{ student.student_name[0] }}
+                                    <img
+                                        src="{{ url_for('static', filename='uploads/students/' ~ student.photo) }}"
+                                        alt="{{ student.student_name }}"
+                                        class="student-avatar-img"
+                                    >
 
-                                </div>
+                                {% else %}
+
+                                    <div class="student-avatar">
+
+                                        {{ student.student_name[0]|upper }}
+
+                                    </div>
+
+                                {% endif %}
 
                                 <div>
 
@@ -502,7 +516,13 @@ Students
 
                                     <div class="student-subtitle">
 
-                                        Student ID : {{ student.id }}
+                                        {{ student.standard }}
+
+                                        {% if student.abhyasika %}
+
+                                            • {{ student.abhyasika.name }}
+
+                                        {% endif %}
 
                                     </div>
 

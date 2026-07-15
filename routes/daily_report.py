@@ -559,11 +559,23 @@ def view_daily_report(report_id):
 
         absent_count=absent_count,
 
-        physical_activity=json.loads(report.physical_activity or "[]"),
+        physical_activity=[
+            item.strip()
+            for item in json.loads(report.physical_activity or "[]")
+            if item.strip()
+        ],
 
-        study_activity=json.loads(report.study_activity or "[]"),
+        study_activity=[
+            item.strip()
+            for item in json.loads(report.study_activity or "[]")
+            if item.strip()
+        ],
 
-        special_activity=json.loads(report.special_activity or "[]")
+        special_activity=[
+            item.strip()
+            for item in json.loads(report.special_activity or "[]")
+            if item.strip()
+        ]
 
     )
 
