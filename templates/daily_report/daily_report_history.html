@@ -166,11 +166,14 @@
 
         <div class="card-header bg-light">
 
-            <h5 class="mb-0">
+            <h5
+                class="mb-0"
+                style="color:#1e293b !important;"
+            >
 
                 <i class="bi bi-funnel-fill me-2"></i>
 
-                शोध फिल्टर
+                Search Filters
 
             </h5>
 
@@ -303,7 +306,7 @@
 
                         <i class="bi bi-search me-2"></i>
 
-                        शोधा
+                        Search
 
                     </button>
 
@@ -314,7 +317,7 @@
 
                         <i class="bi bi-arrow-clockwise me-2"></i>
 
-                        रीसेट
+                        Reset
 
                     </a>
 
@@ -334,7 +337,10 @@
 
         <div class="card-header bg-light">
 
-            <h5 class="mb-0">
+            <h5
+                class="mb-0"
+                style="color: #1e293b !important;"
+            >
 
                 <i class="bi bi-table me-2"></i>
 
@@ -485,16 +491,12 @@
                                         <!-- View -->
 
                                         <a
-
                                             href="{{ url_for(
                                                 'daily_report.view_daily_report',
                                                 report_id=item.report.id
                                             ) }}"
-
                                             class="btn btn-sm btn-outline-primary"
-
-                                            title="अहवाल पहा"
-
+                                            title="View"
                                         >
 
                                             <i class="bi bi-eye"></i>
@@ -506,16 +508,12 @@
                                         {% if current_user.role == "admin" %}
 
                                         <a
-
                                             href="{{ url_for(
                                                 'daily_report.edit_daily_report',
                                                 report_id=item.report.id
                                             ) }}"
-
                                             class="btn btn-sm btn-outline-warning"
-
                                             title="Edit"
-
                                         >
 
                                             <i class="bi bi-pencil-square"></i>
@@ -523,25 +521,48 @@
                                         </a>
 
                                         {% elif current_user.role == "teacher"
-                                            and item.report.teacher_id == current_user.id
-                                            and item.report.report_date == today %}
+                                            and item.report.teacher_id == current_user.id %}
 
                                         <a
-
                                             href="{{ url_for(
                                                 'daily_report.edit_daily_report',
                                                 report_id=item.report.id
                                             ) }}"
-
                                             class="btn btn-sm btn-outline-warning"
-
                                             title="Edit"
-
                                         >
 
                                             <i class="bi bi-pencil-square"></i>
 
                                         </a>
+
+                                        {% endif %}
+
+                                        <!-- Delete (Admin Only) -->
+
+                                        {% if current_user.role == "admin" %}
+
+                                        <form
+                                            action="{{ url_for(
+                                                'daily_report.delete_daily_report',
+                                                report_id=item.report.id
+                                            ) }}"
+                                            method="POST"
+                                            class="d-inline"
+                                            onsubmit="return confirm('Are you sure you want to delete this Daily Report?');"
+                                        >
+
+                                            <button
+                                                type="submit"
+                                                class="btn btn-sm btn-outline-danger"
+                                                title="Delete"
+                                            >
+
+                                                <i class="bi bi-trash"></i>
+
+                                            </button>
+
+                                        </form>
 
                                         {% endif %}
 

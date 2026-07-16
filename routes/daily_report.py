@@ -1,5 +1,6 @@
 from flask import (
     Blueprint,
+    abort,
     render_template,
     redirect,
     url_for,
@@ -867,5 +868,72 @@ def edit_daily_report(report_id):
         selected_study=selected_study,
 
         selected_special=selected_special
+
+    )
+
+# ==========================================================
+# Delete Daily Report
+# ==========================================================
+
+@daily_report_bp.route(
+    "/daily-report/delete/<int:report_id>",
+    methods=["POST"]
+)
+@login_required
+def delete_daily_report(report_id):
+
+    # ==========================================
+    # Admin Permission
+    # ==========================================
+
+    if current_user.role != "admin":
+
+        abort(403)
+
+    # ==========================================
+    # Get Daily Report
+    # ==========================================
+
+    report = DailyReport.query.get_or_404(
+
+        report_id
+
+    )
+
+    # ==========================================
+    # Delete Daily Report
+    # ==========================================
+
+    db.session.delete(
+
+        report
+
+    )
+
+    db.session.commit()
+
+    # ==========================================
+    # Success Message
+    # ==========================================
+
+    flash(
+
+        f"Daily Report for {report.report_date.strftime('%d-%m-%Y')} has been deleted successfully.",
+
+        "success"
+
+    )
+
+    # ==========================================
+    # Redirect
+    # ==========================================
+
+    return redirect(
+
+        url_for(
+
+            "daily_report.daily_report_history"
+
+        )
 
     )
