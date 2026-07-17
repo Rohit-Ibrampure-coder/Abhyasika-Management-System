@@ -71,3 +71,24 @@ class Config:
     MAX_STUDENT_PHOTO_SIZE = int(
         2 * 1024 * 1024
     )
+
+    # ==========================================
+    # Teacher Photo Upload
+    # ==========================================
+
+    TEACHER_UPLOAD_FOLDER = os.path.join(
+        "static",
+        "uploads",
+        "teachers"
+    )
+
+    ALLOWED_TEACHER_EXTENSIONS = {
+        "jpg",
+        "jpeg",
+        "png",
+        "webp"
+    }
+
+    MAX_TEACHER_PHOTO_SIZE = int(
+        2 * 1024 * 1024
+    )

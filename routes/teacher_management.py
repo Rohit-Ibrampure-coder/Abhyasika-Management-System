@@ -19,6 +19,12 @@ from models import db
 from models.user import User
 from models.abhyasika import Abhyasika
 from models.teacher_abhyasika import TeacherAbhyasika
+from utils.teacher_photo import (
+    allowed_teacher_photo,
+    save_teacher_photo,
+    delete_teacher_photo
+)
+
 
 teacher_management_bp = Blueprint(
     "teacher_management",
@@ -42,6 +48,7 @@ def add_teacher():
         email = request.form.get("email")
         username = request.form.get("username")
         password = request.form.get("password")
+        photo = request.files.get("teacher_photo")
 
         # Mobile Validation
         if not mobile.isdigit() or len(mobile) != 10:
@@ -141,6 +148,32 @@ def add_teacher():
                 )
 
             )
+        
+        # ==========================================
+        # Teacher Photo Validation
+        # ==========================================
+
+        if photo and photo.filename != "":
+
+            if not allowed_teacher_photo(photo.filename):
+
+                flash(
+
+                    "Only JPG, JPEG, PNG and WEBP images are allowed.",
+
+                    "danger"
+
+                )
+
+                return redirect(
+
+                    url_for(
+
+                        "teacher_management.add_teacher"
+
+                    )
+
+                )
 
         hashed_password = generate_password_hash(password)
 
@@ -155,6 +188,26 @@ def add_teacher():
 
         db.session.add(teacher)
         db.session.commit()
+
+        # ==========================================
+        # Save Teacher Photo
+        # ==========================================
+
+        if photo and photo.filename != "":
+
+            filename = save_teacher_photo(
+
+                photo,
+
+                teacher.id
+
+            )
+
+            if filename:
+
+                teacher.profile_photo = filename
+
+                db.session.commit()
 
         flash(
 
@@ -173,6 +226,7 @@ def add_teacher():
     return render_template(
         "teacher/add_teacher.html"
     )
+
 
 @teacher_management_bp.route(
     "/admin/teachers"
@@ -235,6 +289,7 @@ def view_teacher(id):
         "teacher/view_teacher.html",
         teacher=teacher
     )
+
 
 @teacher_management_bp.route(
     "/admin/teacher/<int:id>/assign",
@@ -328,6 +383,8 @@ def edit_teacher(id):
         mobile = request.form.get("mobile")
         email = request.form.get("email")
         username = request.form.get("username")
+        photo = request.files.get("teacher_photo")
+        remove_photo = request.form.get("remove_photo")
 
         # Mobile Validation
         if not mobile.isdigit() or len(mobile) != 10:
@@ -350,11 +407,78 @@ def edit_teacher(id):
 
         if existing_email:
             return "Email already exists"
+        
+        # ==========================================
+        # Teacher Photo Validation
+        # ==========================================
+
+        if photo and photo.filename != "":
+
+            if not allowed_teacher_photo(photo.filename):
+
+                flash(
+
+                    "Only JPG, JPEG, PNG and WEBP images are allowed.",
+
+                    "danger"
+
+                )
+
+                return redirect(
+
+                    url_for(
+
+                        "teacher_management.edit_teacher",
+
+                        id=teacher.id
+
+                    )
+
+                )
 
         teacher.name = name
         teacher.mobile = mobile
         teacher.email = email
         teacher.username = username
+
+        # ==========================================
+        # Update / Remove Teacher Photo
+        # ==========================================
+
+        if remove_photo:
+
+            if teacher.profile_photo:
+
+                delete_teacher_photo(
+
+                    teacher.profile_photo
+
+                )
+
+                teacher.profile_photo = None
+
+
+        elif photo and photo.filename != "":
+
+            if teacher.profile_photo:
+
+                delete_teacher_photo(
+
+                    teacher.profile_photo
+
+                )
+
+            filename = save_teacher_photo(
+
+                photo,
+
+                teacher.id
+
+            )
+
+            if filename:
+
+                teacher.profile_photo = filename
 
         db.session.commit()
 
@@ -388,7 +512,20 @@ def delete_teacher(id):
             teacher_id=teacher.id
         ).delete()
 
+        # ==========================================
+        # Delete Teacher Photo
+        # ==========================================
+
+        if teacher.profile_photo:
+
+            delete_teacher_photo(
+
+                teacher.profile_photo
+
+            )
+
         # Delete Teacher
+
         db.session.delete(teacher)
 
         db.session.commit()

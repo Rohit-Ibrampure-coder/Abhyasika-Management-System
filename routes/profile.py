@@ -24,159 +24,17 @@ from models.user import User
 from models.student import Student
 from models.abhyasika import Abhyasika
 from models.teacher_abhyasika import TeacherAbhyasika
-
-ALLOWED_EXTENSIONS = {
-    "png",
-    "jpg",
-    "jpeg",
-    "webp"
-}
-
-
-def allowed_file(filename):
-
-    return (
-        "." in filename
-        and
-        filename.rsplit(".", 1)[1].lower()
-        in ALLOWED_EXTENSIONS
-    )
+from utils.teacher_photo import (
+    allowed_teacher_photo,
+    save_teacher_photo,
+    delete_teacher_photo
+)
 
 profile_bp = Blueprint(
     "profile",
     __name__
 )
 
-@profile_bp.route(
-    "/profile/upload-photo",
-    methods=["POST"]
-)
-@login_required
-def upload_profile_photo():
-
-    if "profile_photo" not in request.files:
-
-        flash(
-            "Please select an image.",
-            "warning"
-        )
-
-        return redirect(
-            url_for("profile.my_profile")
-        )
-
-    file = request.files["profile_photo"]
-
-    if file.filename == "":
-
-        flash(
-            "Please select an image.",
-            "warning"
-        )
-
-        return redirect(
-            url_for("profile.my_profile")
-        )
-
-    if not allowed_file(file.filename):
-
-        flash(
-            "Only JPG, JPEG, PNG and WEBP images are allowed.",
-            "danger"
-        )
-
-        return redirect(
-            url_for("profile.my_profile")
-        )
-
-    extension = secure_filename(
-        file.filename
-    ).rsplit(".", 1)[1].lower()
-
-    timestamp = datetime.now().strftime(
-        "%Y%m%d_%H%M%S"
-    )
-
-    filename = (
-        f"user_{current_user.id}_{timestamp}.{extension}"
-    )
-
-    upload_folder = os.path.join(
-
-        current_app.root_path,
-
-        "static",
-
-        "uploads",
-
-        "profile"
-
-    )
-
-    os.makedirs(
-        upload_folder,
-        exist_ok=True
-    )
-
-    # ----------------------------------
-    # Delete old photo
-    # ----------------------------------
-
-    if (
-
-        current_user.profile_photo
-
-        and
-
-        current_user.profile_photo != "default.png"
-
-    ):
-
-        old_photo = os.path.join(
-
-            upload_folder,
-
-            current_user.profile_photo
-
-        )
-
-        if os.path.exists(old_photo):
-
-            os.remove(old_photo)
-
-    # ----------------------------------
-    # Save new photo
-    # ----------------------------------
-
-    file.save(
-
-        os.path.join(
-
-            upload_folder,
-
-            filename
-
-        )
-
-    )
-
-    current_user.profile_photo = filename
-
-    db.session.commit()
-
-    flash(
-
-        "Profile photo updated successfully.",
-
-        "success"
-
-    )
-
-    return redirect(
-
-        url_for("profile.my_profile")
-
-    )
 
 @profile_bp.route("/profile")
 @login_required
@@ -250,6 +108,8 @@ def edit_profile():
         name = request.form.get("name", "").strip()
         mobile = request.form.get("mobile", "").strip()
         email = request.form.get("email", "").strip()
+        photo = request.files.get("profile_photo")
+        remove_photo = request.form.get("remove_photo")
 
         # -------------------------
         # Mobile Validation
@@ -284,6 +144,27 @@ def edit_profile():
             return redirect(
                 url_for("profile.edit_profile")
             )
+        
+        # -------------------------
+        # Profile Photo Validation
+        # -------------------------
+
+        if (
+            current_user.role in ["admin", "teacher"]
+            and photo
+            and photo.filename != ""
+        ):
+
+            if not allowed_teacher_photo(photo.filename):
+
+                flash(
+                    "Only JPG, JPEG, PNG and WEBP files are allowed.",
+                    "danger"
+                )
+
+                return redirect(
+                    url_for("profile.edit_profile")
+                )
 
         # Check duplicate email
 
@@ -315,6 +196,43 @@ def edit_profile():
         current_user.name = name
         current_user.mobile = mobile
         current_user.email = email
+
+        # ==========================================
+        # Profile Photo
+        # ==========================================
+
+        if current_user.role in ["admin", "teacher"]:
+
+            # Remove Current Photo
+            if remove_photo:
+
+                if current_user.profile_photo:
+
+                    delete_teacher_photo(
+                        current_user.profile_photo
+                    )
+
+                    current_user.profile_photo = None
+
+            # Upload / Replace Photo
+            elif photo and photo.filename != "":
+
+                # Delete Old Photo
+                if current_user.profile_photo:
+
+                    delete_teacher_photo(
+                        current_user.profile_photo
+                    )
+
+                # Save New Photo
+                filename = save_teacher_photo(
+                    photo,
+                    current_user.id
+                )
+
+                if filename:
+
+                    current_user.profile_photo = filename
 
         db.session.commit()
 

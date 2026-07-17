@@ -526,11 +526,16 @@ def abhyasika_profile(id):
             Attendance.student_id == Student.id
         )
 
+        .join(
+            AttendanceSession,
+            Attendance.attendance_session_id == AttendanceSession.id
+        )
+
         .filter(
 
             Student.abhyasika_id == id,
 
-            Attendance.attendance_date == today,
+            AttendanceSession.attendance_date == today,
 
             Attendance.status == "Present"
 
@@ -549,11 +554,16 @@ def abhyasika_profile(id):
             Attendance.student_id == Student.id
         )
 
+        .join(
+            AttendanceSession,
+            Attendance.attendance_session_id == AttendanceSession.id
+        )
+
         .filter(
 
             Student.abhyasika_id == id,
 
-            Attendance.attendance_date == today,
+            AttendanceSession.attendance_date == today,
 
             Attendance.status == "Absent"
 
@@ -652,14 +662,20 @@ def abhyasika_profile(id):
         Attendance.query
 
         .join(
-            Student
+            Student,
+            Attendance.student_id == Student.id
+        )
+
+        .join(
+            AttendanceSession,
+            Attendance.attendance_session_id == AttendanceSession.id
         )
 
         .filter(
 
             Student.abhyasika_id == id,
 
-            Attendance.attendance_date == today
+            AttendanceSession.attendance_date == today
 
         )
 
@@ -724,7 +740,9 @@ def edit_abhyasika(id):
     # Get Abhyasika
     # ==========================================
 
-    abhyasika = Abhyasika.query.get_or_404(id)
+    abhyasika = db.session.get(Abhyasika, id)
+    if not abhyasika:
+        abort(404)
 
     # ==========================================
     # Form Submission

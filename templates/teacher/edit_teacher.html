@@ -41,7 +41,147 @@ Edit Teacher
 
 </div>
 
-<form method="POST">
+<form
+    method="POST"
+    enctype="multipart/form-data"
+>
+
+    <!-- =======================================
+        Teacher Photo
+    ======================================= -->
+
+    <div class="card form-card border-0 shadow-sm rounded-4 mb-4">
+
+        <div class="card-body p-4">
+
+            <div class="form-section-title">
+
+                <i class="bi bi-camera-fill"></i>
+
+                Teacher Photo
+
+            </div>
+
+            <div class="row align-items-center">
+
+                <!-- Current Photo -->
+
+                <div class="col-md-4 text-center">
+
+                    {% if teacher.profile_photo %}
+
+                        <img
+                            id="photoPreview"
+                            src="{{ url_for('static', filename='uploads/teachers/' + teacher.profile_photo) }}"
+                            class="teacher-profile-photo"
+                            alt="{{ teacher.name }}"
+                        >
+
+                        <div
+                            id="photoPlaceholder"
+                            style="display:none;"
+                        >
+
+                            <div class="teacher-avatar">
+
+                                {{ teacher.name[0]|upper }}
+
+                            </div>
+
+                        </div>
+
+                    {% else %}
+
+                        <img
+                            id="photoPreview"
+                            class="teacher-profile-photo"
+                            alt="Teacher Photo"
+                            style="display:none;"
+                        >
+
+                        <div id="photoPlaceholder">
+
+                            <div class="teacher-avatar">
+
+                                {{ teacher.name[0]|upper }}
+
+                            </div>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+                <!-- Upload -->
+
+                <div class="col-md-8">
+
+                    <label class="form-label">
+
+                        Change Teacher Photo
+
+                    </label>
+
+                    <input
+                        type="file"
+                        id="teacher_photo"
+                        name="teacher_photo"
+                        class="form-control"
+                        accept=".jpg,.jpeg,.png,.webp"
+                    >
+
+                    {% if teacher.profile_photo %}
+
+                    <div class="form-check mt-3">
+
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            id="remove_photo"
+                            name="remove_photo"
+                            value="1"
+                        >
+
+                        <label
+                            class="form-check-label text-danger"
+                            for="remove_photo"
+                        >
+
+                            <i class="bi bi-trash3-fill me-1"></i>
+
+                            Remove current photo
+
+                        </label>
+
+                    </div>
+
+                    {% endif %}
+
+                    <div class="form-text">
+
+                        <strong>Recommended:</strong>
+                        Square image (500 × 500 px)
+
+                        <br>
+
+                        <strong>Formats:</strong>
+                        JPG, JPEG, PNG, WEBP
+
+                        <br>
+
+                        <strong>Maximum file size:</strong>
+                        2 MB
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
 
     <!-- ==========================================
          Teacher Information
@@ -69,6 +209,8 @@ Edit Teacher
 
                         Full Name
 
+                        <span class="text-danger">*</span>
+
                     </label>
 
                     <input
@@ -88,6 +230,8 @@ Edit Teacher
                     <label class="form-label">
 
                         Mobile Number
+
+                        <span class="text-danger">*</span>
 
                     </label>
 
@@ -120,6 +264,8 @@ Edit Teacher
 
                         Email Address
 
+                        <span class="text-danger">*</span>
+
                     </label>
 
                     <input
@@ -127,6 +273,7 @@ Edit Teacher
                         name="email"
                         class="form-control"
                         value="{{ teacher.email }}"
+                        required
                     >
 
                 </div>
@@ -138,6 +285,8 @@ Edit Teacher
                     <label class="form-label">
 
                         Username
+
+                        <span class="text-danger">*</span>
 
                     </label>
 
@@ -236,6 +385,39 @@ mobileInput.addEventListener(
                 "text-danger";
 
         }
+
+    }
+
+);
+
+const teacherPhotoInput =
+    document.getElementById("teacher_photo");
+
+const photoPreview =
+    document.getElementById("photoPreview");
+
+const photoPlaceholder =
+    document.getElementById("photoPlaceholder");
+
+teacherPhotoInput.addEventListener(
+
+    "change",
+
+    function(){
+
+        const file = this.files[0];
+
+        if(!file){
+
+            return;
+
+        }
+
+        photoPreview.src = URL.createObjectURL(file);
+
+        photoPreview.style.display = "block";
+
+        photoPlaceholder.style.display = "none";
 
     }
 

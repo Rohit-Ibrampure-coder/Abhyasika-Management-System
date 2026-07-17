@@ -45,6 +45,92 @@ Pending Daily Reports
     </div>
 
     <!-- ========================================== -->
+    <!-- Summary Cards -->
+    <!-- ========================================== -->
+
+    <div class="row mb-4">
+
+        <div class="col-md-4">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body text-center">
+
+                    <i class="bi bi-file-earmark-text fs-1 text-primary"></i>
+
+                    <h2 class="mt-2 mb-1">
+
+                        {{ total_pending_reports }}
+
+                    </h2>
+
+                    <p class="text-muted mb-0">
+
+                        Total Pending Reports
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body text-center">
+
+                    <i class="bi bi-clock-history fs-1 text-warning"></i>
+
+                    <h2 class="mt-2 mb-1">
+
+                        {{ oldest_pending_days }}
+
+                    </h2>
+
+                    <p class="text-muted mb-0">
+
+                        Oldest Pending (Days)
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body text-center">
+
+                    <i class="bi bi-calendar-event fs-1 text-danger"></i>
+
+                    <h2 class="mt-2 mb-1">
+
+                        {{ today_pending_reports }}
+
+                    </h2>
+
+                    <p class="text-muted mb-0">
+
+                        Today's Pending
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ========================================== -->
     <!-- Search Filters -->
     <!-- ========================================== -->
 
@@ -206,92 +292,6 @@ Pending Daily Reports
 
     </div>
 
-
-    <!-- ========================================== -->
-    <!-- Summary Cards -->
-    <!-- ========================================== -->
-
-    <div class="row mb-4">
-
-        <div class="col-md-4">
-
-            <div class="card shadow-sm border-0">
-
-                <div class="card-body text-center">
-
-                    <i class="bi bi-file-earmark-text fs-1 text-primary"></i>
-
-                    <h2 class="mt-2 mb-1">
-
-                        {{ total_pending_reports }}
-
-                    </h2>
-
-                    <p class="text-muted mb-0">
-
-                        Total Pending Reports
-
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-4">
-
-            <div class="card shadow-sm border-0">
-
-                <div class="card-body text-center">
-
-                    <i class="bi bi-clock-history fs-1 text-warning"></i>
-
-                    <h2 class="mt-2 mb-1">
-
-                        {{ oldest_pending_days }}
-
-                    </h2>
-
-                    <p class="text-muted mb-0">
-
-                        Oldest Pending (Days)
-
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-4">
-
-            <div class="card shadow-sm border-0">
-
-                <div class="card-body text-center">
-
-                    <i class="bi bi-calendar-event fs-1 text-danger"></i>
-
-                    <h2 class="mt-2 mb-1">
-
-                        {{ today_pending_reports }}
-
-                    </h2>
-
-                    <p class="text-muted mb-0">
-
-                        Today's Pending
-
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
 
     <!-- ========================================== -->
     <!-- Pending Daily Reports Table -->

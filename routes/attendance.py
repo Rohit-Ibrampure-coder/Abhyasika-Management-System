@@ -1258,7 +1258,7 @@ def delete_attendance(attendance_session_id):
 
             url_for(
 
-                "attendance.mark_attendance"
+                "attendance.attendance_history"
 
             )
 
@@ -1268,7 +1268,7 @@ def delete_attendance(attendance_session_id):
 
         url_for(
 
-            "attendance.mark_attendance"
+            "attendance.attendance_history"
 
         )
 

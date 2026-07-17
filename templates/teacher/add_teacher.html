@@ -41,7 +41,101 @@ Add Teacher
 
 </div>
 
-<form method="POST">
+<form method="POST" enctype="multipart/form-data">
+
+    <!-- =======================================
+        Teacher Photo
+    ======================================= -->
+
+    <div class="card form-card border-0 shadow-sm rounded-4 mb-4">
+
+        <div class="card-body p-4">
+
+            <div class="form-section-title">
+
+                <i class="bi bi-camera-fill"></i>
+
+                Teacher Photo
+
+            </div>
+
+            <div class="row align-items-center">
+
+                <!-- Photo Preview -->
+
+                <div class="col-md-4 text-center">
+
+                    <div id="photoPlaceholder">
+
+                        <i
+                            class="bi bi-person-circle text-secondary"
+                            style="font-size: 8rem;"
+                        ></i>
+
+                        <p class="text-muted mt-2 mb-0">
+
+                            No Photo Selected
+
+                        </p>
+
+                    </div>
+
+                    <img
+                        id="photoPreview"
+                        class="img-fluid rounded-circle border"
+                        style="
+                            width:180px;
+                            height:180px;
+                            object-fit:cover;
+                            display:none;
+                        "
+                        alt="Teacher Photo Preview"
+                    >
+
+                </div>
+
+                <!-- Upload -->
+
+                <div class="col-md-8">
+
+                    <label class="form-label">
+
+                        Upload Teacher Photo
+
+                    </label>
+
+                    <input
+                        type="file"
+                        class="form-control"
+                        id="teacher_photo"
+                        name="teacher_photo"
+                        accept=".jpg,.jpeg,.png,.webp"
+                    >
+
+                    <div class="form-text">
+
+                        <strong>Recommended:</strong>
+                        image (500 × 500 px)
+
+                        <br>
+
+                        <strong>Formats:</strong>
+                        JPG, JPEG, PNG, WEBP
+
+                        <br>
+
+                        <strong>Maximum file size:</strong>
+                        2 MB
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
 
     <!-- =======================================
          Teacher Information
@@ -69,6 +163,8 @@ Add Teacher
 
                         Full Name
 
+                        <span class="text-danger">*</span>
+
                     </label>
 
                     <input
@@ -88,6 +184,8 @@ Add Teacher
                     <label class="form-label">
 
                         Mobile Number
+
+                        <span class="text-danger">*</span>
 
                     </label>
 
@@ -121,6 +219,8 @@ Add Teacher
 
                         Email Address
 
+                        <span class="text-danger">*</span>
+
                     </label>
 
                     <input
@@ -128,6 +228,7 @@ Add Teacher
                         name="email"
                         class="form-control"
                         placeholder="teacher@example.com"
+                        required
                     >
 
                 </div>
@@ -139,6 +240,8 @@ Add Teacher
                     <label class="form-label">
 
                         Username
+
+                        <span class="text-danger">*</span>
 
                     </label>
 
@@ -192,6 +295,8 @@ Add Teacher
                     <label class="form-label">
 
                         Password
+
+                        <span class="text-danger">*</span>
 
                     </label>
 
@@ -471,6 +576,52 @@ usernameInput.addEventListener(
             500
 
         );
+
+    }
+
+);
+
+/* ==========================================
+   Teacher Photo Preview
+========================================== */
+
+const teacherPhotoInput = document.getElementById(
+    "teacher_photo"
+);
+
+const photoPreview = document.getElementById(
+    "photoPreview"
+);
+
+const photoPlaceholder = document.getElementById(
+    "photoPlaceholder"
+);
+
+teacherPhotoInput.addEventListener(
+
+    "change",
+
+    function () {
+
+        const file = this.files[0];
+
+        if (!file) {
+
+            photoPreview.style.display = "none";
+
+            photoPlaceholder.style.display = "block";
+
+            photoPreview.removeAttribute("src");
+
+            return;
+
+        }
+
+        photoPreview.src = URL.createObjectURL(file);
+
+        photoPreview.style.display = "block";
+
+        photoPlaceholder.style.display = "none";
 
     }
 

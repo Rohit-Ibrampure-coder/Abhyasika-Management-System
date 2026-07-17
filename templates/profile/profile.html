@@ -44,16 +44,23 @@ My Profile
 
                 <div class="card-body text-center">
 
-                    <div
-                        class="rounded-circle bg-primary text-white
-                        d-flex align-items-center justify-content-center
-                        mx-auto mb-3"
-                        style="width:110px;height:110px;font-size:42px;font-weight:700;"
-                    >
+                    {% if current_user.role in ["admin", "teacher"] and current_user.profile_photo %}
 
-                        {{ current_user.name[0]|upper }}
+                        <img
+                            src="{{ url_for('static', filename='uploads/teachers/' + current_user.profile_photo) }}"
+                            alt="{{ current_user.name }}"
+                            class="profile-photo mx-auto d-block mb-3"
+                        >
 
-                    </div>
+                    {% else %}
+
+                        <div class="profile-avatar">
+
+                            {{ current_user.name[0]|upper }}
+
+                        </div>
+
+                    {% endif %}
 
                     <h3 class="fw-bold">
 

@@ -49,11 +49,23 @@ Teacher Details
 
             <div class="col-md-3 text-center">
 
-                <div class="teacher-avatar mx-auto mb-3">
+                {% if teacher.profile_photo %}
 
-                    {{ teacher.name[0]|upper }}
+                    <img
+                        src="{{ url_for('static', filename='uploads/teachers/' + teacher.profile_photo) }}"
+                        alt="{{ teacher.name }}"
+                        class="teacher-profile-photo mx-auto mb-3 d-block"
+                    >
 
-                </div>
+                {% else %}
+
+                    <div class="teacher-avatar mx-auto mb-3">
+
+                        {{ teacher.name[0]|upper }}
+
+                    </div>
+
+                {% endif %}
 
                 <h4>
 

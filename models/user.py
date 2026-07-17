@@ -47,7 +47,7 @@ class User(UserMixin, db.Model):
 
     profile_photo = db.Column(
         db.String(255),
-        default="default.png"
+        nullable=True
     )
 
     is_active_account = db.Column(

@@ -28,7 +28,124 @@ Edit Profile
 
                 <div class="card-body">
 
-                    <form method="POST">
+                    <form method="POST" enctype="multipart/form-data">
+
+                        <!-- ========================================== -->
+                        <!-- Profile Photo -->
+                        <!-- ========================================== -->
+
+                        <div class="card border mb-4">
+
+                            <div class="card-header">
+
+                                <strong>
+
+                                    <i class="bi bi-camera-fill me-2"></i>
+
+                                    Profile Photo
+
+                                </strong>
+
+                            </div>
+
+                            <div class="card-body">
+
+                                <div class="text-center">
+
+                                    {% if current_user.role in ["admin", "teacher"] and current_user.profile_photo %}
+
+                                        <img
+                                            src="{{ url_for('static', filename='uploads/teachers/' + current_user.profile_photo) }}"
+                                            id="photoPreview"
+                                            class="profile-photo mb-3"
+                                            alt="Profile Photo"
+                                        >
+
+                                        <div
+                                            id="photoPlaceholder"
+                                            class="profile-avatar mb-3"
+                                            style="display:none;"
+                                        >
+
+                                            {{ current_user.name[0]|upper }}
+
+                                        </div>
+
+                                    {% else %}
+
+                                        <div
+                                            id="photoPlaceholder"
+                                            class="profile-avatar mb-3"
+                                        >
+
+                                            {{ current_user.name[0]|upper }}
+
+                                        </div>
+
+                                        <img
+                                            id="photoPreview"
+                                            class="profile-photo mb-3"
+                                            style="display:none;"
+                                            alt="Preview"
+                                        >
+
+                                    {% endif %}
+
+                                    {% if current_user.role in ["admin", "teacher"] %}
+
+                                        <div class="form-check d-inline-flex align-items-center mb-3">
+
+                                            <input
+                                                class="form-check-input me-2"
+                                                type="checkbox"
+                                                id="remove_photo"
+                                                name="remove_photo"
+                                                value="1"
+                                            >
+
+                                            <label
+                                                class="form-check-label"
+                                                for="remove_photo"
+                                            >
+
+                                                Remove current photo
+
+                                            </label>
+
+                                        </div>
+
+                                        <div class="mb-2 fw-semibold">
+
+                                            Change Profile Photo
+
+                                        </div>
+
+                                        <input
+                                            type="file"
+                                            class="form-control mx-auto"
+                                            id="profile_photo"
+                                            name="profile_photo"
+                                            accept=".jpg,.jpeg,.png,.webp"
+                                            style="max-width:450px;"
+                                        >
+
+                                        <div class="form-text mt-2">
+
+                                            Recommended: Square image (500 × 500 px)
+
+                                            <br>
+
+                                            JPG, JPEG, PNG or WEBP (Maximum 2 MB)
+
+                                        </div>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        </div>
 
                         <div class="mb-3">
 
@@ -144,5 +261,39 @@ Edit Profile
     </div>
 
 </div>
+
+<script>
+
+const photoInput = document.getElementById("profile_photo");
+
+if(photoInput){
+
+    photoInput.addEventListener("change", function(){
+
+        const file = this.files[0];
+
+        if(file){
+
+            const preview = document.getElementById("photoPreview");
+
+            const placeholder = document.getElementById("photoPlaceholder");
+
+            preview.src = URL.createObjectURL(file);
+
+            preview.style.display = "block";
+
+            if(placeholder){
+
+                placeholder.style.display = "none";
+
+            }
+
+        }
+
+    });
+
+}
+
+</script>
 
 {% endblock %}

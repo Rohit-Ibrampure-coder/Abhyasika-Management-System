@@ -57,11 +57,23 @@
                 data-bs-toggle="dropdown"
             >
 
-                <div class="user-avatar">
+                {% if current_user.role in ["admin", "teacher"] and current_user.profile_photo %}
 
-                    {{ current_user.name[0]|upper }}
+                    <img
+                        src="{{ url_for('static', filename='uploads/teachers/' + current_user.profile_photo) }}"
+                        alt="{{ current_user.name }}"
+                        class="user-avatar-photo"
+                    >
 
-                </div>
+                {% else %}
+
+                    <div class="user-avatar">
+
+                        {{ current_user.name[0]|upper }}
+
+                    </div>
+
+                {% endif %}
 
                 <div class="user-details">
 

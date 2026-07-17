@@ -115,17 +115,33 @@ Teachers
 
                             <div class="d-flex align-items-center">
 
-                                <div class="teacher-avatar me-3">
+                                {% if teacher.profile_photo %}
 
-                                    {{ teacher.name[0]|upper }}
+                                    <img
+                                        src="{{ url_for('static', filename='uploads/teachers/' + teacher.profile_photo) }}"
+                                        alt="{{ teacher.name }}"
+                                        class="teacher-table-avatar me-3"
+                                    >
+
+                                {% else %}
+
+                                    <div class="teacher-table-avatar-placeholder me-3">
+
+                                        {{ teacher.name[0]|upper }}
+
+                                    </div>
+
+                                {% endif %}
+
+                                <div>
+
+                                    <div class="fw-semibold">
+
+                                        {{ teacher.name }}
+
+                                    </div>
 
                                 </div>
-
-                                <strong>
-
-                                    {{ teacher.name }}
-
-                                </strong>
 
                             </div>
 
