@@ -3,6 +3,7 @@ from flask import (
     abort,
     render_template,
     redirect,
+    session,
     url_for,
     flash,
     request
@@ -935,5 +936,133 @@ def delete_daily_report(report_id):
             "daily_report.daily_report_history"
 
         )
+
+    )
+
+# ==========================================================
+# Pending Daily Reports
+# ==========================================================
+
+@daily_report_bp.route("/daily-report/pending")
+@login_required
+def pending_daily_reports():
+
+    # ==========================================
+    # Teacher Only
+    # ==========================================
+
+    if current_user.role != "teacher":
+
+        abort(403)
+
+    # ==========================================
+    # Selected Abhyasika
+    # ==========================================
+
+    abhyasika_id = session.get("abhyasika_id")
+
+    if not abhyasika_id:
+
+        flash(
+
+            "Please select an Abhyasika.",
+
+            "warning"
+
+        )
+
+        return redirect(
+
+            url_for("teacher.select_abhyasika")
+
+        )
+
+    today = date.today()
+
+    # ==========================================
+    # Filters
+    # ==========================================
+
+    from_date = request.args.get("from_date")
+
+    to_date = request.args.get("to_date")
+
+    # ==========================================
+    # Attendance Sessions
+    # ==========================================
+
+    query = AttendanceSession.query.filter(
+
+        AttendanceSession.abhyasika_id == abhyasika_id,
+
+        AttendanceSession.attendance_date < today
+
+    )
+
+    if from_date:
+
+        query = query.filter(
+
+            AttendanceSession.attendance_date >= from_date
+
+        )
+
+    if to_date:
+
+        query = query.filter(
+
+            AttendanceSession.attendance_date <= to_date
+
+        )
+
+    attendance_sessions = query.order_by(
+
+        AttendanceSession.attendance_date.asc()
+
+    ).all()
+
+    # ==========================================
+    # Existing Daily Reports
+    # ==========================================
+
+    report_session_ids = {
+
+        report.attendance_session_id
+
+        for report in DailyReport.query.with_entities(
+
+            DailyReport.attendance_session_id
+
+        ).all()
+
+    }
+
+    # ==========================================
+    # Pending Reports
+    # ==========================================
+
+    pending_reports = []
+
+    for attendance_session in attendance_sessions:
+
+        if attendance_session.id not in report_session_ids:
+
+            pending_reports.append(attendance_session)
+
+    # ==========================================
+    # Render
+    # ==========================================
+
+    return render_template(
+
+        "daily_report/pending_daily_reports_list.html",
+
+        pending_reports=pending_reports,
+
+        today=today,
+
+        from_date=from_date,
+
+        to_date=to_date
 
     )

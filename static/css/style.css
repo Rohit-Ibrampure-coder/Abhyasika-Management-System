@@ -5422,7 +5422,7 @@ REMARK CARD
 .card-header h5,
 .card-header h6{
 
-    color:#ffffff !important;
+    color:#1f2937 !important;
 
     margin:0;
 
@@ -6019,5 +6019,57 @@ REMARK CARD
     background:#FFFFFF;
 
     border-color:#2563EB;
+
+}
+
+/* ==========================================================
+   Attendance History Page Headers
+   - Search & Filters
+   - Attendance Sessions
+========================================================== */
+
+/* Common Header Style */
+
+.search-card .card-header,
+.attendance-session-card .card-header{
+
+    display: flex;
+    align-items: center;
+
+    min-height: 58px;
+    padding: 0.95rem 1.5rem;
+
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+
+    border-top-left-radius: var(--radius);
+    border-top-right-radius: var(--radius);
+
+}
+
+.search-card .card-header h5,
+.attendance-session-card .card-header h5{
+
+    display: flex;
+    align-items: center;
+
+    margin: 0;
+
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--heading);
+
+}
+
+.search-card .card-header i,
+.attendance-session-card .card-header i{
+
+    color: var(--primary);
+
+    font-size: 1.1rem;
+
+    margin-right: 0.65rem;
+
+    flex-shrink: 0;
 
 }

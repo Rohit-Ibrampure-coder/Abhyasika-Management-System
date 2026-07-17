@@ -177,6 +177,12 @@ def teacher_dashboard():
 
     daily_report_completed = False
 
+    # ==========================================
+    # Pending Daily Reports
+    # ==========================================
+
+    pending_reports = []
+
     if today_session:
 
         today_report = DailyReport.query.filter_by(
@@ -232,6 +238,56 @@ def teacher_dashboard():
         )
 
     # ==========================================
+    # Find Pending Daily Reports
+    # ==========================================
+
+    attendance_sessions = AttendanceSession.query.filter(
+
+        AttendanceSession.abhyasika_id == abhyasika.id,
+
+        AttendanceSession.attendance_date < today
+
+    ).order_by(
+
+        AttendanceSession.attendance_date.asc()
+
+    ).all()
+
+    report_session_ids = {
+
+        report.attendance_session_id
+
+        for report in DailyReport.query.with_entities(
+
+            DailyReport.attendance_session_id
+
+        ).all()
+
+    }
+
+    for attendance_session in attendance_sessions:
+
+        if attendance_session.id not in report_session_ids:
+
+            pending_reports.append(
+
+                attendance_session
+
+            )
+
+    # ==========================================
+    # Dashboard Preview
+    # ==========================================
+
+    total_pending_reports = len(
+
+        pending_reports
+
+    )
+
+    dashboard_pending_reports = pending_reports[:3]
+
+    # ==========================================
     # Attendance Summary Variables
     # ==========================================
 
@@ -272,6 +328,7 @@ def teacher_dashboard():
         today_session=today_session,
         today_report=today_report,
         daily_report_pending=daily_report_pending,
-        daily_report_completed=daily_report_completed
-
+        daily_report_completed=daily_report_completed,
+        pending_reports=dashboard_pending_reports,
+        total_pending_reports=total_pending_reports
     )

@@ -35,10 +35,12 @@ Dashboard
     {% if current_user.role == "teacher" %}
 
         {% include "dashboard/teacher_daily_report_status.html" %}
+        {% include "dashboard/pending_daily_reports.html" %}
 
     {% elif current_user.role == "admin" %}
 
         {% include "dashboard/admin_daily_report_status.html" %}
+        {% include "dashboard/admin_pending_daily_reports.html" %}
 
     {% endif %}
 

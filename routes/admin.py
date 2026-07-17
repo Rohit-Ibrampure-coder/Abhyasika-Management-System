@@ -206,18 +206,36 @@ def admin_dashboard():
     pending_reports = max(0, total_reports - completed_reports)
 
     # ------------------------------------------
-    # Pending Daily Reports
+    # Pending Daily Reports (All Pending)
     # ------------------------------------------
+
+    attendance_sessions = AttendanceSession.query.filter(
+
+        AttendanceSession.attendance_date < today
+
+    ).order_by(
+
+        AttendanceSession.attendance_date.asc()
+
+    ).all()
+
+    report_session_ids = {
+
+        report.attendance_session_id
+
+        for report in DailyReport.query.with_entities(
+
+            DailyReport.attendance_session_id
+
+        ).all()
+
+    }
 
     pending_daily_reports = []
 
-    for attendance_session in today_sessions:
+    for attendance_session in attendance_sessions:
 
-        report = DailyReport.query.filter_by(
-            attendance_session_id=attendance_session.id
-        ).first()
-
-        if not report:
+        if attendance_session.id not in report_session_ids:
 
             pending_daily_reports.append({
 
@@ -225,9 +243,31 @@ def admin_dashboard():
 
                 "teacher": attendance_session.teacher,
 
-                "attendance_session": attendance_session
+                "attendance_session": attendance_session,
+
+                "days_pending": (
+
+                    today - attendance_session.attendance_date
+
+                ).days
 
             })
+
+    # ------------------------------------------
+    # Dashboard Preview
+    # ------------------------------------------
+
+    total_pending_daily_reports = len(
+
+        pending_daily_reports
+
+    )
+
+    dashboard_pending_daily_reports = (
+
+        pending_daily_reports[:3]
+
+    )
 
     # ==========================================
     # Render Template
@@ -263,7 +303,9 @@ def admin_dashboard():
 
         pending_reports=pending_reports,
 
-        pending_daily_reports=pending_daily_reports,
+        pending_daily_reports=dashboard_pending_daily_reports,
+
+        total_pending_daily_reports=total_pending_daily_reports
 
     )
 
@@ -852,5 +894,251 @@ def delete_abhyasika(id):
         remark_count=remark_count,
 
         achievement_count=achievement_count
+
+    )
+
+# ==========================================================
+# Admin Pending Daily Reports
+# ==========================================================
+
+@admin_bp.route("/admin/daily-report/pending")
+@login_required
+def pending_daily_reports():
+
+    # ==========================================
+    # Admin Only
+    # ==========================================
+
+    if current_user.role != "admin":
+
+        abort(403)
+
+    # ==========================================
+    # Today's Date
+    # ==========================================
+
+    today = date.today()
+
+    # ==========================================
+    # Search Filters
+    # ==========================================
+
+    teacher_id = request.args.get(
+
+        "teacher_id",
+
+        type=int
+
+    )
+
+    abhyasika_id = request.args.get(
+
+        "abhyasika_id",
+
+        type=int
+
+    )
+
+    from_date = request.args.get(
+
+        "from_date"
+
+    )
+
+    to_date = request.args.get(
+
+        "to_date"
+
+    )
+
+    # ==========================================
+    # Attendance Sessions Query
+    # ==========================================
+
+    query = AttendanceSession.query.filter(
+
+        AttendanceSession.attendance_date < today
+
+    )
+
+    # ==========================================
+    # Abhyasika Filter
+    # ==========================================
+
+    if abhyasika_id:
+
+        query = query.filter(
+
+            AttendanceSession.abhyasika_id == abhyasika_id
+
+        )
+
+    # ==========================================
+    # Teacher Filter
+    # ==========================================
+
+    if teacher_id:
+
+        query = query.filter(
+
+            AttendanceSession.teacher_id == teacher_id
+
+        )
+
+    # ==========================================
+    # Date Filters
+    # ==========================================
+
+    if from_date:
+
+        query = query.filter(
+
+            AttendanceSession.attendance_date >= from_date
+
+        )
+
+    if to_date:
+
+        query = query.filter(
+
+            AttendanceSession.attendance_date <= to_date
+
+        )
+
+    # ==========================================
+    # Attendance Sessions
+    # ==========================================
+
+    attendance_sessions = query.order_by(
+
+        AttendanceSession.attendance_date.asc()
+
+    ).all()
+
+    # ==========================================
+    # Existing Daily Reports
+    # ==========================================
+
+    report_session_ids = {
+
+        report.attendance_session_id
+
+        for report in DailyReport.query.with_entities(
+
+            DailyReport.attendance_session_id
+
+        ).all()
+
+    }
+
+    # ==========================================
+    # Pending Reports
+    # ==========================================
+
+    pending_reports = []
+
+    for attendance_session in attendance_sessions:
+
+        if attendance_session.id not in report_session_ids:
+
+            pending_reports.append({
+
+                "attendance_session": attendance_session,
+
+                "teacher": attendance_session.teacher,
+
+                "abhyasika": attendance_session.abhyasika,
+
+                "days_pending": (
+
+                    today -
+
+                    attendance_session.attendance_date
+
+                ).days
+
+            })
+
+    # ==========================================
+    # Dropdown Data
+    # ==========================================
+
+    teachers = User.query.filter_by(
+
+        role="teacher"
+
+    ).order_by(
+
+        User.name
+
+    ).all()
+
+    abhyasikas = Abhyasika.query.order_by(
+
+        Abhyasika.name
+
+    ).all()
+
+    # ==========================================
+    # Summary Statistics
+    # ==========================================
+
+    total_pending_reports = len(
+
+        pending_reports
+
+    )
+
+    today_pending_reports = sum(
+
+        1
+
+        for report in pending_reports
+
+        if report["attendance_session"].attendance_date == today
+
+    )
+
+    oldest_pending_days = 0
+
+    if pending_reports:
+
+        oldest_pending_days = max(
+
+            report["days_pending"]
+
+            for report in pending_reports
+
+        )
+
+    # ==========================================
+    # Render
+    # ==========================================
+
+    return render_template(
+
+        "daily_report/admin_pending_daily_reports_list.html",
+
+        pending_reports=pending_reports,
+
+        teachers=teachers,
+
+        abhyasikas=abhyasikas,
+
+        teacher_id=teacher_id,
+
+        abhyasika_id=abhyasika_id,
+
+        from_date=from_date,
+
+        to_date=to_date,
+
+        today=today,
+
+        total_pending_reports=total_pending_reports,
+
+        today_pending_reports=today_pending_reports,
+
+        oldest_pending_days=oldest_pending_days
 
     )
