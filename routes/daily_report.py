@@ -23,7 +23,6 @@ from models.abhyasika import Abhyasika
 from models.attendance import Attendance
 import json
 from datetime import date
-
 from routes import reports
 
 
@@ -582,6 +581,48 @@ def view_daily_report(report_id):
     )
 
 # ==========================================================
+# Daily Report Context
+# ==========================================================
+
+def build_daily_report_context(report):
+
+    attendance_session = report.attendance_session
+
+    present_count = Attendance.query.filter_by(
+        attendance_session_id=attendance_session.id,
+        status="Present"
+    ).count()
+
+    absent_count = Attendance.query.filter_by(
+        attendance_session_id=attendance_session.id,
+        status="Absent"
+    ).count()
+
+    return {
+
+        "report": report,
+
+        "attendance_session": attendance_session,
+
+        "present_count": present_count,
+
+        "absent_count": absent_count,
+
+        "physical_activity": json.loads(
+            report.physical_activity or "[]"
+        ),
+
+        "study_activity": json.loads(
+            report.study_activity or "[]"
+        ),
+
+        "special_activity": json.loads(
+            report.special_activity or "[]"
+        )
+
+    }
+
+# ==========================================================
 # Print Daily Report
 # ==========================================================
 
@@ -627,53 +668,17 @@ def print_daily_report(report_id):
 
         )
 
-    attendance_session = report.attendance_session
-
-    present_count = Attendance.query.filter_by(
-
-        attendance_session_id=attendance_session.id,
-
-        status="Present"
-
-    ).count()
-
-    absent_count = Attendance.query.filter_by(
-
-        attendance_session_id=attendance_session.id,
-
-        status="Absent"
-
-    ).count()
+    context = build_daily_report_context(
+        report
+    )
 
     return render_template(
 
         "daily_report/daily_report_print.html",
 
-        report=report,
+        auto_print=True,
 
-        attendance_session=attendance_session,
-
-        present_count=present_count,
-
-        absent_count=absent_count,
-
-        physical_activity=json.loads(
-
-            report.physical_activity or "[]"
-
-        ),
-
-        study_activity=json.loads(
-
-            report.study_activity or "[]"
-
-        ),
-
-        special_activity=json.loads(
-
-            report.special_activity or "[]"
-
-        )
+        **context
 
     )
 

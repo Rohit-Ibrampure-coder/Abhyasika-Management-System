@@ -152,6 +152,7 @@ Edit Profile
                             <label class="form-label">
 
                                 Full Name
+                                <span class="text-danger">*</span>
 
                             </label>
 
@@ -187,6 +188,7 @@ Edit Profile
                             <label class="form-label">
 
                                 Mobile Number
+                                <span class="text-danger">*</span>
 
                             </label>
 
@@ -216,6 +218,7 @@ Edit Profile
                             <label class="form-label">
 
                                 Email Address
+                                <span class="text-danger">*</span>
 
                             </label>
 
@@ -224,6 +227,7 @@ Edit Profile
                                 name="email"
                                 class="form-control"
                                 value="{{ current_user.email or '' }}"
+                                required
                             >
 
                         </div>

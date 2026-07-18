@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>दैनंदिन अभ्यासिका अहवाल</title>
+    <title>
+    Daily_Abhyasika_Report_{{ report.abhyasika.name|replace(' ', '_') }}_{{ report.report_date.strftime('%Y-%m-%d') }}
+    </title>
 
     <!-- ==========================================================
          PRINT CSS
@@ -467,9 +469,10 @@
 
         <div class="logo-container">
             <img
-                src="{{ url_for('static', filename='images/logo-icon.png') }}"
+                src="{% if logo_url is defined %}{{ logo_url }}{% else %}{{ url_for('static', filename='images/logo-icon.png') }}{% endif %}"
                 alt="NGO Logo"
-                class="ngo-logo">
+                class="ngo-logo"
+            >
         </div>
 
         <h1 class="ngo-title">
@@ -574,11 +577,9 @@
                 {% if attendance_session.attendance_photo %}
 
                 <img
-                    src="{{ url_for(
-                        'static',
-                        filename='uploads/attendance/' ~ attendance_session.attendance_photo
-                    ) }}"
-                    class="photo">
+                    src="{% if attendance_photo_url is defined %}{{ attendance_photo_url }}{% else %}{{ url_for('static', filename='uploads/attendance/' ~ attendance_session.attendance_photo) }}{% endif %}"
+                    class="photo"
+                >
 
                 {% else %}
 
@@ -792,15 +793,25 @@
 
 </div>
 
+{% if auto_print %}
+
 <script>
+
 window.onload = function () {
+
     window.print();
+
 };
 
 window.onafterprint = function () {
+
     window.close();
+
 };
+
 </script>
+
+{% endif %}
 
 </body>
 </html>
