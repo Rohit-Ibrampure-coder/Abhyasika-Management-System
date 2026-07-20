@@ -1,0 +1,676 @@
+{% extends "base.html" %}
+
+{% block title %}
+विद्यार्थी अहवाल
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- ========================================== -->
+    <!-- Page Header -->
+    <!-- ========================================== -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold mb-1">
+                विद्यार्थी अहवाल
+            </h2>
+
+            <p class="text-muted mb-0">
+                विद्यार्थ्याची उपस्थिती व माहिती
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- Student Profile -->
+    <!-- ========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-body">
+
+            <div class="row align-items-center">
+
+                <!-- Student Photo -->
+
+                <div class="col-md-2 text-center">
+
+                    {% if student.photo %}
+
+                        <img
+                            src="{{ url_for('static', filename='uploads/students/' ~ student.photo) }}"
+                            class="rounded-circle border"
+                            width="120"
+                            height="120"
+                            style="object-fit: cover;"
+                        >
+
+                    {% else %}
+
+                        <div
+                            class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center"
+                            style="width:120px;height:120px;font-size:42px;font-weight:bold;"
+                        >
+
+                            {{ student.student_name[0] }}
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+                <!-- Student Details -->
+
+                <div class="col-md-10">
+
+                    <div class="d-flex justify-content-between">
+
+                        <div>
+
+                            <h3 class="fw-bold mb-1">
+
+                                {{ student.student_name }}
+
+                            </h3>
+
+                            <p class="text-muted mb-2">
+
+                                {{ student.school_college_name }}
+
+                            </p>
+
+                        </div>
+
+                        <div>
+
+                            {% if student.status=="Active" %}
+
+                                <span class="badge bg-success">
+
+                                    Active
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-danger">
+
+                                    {{ student.status }}
+
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                    <div class="row mt-3">
+
+                        <div class="col-md-4 mb-3">
+
+                            <small class="text-muted">
+
+                                Standard
+
+                            </small>
+
+                            <div>
+
+                                {{ student.standard }}
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+
+                            <small class="text-muted">
+
+                                Gender
+
+                            </small>
+
+                            <div>
+
+                                {{ student.gender }}
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+
+                            <small class="text-muted">
+
+                                Date of Birth
+
+                            </small>
+
+                            <div>
+
+                                {{ student.date_of_birth.strftime('%d-%m-%Y') }}
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+
+                            <small class="text-muted">
+
+                                Parent Name
+
+                            </small>
+
+                            <div>
+
+                                {{ student.parent_name }}
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+
+                            <small class="text-muted">
+
+                                Parent Mobile
+
+                            </small>
+
+                            <div>
+
+                                {{ student.parent_mobile }}
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+
+                            <small class="text-muted">
+
+                                Admission Date
+
+                            </small>
+
+                            <div>
+
+                                {{ student.admission_date.strftime('%d-%m-%Y') }}
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted">
+
+                                Abhyasika
+
+                            </small>
+
+                            <div>
+
+                                {{ student.abhyasika.name }}
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted">
+
+                                Address
+
+                            </small>
+
+                            <div>
+
+                                {{ student.address }}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- Attendance Summary -->
+    <!-- ========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header">
+
+            <h5 class="mb-0 fw-semibold">
+
+                उपस्थिती सारांश
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row py-2">
+
+                <div class="col-md-6">
+
+                    <span class="fw-semibold">
+
+                        एकूण उपस्तिथी सत्रे
+
+                    </span>
+
+                </div>
+
+                <div class="col-md-6 text-md-end fw-bold">
+
+                    {{ total_attendance }}
+
+                </div>
+
+            </div>
+
+            <hr class="my-2">
+
+            <div class="row py-2">
+
+                <div class="col-md-6">
+
+                    <span class="fw-semibold">
+
+                        उपस्थित
+
+                    </span>
+
+                </div>
+
+                <div class="col-md-6 text-md-end">
+
+                    <span class="badge bg-success fs-6">
+
+                        {{ present_count }}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+            <hr class="my-2">
+
+            <div class="row py-2">
+
+                <div class="col-md-6">
+
+                    <span class="fw-semibold">
+
+                        अनुपस्थित
+
+                    </span>
+
+                </div>
+
+                <div class="col-md-6 text-md-end">
+
+                    <span class="badge bg-danger fs-6">
+
+                        {{ absent_count }}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+            <hr class="my-2">
+
+            <div class="row py-2">
+
+                <div class="col-md-6">
+
+                    <span class="fw-semibold">
+
+                        उपस्थिती टक्केवारी
+
+                    </span>
+
+                </div>
+
+                <div class="col-md-6 text-md-end">
+
+                    <span class="badge bg-primary fs-6">
+
+                        {{ attendance_percentage }}%
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- Monthly Attendance Summary -->
+    <!-- ========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header">
+
+            <h5 class="mb-0 fw-semibold">
+
+                मासिक उपस्थिती सारांश
+
+            </h5>
+
+        </div>
+
+        <div class="card-body p-0">
+
+            {% if monthly_summary %}
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>महिना</th>
+
+                            <th class="text-center">
+
+                                एकूण सत्रे
+
+                            </th>
+
+                            <th class="text-center">
+
+                                उपस्थित
+
+                            </th>
+
+                            <th class="text-center">
+
+                                अनुपस्थित
+
+                            </th>
+
+                            <th class="text-center">
+
+                                उपस्थिती %
+
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for month in monthly_summary %}
+
+                        <tr>
+
+                            <td>
+
+                                <strong>
+
+                                    {{ month.month_display }}
+
+                                </strong>
+
+                            </td>
+
+                            <td class="text-center">
+
+                                {{ month.total }}
+
+                            </td>
+
+                            <td class="text-center">
+
+                                <span class="badge bg-success">
+
+                                    {{ month.present }}
+
+                                </span>
+
+                            </td>
+
+                            <td class="text-center">
+
+                                <span class="badge bg-danger">
+
+                                    {{ month.absent }}
+
+                                </span>
+
+                            </td>
+
+                            <td class="text-center">
+
+                                <span class="badge bg-primary">
+
+                                    {{ month.percentage }}%
+
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {% else %}
+
+            <div class="text-center py-4">
+
+                <p class="text-muted mb-0">
+
+                    मासिक उपस्थितीची माहिती उपलब्ध नाही.
+
+                </p>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- Teacher Remarks -->
+    <!-- ========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header">
+
+            <h5 class="mb-0 fw-semibold">
+
+                शिक्षकांच्या नोंदी
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            {% if remarks %}
+
+                {% for remark in remarks %}
+
+                    <div class="mb-3">
+
+                        <div class="d-flex justify-content-between align-items-center">
+
+                            <strong>
+
+                                शिक्षक : {{ remark.teacher.name }}
+
+                            </strong>
+
+                            <small class="text-muted">
+
+                                {{ remark.created_at.strftime("%d-%m-%Y") }}
+
+                            </small>
+
+                        </div>
+
+                        <div class="mt-2">
+
+                            {{ remark.remark }}
+
+                        </div>
+
+                    </div>
+
+                    {% if not loop.last %}
+
+                        <hr class="my-3">
+
+                    {% endif %}
+
+                {% endfor %}
+
+            {% else %}
+
+                <div class="text-center py-3">
+
+                    <span class="text-muted">
+
+                        अद्याप कोणतीही नोंद उपलब्ध नाही.
+
+                    </span>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- Student Achievements -->
+    <!-- ========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header">
+
+            <h5 class="mb-0 fw-semibold">
+
+                विद्यार्थ्याचे यश
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            {% if achievements %}
+
+                {% for achievement in achievements %}
+
+                    <div class="mb-4">
+
+                        <div class="d-flex justify-content-between align-items-center">
+
+                            <strong>
+
+                                {{ achievement.title }}
+
+                            </strong>
+
+                            <small class="text-muted">
+
+                                {% if achievement.achievement_date %}
+
+                                    {{ achievement.achievement_date.strftime("%d-%m-%Y") }}
+
+                                {% else %}
+
+                                    {{ achievement.created_at.strftime("%d-%m-%Y") }}
+
+                                {% endif %}
+
+                            </small>
+
+                        </div>
+
+                        {% if achievement.description %}
+
+                            <div class="mt-2">
+
+                                {{ achievement.description }}
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                    {% if not loop.last %}
+
+                        <hr class="my-3">
+
+                    {% endif %}
+
+                {% endfor %}
+
+            {% else %}
+
+                <div class="text-center py-3">
+
+                    <span class="text-muted">
+
+                        अद्याप कोणतीही उपलब्धी नोंदवलेली नाही.
+
+                    </span>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

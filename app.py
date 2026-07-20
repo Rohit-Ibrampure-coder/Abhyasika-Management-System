@@ -15,6 +15,7 @@ from routes.achievement import achievement_bp
 from routes.profile import profile_bp
 from routes.reports import reports_bp
 from routes.daily_report import daily_report_bp
+from routes.student_report import student_report_bp
 
 from branding import (
     APP_NAME,
@@ -74,6 +75,7 @@ app.register_blueprint(achievement_bp)
 app.register_blueprint(profile_bp)
 app.register_blueprint(reports_bp)
 app.register_blueprint(daily_report_bp)
+app.register_blueprint(student_report_bp)
 
 
 
