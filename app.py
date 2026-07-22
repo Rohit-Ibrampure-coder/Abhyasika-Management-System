@@ -4,6 +4,9 @@ from models import db
 from routes.auth import auth_bp
 from flask_login import LoginManager
 from models.user import User
+from models.student_evaluation import StudentEvaluation
+from models.student_evaluation_question import StudentEvaluationQuestion
+from models.student_evaluation_answer import StudentEvaluationAnswer
 from routes.admin import admin_bp
 from routes.teacher import teacher_bp
 from routes.teacher_management import teacher_management_bp

@@ -146,6 +146,12 @@ class Student(db.Model):
         cascade="all, delete-orphan"
     )
 
+    student_evaluations = db.relationship(
+        "StudentEvaluation",
+        back_populates="student",
+        cascade="all, delete-orphan"
+    )
+
     # ==========================================
     # String Representation
     # ==========================================

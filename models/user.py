@@ -87,5 +87,11 @@ class User(UserMixin, db.Model):
         cascade="all, delete-orphan"
     )
 
+    student_evaluations = db.relationship(
+        "StudentEvaluation",
+        back_populates="teacher",
+        cascade="all, delete-orphan"
+    )
+
     def __repr__(self):
         return f"<User {self.username}>"

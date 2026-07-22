@@ -11,6 +11,9 @@ from models.achievement import Achievement
 from models.teacher_abhyasika import TeacherAbhyasika
 from models.attendance_session import AttendanceSession
 from models.daily_report import DailyReport
+from models.student_evaluation_question import StudentEvaluationQuestion
+from models.student_evaluation import StudentEvaluation
+from models.student_evaluation_answer import StudentEvaluationAnswer
 
 with app.app_context():
     db.create_all()
