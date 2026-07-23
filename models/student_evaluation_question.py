@@ -23,19 +23,23 @@ class StudentEvaluationQuestion(db.Model):
         nullable=False
     )
 
-    category = db.Column(
-        db.Enum(
-            "Core",
-            "Monthly",
-            name="evaluation_category"
+    question_group_id = db.Column(
+        db.Integer,
+        db.ForeignKey(
+            "student_evaluation_question_groups.id"
         ),
-        nullable=False,
-        default="Core"
+        nullable=False
+    )
+
+    question_group = db.relationship(
+        "StudentEvaluationQuestionGroup",
+        back_populates="questions"
     )
 
     display_order = db.Column(
         db.Integer,
-        nullable=False
+        nullable=False,
+        default=1
     )
 
     is_active = db.Column(
@@ -58,6 +62,11 @@ class StudentEvaluationQuestion(db.Model):
         "StudentEvaluationAnswer",
         back_populates="question",
         cascade="all, delete-orphan"
+    )
+
+    question_group = db.relationship(
+        "StudentEvaluationQuestionGroup",
+        back_populates="questions"
     )
 
     # ==========================================

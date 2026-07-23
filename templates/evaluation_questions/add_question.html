@@ -62,8 +62,7 @@ Add Evaluation Question
                         name="question_text"
                         class="form-control"
                         rows="3"
-                        required
-                    ></textarea>
+                        required>{{ request.form.get('question_text', '') }}</textarea>
 
                 </div>
 
@@ -71,38 +70,115 @@ Add Evaluation Question
 
                     <label class="form-label">
 
-                        Category ( प्रकार )
+                        Question Group ( प्रश्न गट )
 
                     </label>
 
                     <select
-                        name="category"
                         class="form-select"
-                    >
+                        id="question_group_id"
+                        name="question_group_id"
+                        required>
 
-                        <option value="Core">
+                        <option value="">
 
-                            Core ( मूलभूत )
+                            -- Select Question Group --
+
+                        </option>
+
+                        {% for group in groups %}
+
+                        <option
+                            value="{{ group.id }}"
+                            {% if selected_group == group.id %}
+                                selected
+                            {% endif %}>
+
+                            {{ group.group_name }}
+
+                            {% if group.group_type == "Core" %}
+
+                                (मूलभूत)
+
+                            {% else %}
+
+                                (मासिक)
+
+                            {% endif %}
 
                         </option>
 
-                        <option value="Monthly">
-
-                            Monthly ( मासिक )
-
-                        </option>
+                        {% endfor %}
 
                     </select>
 
                 </div>
 
-                <button
-                    class="btn btn-primary"
-                >
+                <div class="mb-3">
 
-                    Save Question
+                    <label class="form-label fw-semibold">
 
-                </button>
+                        Display Position
+                        <span class="text-danger">*</span>
+
+                    </label>
+
+                    <select
+                        class="form-select"
+                        name="display_position"
+                        required>
+
+                        {% for position in position_list %}
+
+                        <option
+                            value="{{ position }}"
+                            {% if loop.last %}
+                                selected
+                            {% endif %}
+                        >
+
+                            {% if loop.last %}
+                                {{ position }} - Add at End
+                            {% else %}
+                                {{ position }}
+                            {% endif %}
+
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                    <div class="form-text">
+                        Select where this question should appear in the list.
+                        (प्रश्न कोणत्या क्रमांकावर दिसेल ते निवडा.)
+                    </div>
+
+                </div>
+
+                <div class="d-flex gap-2">
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary">
+
+                        <i class="bi bi-check-circle me-2"></i>
+
+                        Save Question
+
+                    </button>
+
+                    <a
+                        href="{{ url_for('evaluation_question.view_questions', group_id=selected_group) }}"
+                        class="btn btn-secondary">
+
+                        <i class="bi bi-arrow-left me-2"></i>
+
+                        Back
+
+                    </a>
+
+                </div>
 
             </form>
 
@@ -111,5 +187,29 @@ Add Evaluation Question
     </div>
 
 </div>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const groupSelect = document.getElementById("question_group_id");
+
+    if (!groupSelect) return;
+
+    groupSelect.addEventListener("change", function () {
+
+        if (!this.value) {
+            return;
+        }
+
+        window.location.href =
+            "{{ url_for('evaluation_question.add_question') }}" +
+            "?group_id=" + this.value;
+
+    });
+
+});
+
+</script>
 
 {% endblock %}

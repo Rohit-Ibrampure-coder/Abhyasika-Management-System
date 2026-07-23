@@ -10,6 +10,9 @@ from flask import (
 from flask_login import login_required, current_user
 from models import db
 from models.student_evaluation_question import StudentEvaluationQuestion
+from models.student_evaluation_question_group import (
+    StudentEvaluationQuestionGroup
+)
 
 evaluation_question_bp = Blueprint(
     "evaluation_question",
@@ -24,12 +27,55 @@ evaluation_question_bp = Blueprint(
 @login_required
 def view_questions():
 
+    # ------------------------------------------
+    # Only Admin Can Access
+    # ------------------------------------------
+
     if current_user.role.lower() != "admin":
         abort(403)
 
-    questions = StudentEvaluationQuestion.query.order_by(
-        StudentEvaluationQuestion.display_order.asc()
+    # ------------------------------------------
+    # Load Active Question Groups
+    # ------------------------------------------
+
+    groups = StudentEvaluationQuestionGroup.query.filter_by(
+        is_active=True
+    ).order_by(
+        StudentEvaluationQuestionGroup.display_order.asc()
     ).all()
+
+    # ------------------------------------------
+    # Selected Question Group
+    # ------------------------------------------
+
+    selected_group = request.args.get(
+        "group_id",
+        type=int
+    )
+
+    if not selected_group and groups:
+        selected_group = groups[0].id
+
+    selected_group_obj = None
+    questions = []
+
+    if selected_group:
+
+        selected_group_obj = StudentEvaluationQuestionGroup.query.get(
+            selected_group
+        )
+
+        if selected_group_obj:
+
+            questions = StudentEvaluationQuestion.query.filter_by(
+                question_group_id=selected_group
+            ).order_by(
+                StudentEvaluationQuestion.display_order.asc()
+            ).all()
+
+    # ------------------------------------------
+    # Statistics
+    # ------------------------------------------
 
     total_questions = StudentEvaluationQuestion.query.count()
 
@@ -41,16 +87,32 @@ def view_questions():
         is_active=False
     ).count()
 
+    # ------------------------------------------
+    # Render Page
+    # ------------------------------------------
+
     return render_template(
+
         "evaluation_questions/view_questions.html",
+
+        groups=groups,
+
+        selected_group=selected_group,
+
+        selected_group_obj=selected_group_obj,
+
         questions=questions,
+
         total_questions=total_questions,
+
         active_questions=active_questions,
+
         inactive_questions=inactive_questions
+
     )
 
 # ==========================================
-# Add Question
+# Add Evaluation Question
 # ==========================================
 
 @evaluation_question_bp.route(
@@ -60,38 +122,116 @@ def view_questions():
 @login_required
 def add_question():
 
+    # ------------------------------------------
+    # Only Admin Can Access
+    # ------------------------------------------
+
     if current_user.role.lower() != "admin":
         abort(403)
 
+    # ------------------------------------------
+    # Load Active Question Groups
+    # ------------------------------------------
+
+    groups = StudentEvaluationQuestionGroup.query.filter_by(
+        is_active=True
+    ).order_by(
+        StudentEvaluationQuestionGroup.display_order.asc()
+    ).all()
+
+    selected_group = request.args.get(
+        "group_id",
+        type=int
+    )
+
+    # ------------------------------------------
+    # Calculate Available Positions
+    # ------------------------------------------
+
+    position_list = []
+
+    if selected_group:
+
+        total_questions = StudentEvaluationQuestion.query.filter_by(
+            question_group_id=selected_group
+        ).count()
+
+        position_list = list(range(1, total_questions + 2))
+
+    # ------------------------------------------
+    # Save Question
+    # ------------------------------------------
+
     if request.method == "POST":
 
-        last_question = StudentEvaluationQuestion.query.order_by(
-            StudentEvaluationQuestion.display_order.desc()
-        ).first()
+        question_text = request.form.get(
+            "question_text",
+            ""
+        ).strip()
 
-        next_order = 1
+        question_group_id = request.form.get(
+            "question_group_id",
+            type=int
+        )
 
-        if last_question:
-            next_order = last_question.display_order + 1
+        display_position = request.form.get(
+            "display_position",
+            type=int
+        )
 
-        question = StudentEvaluationQuestion(
+        # ------------------------------------------
+        # Validation
+        # ------------------------------------------
 
-            question_text=request.form.get(
-                "question_text"
-            ),
+        if not question_text:
+            flash(
+                "Question is required.",
+                "danger"
+            )
+            return redirect(request.url)
 
-            category=request.form.get(
-                "category"
-            ),
+        if not question_group_id:
+            flash(
+                "Please select a Question Group.",
+                "danger"
+            )
+            return redirect(request.url)
 
-            display_order=next_order,
+        if not display_position:
+            display_position = 1
+
+        # ------------------------------------------
+        # Shift Existing Questions
+        # ------------------------------------------
+
+        StudentEvaluationQuestion.query.filter(
+            StudentEvaluationQuestion.question_group_id == question_group_id,
+            StudentEvaluationQuestion.display_order >= display_position
+        ).update(
+            {
+                StudentEvaluationQuestion.display_order:
+                StudentEvaluationQuestion.display_order + 1
+            },
+            synchronize_session=False
+        )
+
+        # ------------------------------------------
+        # Create Question
+        # ------------------------------------------
+
+        new_question = StudentEvaluationQuestion(
+
+            question_text=question_text,
+
+            question_group_id=question_group_id,
+
+            display_order=display_position,
 
             is_active=True
 
         )
 
-        db.session.add(question)
-
+        db.session.add(new_question)
         db.session.commit()
 
         flash(
@@ -101,16 +241,24 @@ def add_question():
 
         return redirect(
             url_for(
-                "evaluation_question.view_questions"
+                "evaluation_question.view_questions",
+                group_id=question_group_id
             )
         )
 
+    # ------------------------------------------
+    # Render Page
+    # ------------------------------------------
+
     return render_template(
-        "evaluation_questions/add_question.html"
+        "evaluation_questions/add_question.html",
+        groups=groups,
+        selected_group=selected_group,
+        position_list=position_list
     )
 
 # ==========================================
-# Edit Question
+# Edit Evaluation Question
 # ==========================================
 
 @evaluation_question_bp.route(
@@ -120,24 +268,166 @@ def add_question():
 @login_required
 def edit_question(question_id):
 
+    # ------------------------------------------
+    # Only Admin
+    # ------------------------------------------
+
     if current_user.role.lower() != "admin":
         abort(403)
 
-    question = StudentEvaluationQuestion.query.get_or_404(question_id)
+    # ------------------------------------------
+    # Load Question
+    # ------------------------------------------
+
+    question = StudentEvaluationQuestion.query.get_or_404(
+        question_id
+    )
+
+    # ------------------------------------------
+    # Load Question Groups
+    # ------------------------------------------
+
+    groups = StudentEvaluationQuestionGroup.query.filter_by(
+        is_active=True
+    ).order_by(
+        StudentEvaluationQuestionGroup.display_order.asc()
+    ).all()
+
+    # ------------------------------------------
+    # Available Positions
+    # ------------------------------------------
+
+    total_questions = StudentEvaluationQuestion.query.filter_by(
+        question_group_id=question.question_group_id
+    ).count()
+
+    position_list = list(
+        range(1, total_questions + 1)
+    )
+
+    # ------------------------------------------
+    # Update Question
+    # ------------------------------------------
 
     if request.method == "POST":
 
-        question.question_text = request.form.get(
-            "question_text"
+        question_text = request.form.get(
+            "question_text",
+            ""
         ).strip()
 
-        question.category = request.form.get(
-            "category"
+        question_group_id = request.form.get(
+            "question_group_id",
+            type=int
         )
 
-        question.is_active = (
-            request.form.get("is_active") == "True"
+        display_position = request.form.get(
+            "display_position",
+            type=int
         )
+
+        is_active = request.form.get(
+            "is_active"
+        ) == "1"
+
+        # --------------------------------------
+        # Validation
+        # --------------------------------------
+
+        if not question_text:
+
+            flash(
+                "Question is required.",
+                "danger"
+            )
+
+            return redirect(request.url)
+
+        if not question_group_id:
+
+            flash(
+                "Please select a Question Group.",
+                "danger"
+            )
+
+            return redirect(request.url)
+
+        if question_group_id != question.question_group_id:
+
+            flash(
+                "Changing Question Group will be supported in the next update.",
+                "warning"
+            )
+
+            return redirect(request.url)
+
+        if display_position is None:
+
+            display_position = question.display_order
+
+        old_position = question.display_order
+
+        # --------------------------------------
+        # Reorder Questions
+        # --------------------------------------
+
+        if display_position != old_position:
+
+            if display_position < old_position:
+
+                StudentEvaluationQuestion.query.filter(
+
+                    StudentEvaluationQuestion.question_group_id == question_group_id,
+
+                    StudentEvaluationQuestion.display_order >= display_position,
+
+                    StudentEvaluationQuestion.display_order < old_position,
+
+                    StudentEvaluationQuestion.id != question.id
+
+                ).update(
+
+                    {
+                        StudentEvaluationQuestion.display_order:
+                        StudentEvaluationQuestion.display_order + 1
+                    },
+
+                    synchronize_session=False
+
+                )
+
+            else:
+
+                StudentEvaluationQuestion.query.filter(
+
+                    StudentEvaluationQuestion.question_group_id == question_group_id,
+
+                    StudentEvaluationQuestion.display_order <= display_position,
+
+                    StudentEvaluationQuestion.display_order > old_position,
+
+                    StudentEvaluationQuestion.id != question.id
+
+                ).update(
+
+                    {
+                        StudentEvaluationQuestion.display_order:
+                        StudentEvaluationQuestion.display_order - 1
+                    },
+
+                    synchronize_session=False
+
+                )
+
+        # --------------------------------------
+        # Update Question
+        # --------------------------------------
+
+        question.question_text = question_text
+
+        question.display_order = display_position
+
+        question.is_active = is_active
 
         db.session.commit()
 
@@ -147,14 +437,31 @@ def edit_question(question_id):
         )
 
         return redirect(
+
             url_for(
-                "evaluation_question.view_questions"
+
+                "evaluation_question.view_questions",
+
+                group_id=question.question_group_id
+
             )
+
         )
 
+    # ------------------------------------------
+    # Render Page
+    # ------------------------------------------
+
     return render_template(
+
         "evaluation_questions/edit_question.html",
-        question=question
+
+        question=question,
+
+        groups=groups,
+
+        position_list=position_list
+
     )
 
 # ==========================================
@@ -168,30 +475,78 @@ def edit_question(question_id):
 @login_required
 def delete_question(question_id):
 
-    # Only Admin can delete
+    # ------------------------------------------
+    # Only Admin
+    # ------------------------------------------
+
     if current_user.role.lower() != "admin":
         abort(403)
 
+    # ------------------------------------------
     # Find Question
+    # ------------------------------------------
+
     question = StudentEvaluationQuestion.query.get_or_404(
         question_id
     )
 
+    group_id = question.question_group_id
+    deleted_position = question.display_order
+
+    # ------------------------------------------
     # Delete Question
+    # ------------------------------------------
+
     db.session.delete(question)
 
+    # ------------------------------------------
+    # Shift Remaining Questions Up
+    # ------------------------------------------
+
+    StudentEvaluationQuestion.query.filter(
+
+        StudentEvaluationQuestion.question_group_id == group_id,
+
+        StudentEvaluationQuestion.display_order > deleted_position
+
+    ).update(
+
+        {
+            StudentEvaluationQuestion.display_order:
+            StudentEvaluationQuestion.display_order - 1
+        },
+
+        synchronize_session=False
+
+    )
+
+    # ------------------------------------------
     # Save Changes
+    # ------------------------------------------
+
     db.session.commit()
 
+    # ------------------------------------------
     # Success Message
+    # ------------------------------------------
+
     flash(
         "Question deleted successfully.",
         "success"
     )
 
+    # ------------------------------------------
     # Redirect
+    # ------------------------------------------
+
     return redirect(
+
         url_for(
-            "evaluation_question.view_questions"
+
+            "evaluation_question.view_questions",
+
+            group_id=group_id
+
         )
+
     )

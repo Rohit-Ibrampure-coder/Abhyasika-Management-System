@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}
+Student Evaluation
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header">
+
+            <h4 class="mb-0">
+
+                विद्यार्थी मूल्यांकन
+
+            </h4>
+
+        </div>
+
+        <div class="card-body">
+
+            <form>
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+
+                            Student Name
+
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            value="{{ student.student_name }}"
+                            readonly
+                        >
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+
+                            Standard
+
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            value="{{ student.standard }}"
+                            readonly
+                        >
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+
+                            Evaluation Date
+
+                        </label>
+
+                        <input
+                            type="date"
+                            class="form-control"
+                            name="evaluation_date"
+                            value="{{ today }}"
+                        >
+
+                    </div>
+
+                    <div class="col-12">
+
+                        <label class="form-label">
+
+                            School / College
+
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            value="{{ student.school_college_name }}"
+                            readonly
+                        >
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

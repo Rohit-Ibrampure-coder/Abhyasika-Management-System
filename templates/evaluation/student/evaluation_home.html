@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}
+Student Evaluation
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- Page Header -->
+
+    <div class="mb-4">
+
+        <h2 class="fw-bold">
+
+            विद्यार्थी मूल्यांकन
+
+        </h2>
+
+        <p class="text-muted">
+
+            Select an Abhyasika to start student evaluation.
+
+        </p>
+
+    </div>
+
+    <!-- Selection Card -->
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header">
+
+            <h5 class="mb-0">
+
+                Select Abhyasika
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <form method="GET">
+
+                <div class="row">
+
+                    <div class="col-md-6">
+
+                        <label class="form-label fw-semibold">
+
+                            Abhyasika
+
+                        </label>
+
+                        <select
+                            name="abhyasika_id"
+                            class="form-select"
+                        >
+
+                            <option value="">
+                                -- Select Abhyasika --
+                            </option>
+
+                            {% for abhyasika in abhyasikas %}
+
+                            <option
+                                value="{{ abhyasika.id }}"
+                                {% if selected_abhyasika == abhyasika.id %}selected{% endif %}
+                            >
+
+                                {{ abhyasika.name }}
+
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-2 d-flex align-items-end">
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary w-100"
+                        >
+
+                            Load
+
+                        </button>
+
+                    </div>
+
+                    {% if students %}
+
+                    <div class="card shadow-sm border-0 mt-4">
+
+                        <div class="card-header">
+
+                            <h5 class="mb-0">
+
+                                Student List
+
+                            </h5>
+
+                        </div>
+
+                        <div class="card-body p-0">
+
+                            <table class="table table-hover mb-0">
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>Sr.</th>
+                                        <th>Student Name</th>
+                                        <th>Standard</th>
+                                        <th>Action</th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                    {% for student in students %}
+
+                                    <tr>
+
+                                        <td>{{ loop.index }}</td>
+
+                                        <td>{{ student.student_name }}</td>
+
+                                        <td>{{ student.standard }}</td>
+
+                                        <td>
+
+                                            <a
+
+                                                href="{{ url_for(
+                                                    'evaluation_student.evaluate_student',
+                                                    student_id=student.id
+                                                ) }}"
+
+                                                class="btn btn-success btn-sm">
+
+                                                Evaluate
+
+                                            </a>
+
+                                        </td>
+
+                                    </tr>
+
+                                    {% endfor %}
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -14,6 +14,7 @@ from models.daily_report import DailyReport
 from models.student_evaluation_question import StudentEvaluationQuestion
 from models.student_evaluation import StudentEvaluation
 from models.student_evaluation_answer import StudentEvaluationAnswer
+from models.student_evaluation_question_group import StudentEvaluationQuestionGroup
 
 with app.app_context():
     db.create_all()

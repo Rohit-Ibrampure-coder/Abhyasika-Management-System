@@ -6,17 +6,43 @@ Edit Evaluation Question
 
 {% block content %}
 
-<div class="container-fluid py-4">
+<div class="container mt-4">
 
-    <div class="card shadow-sm border-0">
+    <div class="card">
 
         <div class="card-header">
 
-            <h4 class="mb-0">
-
+            <h4>
                 Edit Evaluation Question
-
             </h4>
+
+        </div>
+
+        <div class="card border-info mb-4">
+
+            <div class="card-header bg-info-subtle">
+
+                <i class="bi bi-info-circle-fill me-2"></i>
+
+                <strong>सूचना</strong>
+
+            </div>
+
+            <div class="card-body">
+
+                <ul class="mb-0">
+
+                    <li>प्रश्न मराठी भाषेत लिहा.</li>
+
+                    <li>प्रत्येक प्रश्न स्पष्ट, सोपा आणि समजण्यास सुलभ असावा.</li>
+
+                    <li>एकाच प्रश्नाची पुन्हा नोंद करू नका.</li>
+
+                    <li>प्रश्न विद्यार्थ्याच्या वर्तन, शिस्त, अभ्यास व व्यक्तिमत्त्व विकासाशी संबंधित असावा.</li>
+
+                </ul>
+
+            </div>
 
         </div>
 
@@ -24,11 +50,13 @@ Edit Evaluation Question
 
             <form method="POST">
 
+                <!-- Question -->
+
                 <div class="mb-3">
 
-                    <label class="form-label fw-semibold">
+                    <label class="form-label">
 
-                        प्रश्न (Question)
+                        Question ( प्रश्न )
 
                     </label>
 
@@ -40,69 +68,126 @@ Edit Evaluation Question
 
                 </div>
 
+                <!-- Question Group -->
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+
+                        Question Group ( प्रश्न गट )
+
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="question_group_id"
+                        name="question_group_id"
+                        required>
+
+                        {% for group in groups %}
+
+                        <option
+                            value="{{ group.id }}"
+                            {% if question.question_group_id == group.id %}
+                                selected
+                            {% endif %}>
+
+                            {{ group.group_name }}
+
+                            {% if group.group_type == "Core" %}
+                                (मूलभूत)
+                            {% else %}
+                                (मासिक)
+                            {% endif %}
+
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+                <!-- Display Position -->
+
                 <div class="mb-3">
 
                     <label class="form-label fw-semibold">
 
-                        प्रश्न प्रकार (Category)
+                        Display Position
+                        <span class="text-danger">*</span>
 
                     </label>
 
                     <select
-                        name="category"
-                        class="form-select">
+                        class="form-select"
+                        name="display_position"
+                        required>
+
+                        {% for position in position_list %}
 
                         <option
-                            value="Core"
-                            {% if question.category=="Core" %}selected{% endif %}>
+                            value="{{ position }}"
+                            {% if question.display_order == position %}
+                                selected
+                            {% endif %}>
 
-                            मूलभूत (Core)
+                            {{ position }}
 
                         </option>
 
-                        <option
-                            value="Monthly"
-                            {% if question.category=="Monthly" %}selected{% endif %}>
-
-                            मासिक (Monthly)
-
-                        </option>
+                        {% endfor %}
 
                     </select>
 
+                    <div class="form-text">
+
+                        Select where this question should appear in the list.
+                        (प्रश्न कोणत्या क्रमांकावर दिसेल ते निवडा.)
+
+                    </div>
+
                 </div>
+
+                <!-- Active Status -->
 
                 <div class="mb-4">
 
-                    <label class="form-label fw-semibold">
+                    <label class="form-label">
 
-                        स्थिती (Status)
+                        Status (स्थिती)
 
                     </label>
 
                     <select
-                        name="is_active"
-                        class="form-select">
+                        class="form-select"
+                        name="is_active">
 
                         <option
-                            value="True"
-                            {% if question.is_active %}selected{% endif %}>
+                            value="1"
+                            {% if question.is_active %}
+                                selected
+                            {% endif %}>
 
-                            Active
+                            Active (सक्रिय)
 
                         </option>
 
                         <option
-                            value="False"
-                            {% if not question.is_active %}selected{% endif %}>
+                            value="0"
+                            {% if not question.is_active %}
+                                selected
+                            {% endif %}>
 
-                            Inactive
+                            Inactive (निष्क्रिय)
 
                         </option>
 
                     </select>
 
                 </div>
+
+                <!-- Buttons -->
 
                 <div class="d-flex gap-2">
 
@@ -117,10 +202,12 @@ Edit Evaluation Question
                     </button>
 
                     <a
-                        href="{{ url_for('evaluation_question.view_questions') }}"
+                        href="{{ url_for('evaluation_question.view_questions', group_id=question.question_group_id) }}"
                         class="btn btn-secondary">
 
-                        Cancel
+                        <i class="bi bi-arrow-left me-2"></i>
+
+                        Back
 
                     </a>
 
