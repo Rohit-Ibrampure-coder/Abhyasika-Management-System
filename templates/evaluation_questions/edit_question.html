@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit Evaluation Question
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header">
+
+            <h4 class="mb-0">
+
+                Edit Evaluation Question
+
+            </h4>
+
+        </div>
+
+        <div class="card-body">
+
+            <form method="POST">
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-semibold">
+
+                        प्रश्न (Question)
+
+                    </label>
+
+                    <textarea
+                        name="question_text"
+                        class="form-control"
+                        rows="3"
+                        required>{{ question.question_text }}</textarea>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-semibold">
+
+                        प्रश्न प्रकार (Category)
+
+                    </label>
+
+                    <select
+                        name="category"
+                        class="form-select">
+
+                        <option
+                            value="Core"
+                            {% if question.category=="Core" %}selected{% endif %}>
+
+                            मूलभूत (Core)
+
+                        </option>
+
+                        <option
+                            value="Monthly"
+                            {% if question.category=="Monthly" %}selected{% endif %}>
+
+                            मासिक (Monthly)
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="mb-4">
+
+                    <label class="form-label fw-semibold">
+
+                        स्थिती (Status)
+
+                    </label>
+
+                    <select
+                        name="is_active"
+                        class="form-select">
+
+                        <option
+                            value="True"
+                            {% if question.is_active %}selected{% endif %}>
+
+                            Active
+
+                        </option>
+
+                        <option
+                            value="False"
+                            {% if not question.is_active %}selected{% endif %}>
+
+                            Inactive
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="d-flex gap-2">
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary">
+
+                        <i class="bi bi-check-circle me-2"></i>
+
+                        Update Question
+
+                    </button>
+
+                    <a
+                        href="{{ url_for('evaluation_question.view_questions') }}"
+                        class="btn btn-secondary">
+
+                        Cancel
+
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

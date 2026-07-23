@@ -124,6 +124,33 @@
 
         </li>
 
+        <!-- Evaluation -->
+
+        <li class="nav-item">
+
+            <a
+
+                href="{{ url_for('evaluation.evaluation_home') }}"
+
+                class="nav-link
+                {% if request.endpoint and request.endpoint.startswith('evaluation.') %}
+                    active
+                {% endif %}"
+
+            >
+
+                <i class="bi bi-clipboard2-check-fill"></i>
+
+                <span class="menu-text">
+
+                    Evaluation
+
+                </span>
+
+            </a>
+
+        </li>
+
 
         {% if current_user.role=="admin" %}
 
@@ -351,6 +378,33 @@
                         <span class="menu-text">
 
                             Attendance
+
+                        </span>
+
+                    </a>
+
+                </li>
+
+                <!-- Evaluation -->
+
+                <li class="nav-item">
+
+                    <a
+
+                        href="{{ url_for('evaluation.evaluation_home') }}"
+
+                        class="nav-link
+                        {% if request.endpoint and request.endpoint.startswith('evaluation.') %}
+                            active
+                        {% endif %}"
+
+                    >
+
+                        <i class="bi bi-clipboard2-check-fill"></i>
+
+                        <span class="menu-text">
+
+                            Evaluation
 
                         </span>
 

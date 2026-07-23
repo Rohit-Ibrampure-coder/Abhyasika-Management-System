@@ -1,0 +1,385 @@
+{% extends "base.html" %}
+
+{% block title %}
+Evaluation Question Master
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- ========================================== -->
+    <!-- Page Header -->
+    <!-- ========================================== -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold mb-1">
+                Evaluation Question Master
+            </h2>
+
+            <p class="text-muted mb-0">
+                Manage student evaluation questions.
+            </p>
+
+        </div>
+
+        <a
+            href="{{ url_for('evaluation_question.add_question') }}"
+            class="btn btn-primary">
+
+            <i class="bi bi-plus-circle me-2"></i>
+
+            Add Question
+
+        </a>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- Statistics Cards -->
+    <!-- ========================================== -->
+
+    <div class="row mb-4">
+
+        <div class="col-lg-4 col-md-6 mb-3">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted mb-2">
+
+                        Total Questions
+
+                    </h6>
+
+                    <h2 class="fw-bold text-primary">
+
+                        {{ total_questions }}
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-3">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted mb-2">
+
+                        Active Questions
+
+                    </h6>
+
+                    <h2 class="fw-bold text-success">
+
+                        {{ active_questions }}
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-3">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted mb-2">
+
+                        Inactive Questions
+
+                    </h6>
+
+                    <h2 class="fw-bold text-danger">
+
+                        {{ inactive_questions }}
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card shadow-sm border-0 mb-3">
+
+        <div class="card-body">
+
+            <div class="row align-items-center">
+
+                <div class="col-md-6">
+
+                    <input
+                        type="text"
+                        id="searchInput"
+                        class="form-control"
+                        placeholder="Search question...">
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- Questions Table -->
+    <!-- ========================================== -->
+
+    {% if questions %}
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body">
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle mb-0">
+
+                        <thead class="table-light">
+
+                            <tr>
+
+                                <th style="width:70px;">
+                                    Sr.
+                                </th>
+
+                                <th>
+                                    Question
+                                </th>
+
+                                <th style="width:130px;">
+                                    Category
+                                </th>
+
+                                <th style="width:110px;">
+                                    Order
+                                </th>
+
+                                <th style="width:120px;">
+                                    Status
+                                </th>
+
+                                <th style="width:170px;" class="text-center">
+                                    Action
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for question in questions %}
+
+                                <tr>
+
+                                    <td>
+
+                                        {{ loop.index }}
+
+                                    </td>
+
+                                    <td>
+
+                                        {{ question.question_text }}
+
+                                    </td>
+
+                                    <td>
+
+                                        <span class="badge bg-primary">
+
+                                            {{ question.category }}
+
+                                        </span>
+
+                                    </td>
+
+                                    <td>
+
+                                        {{ question.display_order }}
+
+                                    </td>
+
+                                    <td>
+
+                                        {% if question.is_active %}
+
+                                            <span class="badge bg-success">
+
+                                                Active
+
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="badge bg-danger">
+
+                                                Inactive
+
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                    <td class="text-center">
+
+                                        <!-- Edit Button -->
+
+                                        <a
+                                            href="{{ url_for('evaluation_question.edit_question', question_id=question.id) }}"
+                                            class="btn btn-warning btn-sm"
+                                            title="Edit Question">
+
+                                            <i class="bi bi-pencil-square"></i>
+
+                                        </a>
+
+                                        <!-- Delete Button -->
+
+                                        <form
+                                            action="{{ url_for('evaluation_question.delete_question', question_id=question.id) }}"
+                                            method="POST"
+                                            class="d-inline delete-form">
+
+                                            <button
+                                                type="submit"
+                                                class="btn btn-danger btn-sm"
+                                                title="Delete Question">
+
+                                                <i class="bi bi-trash"></i>
+
+                                            </button>
+
+                                        </form>
+
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    {% else %}
+
+        <!-- ========================================== -->
+        <!-- Empty State -->
+        <!-- ========================================== -->
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body text-center py-5">
+
+                <i
+                    class="bi bi-question-circle display-1 text-secondary">
+                </i>
+
+                <h4 class="mt-3">
+
+                    No Evaluation Questions Found
+
+                </h4>
+
+                <p class="text-muted">
+
+                    Click the button below to add your first evaluation question.
+
+                </p>
+
+                <a
+                    href="{{ url_for('evaluation_question.add_question') }}"
+                    class="btn btn-primary">
+
+                    <i class="bi bi-plus-circle me-2"></i>
+
+                    Add First Question
+
+                </a>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block js %}
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    document.querySelectorAll(".delete-form").forEach(function(form){
+
+        form.addEventListener("submit", function(e){
+
+            e.preventDefault();
+
+            Swal.fire({
+
+                title: "Delete Question?",
+
+                text: "This question will be permanently deleted.",
+
+                icon: "warning",
+
+                showCancelButton: true,
+
+                confirmButtonColor: "#d33",
+
+                cancelButtonColor: "#6c757d",
+
+                confirmButtonText: "Yes, Delete",
+
+                cancelButtonText: "Cancel"
+
+            }).then((result) => {
+
+                if(result.isConfirmed){
+
+                    form.submit();
+
+                }
+
+            });
+
+        });
+
+    });
+
+});
+
+</script>
+
+{% endblock %}

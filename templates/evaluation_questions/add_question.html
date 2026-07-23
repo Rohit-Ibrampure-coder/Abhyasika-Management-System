@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}
+Add Evaluation Question
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <h4>
+                Add Evaluation Question
+            </h4>
+
+        </div>
+
+        <div class="card border-info mb-4">
+
+            <div class="card-header bg-info-subtle">
+
+                <i class="bi bi-info-circle-fill me-2"></i>
+
+                <strong>सूचना</strong>
+
+            </div>
+
+            <div class="card-body">
+
+                <ul class="mb-0">
+
+                    <li>प्रश्न मराठी भाषेत लिहा.</li>
+
+                    <li>प्रत्येक प्रश्न स्पष्ट, सोपा आणि समजण्यास सुलभ असावा.</li>
+
+                    <li>एकाच प्रश्नाची पुन्हा नोंद करू नका.</li>
+
+                    <li>प्रश्न विद्यार्थ्याच्या वर्तन, शिस्त, अभ्यास व व्यक्तिमत्त्व विकासाशी संबंधित असावा.</li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+        <div class="card-body">
+
+            <form method="POST">
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+
+                        Question ( प्रश्न )
+
+                    </label>
+
+                    <textarea
+                        name="question_text"
+                        class="form-control"
+                        rows="3"
+                        required
+                    ></textarea>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+
+                        Category ( प्रकार )
+
+                    </label>
+
+                    <select
+                        name="category"
+                        class="form-select"
+                    >
+
+                        <option value="Core">
+
+                            Core ( मूलभूत )
+
+                        </option>
+
+                        <option value="Monthly">
+
+                            Monthly ( मासिक )
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <button
+                    class="btn btn-primary"
+                >
+
+                    Save Question
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
