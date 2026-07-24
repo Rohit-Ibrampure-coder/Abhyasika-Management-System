@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}
+Student Evaluations
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header">
+
+            <h4 class="mb-0">
+
+                Student Evaluation History
+
+            </h4>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row mb-3">
+
+                <div class="col-md-6">
+
+                    <h5 class="mb-1">
+
+                        {{ student.student_name }}
+
+                    </h5>
+
+                    <small class="text-muted">
+
+                        Standard : {{ student.standard }}
+
+                    </small>
+
+                </div>
+
+            </div>
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th style="width:70px;">
+                                #
+                            </th>
+
+                            <th>
+                                Evaluation Date
+                            </th>
+
+                            <th style="width:180px;">
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for evaluation in evaluations %}
+
+                        <tr>
+
+                            <td>
+
+                                {{ loop.index }}
+
+                            </td>
+
+                            <td>
+
+                                {{ evaluation.evaluation_date.strftime("%d-%m-%Y") }}
+
+                            </td>
+
+                            <td>
+
+                                <a
+                                    href="{{ url_for('evaluation_student.view_evaluation', evaluation_id=evaluation.id) }}"
+                                    class="btn btn-info btn-sm"
+                                >
+                                    View
+                                </a>
+
+                                <a
+                                    href="{{ url_for('evaluation_student.edit_student_evaluation', evaluation_id=evaluation.id) }}"
+                                    class="btn btn-warning btn-sm"
+                                >
+                                    Edit
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+
+                            <td
+                                colspan="3"
+                                class="text-center text-muted"
+                            >
+
+                                No evaluations found.
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <div class="mt-4">
+
+                <a
+                    href="{{ url_for('evaluation_student.student_evaluation_home') }}"
+                    class="btn btn-secondary"
+                >
+                    Back to Students
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -12,29 +12,31 @@ Student Evaluation
 
     <div class="mb-4">
 
-        <h2 class="fw-bold">
-
+        <h2 class="fw-bold mb-1">
             विद्यार्थी मूल्यांकन
-
         </h2>
 
-        <p class="text-muted">
+        <p class="text-muted mb-0">
 
-            Select an Abhyasika to start student evaluation.
+            {% if is_admin %}
+                Select an Abhyasika and Evaluation Date to manage student evaluations.
+            {% else %}
+                Select an Evaluation Date to manage student evaluations.
+            {% endif %}
 
         </p>
 
     </div>
 
-    <!-- Selection Card -->
+    <!-- Filter Card -->
 
-    <div class="card shadow-sm border-0">
+    <div class="card shadow-sm border-0 mb-4">
 
         <div class="card-header">
 
             <h5 class="mb-0">
 
-                Select Abhyasika
+                Evaluation Filters
 
             </h5>
 
@@ -44,19 +46,20 @@ Student Evaluation
 
             <form method="GET">
 
-                <div class="row">
+                <div class="row g-3 align-items-end">
 
-                    <div class="col-md-6">
+                    {% if is_admin %}
+
+                    <div class="col-lg-5 col-md-6">
 
                         <label class="form-label fw-semibold">
-
                             Abhyasika
-
                         </label>
 
                         <select
                             name="abhyasika_id"
                             class="form-select"
+                            required
                         >
 
                             <option value="">
@@ -69,9 +72,7 @@ Student Evaluation
                                 value="{{ abhyasika.id }}"
                                 {% if selected_abhyasika == abhyasika.id %}selected{% endif %}
                             >
-
                                 {{ abhyasika.name }}
-
                             </option>
 
                             {% endfor %}
@@ -80,92 +81,34 @@ Student Evaluation
 
                     </div>
 
-                    <div class="col-md-2 d-flex align-items-end">
+                    {% endif %}
+
+                    <div class="{% if is_admin %}col-lg-4 col-md-6{% else %}col-lg-4 col-md-6{% endif %}">
+
+                        <label class="form-label fw-semibold">
+                            Evaluation Date
+                        </label>
+
+                        <input
+                            type="date"
+                            name="evaluation_date"
+                            class="form-control"
+                            value="{{ evaluation_date.strftime('%Y-%m-%d') }}"
+                            required
+                        >
+
+                    </div>
+
+                    <div class="{% if is_admin %}col-lg-3 col-md-12{% else %}col-lg-2 col-md-6{% endif %}">
 
                         <button
                             type="submit"
                             class="btn btn-primary w-100"
                         >
-
-                            Load
-
+                            Load Students
                         </button>
 
                     </div>
-
-                    {% if students %}
-
-                    <div class="card shadow-sm border-0 mt-4">
-
-                        <div class="card-header">
-
-                            <h5 class="mb-0">
-
-                                Student List
-
-                            </h5>
-
-                        </div>
-
-                        <div class="card-body p-0">
-
-                            <table class="table table-hover mb-0">
-
-                                <thead>
-
-                                    <tr>
-
-                                        <th>Sr.</th>
-                                        <th>Student Name</th>
-                                        <th>Standard</th>
-                                        <th>Action</th>
-
-                                    </tr>
-
-                                </thead>
-
-                                <tbody>
-
-                                    {% for student in students %}
-
-                                    <tr>
-
-                                        <td>{{ loop.index }}</td>
-
-                                        <td>{{ student.student_name }}</td>
-
-                                        <td>{{ student.standard }}</td>
-
-                                        <td>
-
-                                            <a
-
-                                                href="{{ url_for(
-                                                    'evaluation_student.evaluate_student',
-                                                    student_id=student.id
-                                                ) }}"
-
-                                                class="btn btn-success btn-sm">
-
-                                                Evaluate
-
-                                            </a>
-
-                                        </td>
-
-                                    </tr>
-
-                                    {% endfor %}
-
-                                </tbody>
-
-                            </table>
-
-                        </div>
-
-                    </div>
-
-                    {% endif %}
 
                 </div>
 
@@ -175,6 +118,436 @@ Student Evaluation
 
     </div>
 
+    <!-- Evaluation Progress -->
+
+    {% if students %}
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header">
+
+            <h5 class="mb-0">
+
+                Evaluation Progress
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row align-items-center">
+
+                <!-- Left Side -->
+
+                <div class="col-lg-4">
+
+                    <h3 class="fw-bold text-success mb-1">
+
+                        {{ completed_students }}
+                        /
+                        {{ total_students }}
+
+                    </h3>
+
+                    <p class="text-muted mb-0">
+
+                        Students Evaluated
+
+                    </p>
+
+                </div>
+
+                <!-- Right Side -->
+
+                <div class="col-lg-8">
+
+                    <div
+                        class="progress mb-3"
+                        style="height:25px;"
+                    >
+
+                        <div
+
+                            class="progress-bar bg-success"
+
+                            role="progressbar"
+
+                            style="width: {{ progress_percentage }}%;"
+
+                            aria-valuenow="{{ progress_percentage }}"
+
+                            aria-valuemin="0"
+
+                            aria-valuemax="100"
+
+                        >
+
+                            {{ progress_percentage }}%
+
+                        </div>
+
+                    </div>
+
+                    <div class="row text-center">
+
+                        <div class="col-4">
+
+                            <h5 class="text-primary mb-0">
+
+                                {{ total_students }}
+
+                            </h5>
+
+                            <small class="text-muted">
+
+                                Total
+
+                            </small>
+
+                        </div>
+
+                        <div class="col-4">
+
+                            <h5 class="text-success mb-0">
+
+                                {{ completed_students }}
+
+                            </h5>
+
+                            <small class="text-muted">
+
+                                Completed
+
+                            </small>
+
+                        </div>
+
+                        <div class="col-4">
+
+                            <h5 class="text-warning mb-0">
+
+                                {{ pending_students }}
+
+                            </h5>
+
+                            <small class="text-muted">
+
+                                Pending
+
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+    <!-- Student List -->
+
+    {% if students %}
+
+    <!-- Search Student -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-body">
+
+            <div class="row align-items-end">
+
+                <div class="col-lg-6 col-md-8">
+
+                    <label class="form-label fw-semibold">
+
+                        <i class="bi bi-search me-1"></i>
+
+                        Search Student
+
+                    </label>
+
+                    <input
+                        type="text"
+                        id="studentSearch"
+                        class="form-control"
+                        placeholder="Search by Name, School or Standard..."
+                    >
+
+                </div>
+
+                <div class="col-lg-6 col-md-4 mt-3 mt-md-0">
+
+                    <div class="form-check mt-md-4">
+
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            id="pendingOnly"
+                        >
+
+                        <label
+                            class="form-check-label fw-semibold"
+                            for="pendingOnly"
+                        >
+
+                            Show Only Pending Students
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header d-flex justify-content-between align-items-center">
+
+            <h5 class="mb-0">
+
+                Student List
+
+            </h5>
+
+            <span class="badge bg-primary">
+
+                {{ students|length }} Students
+
+            </span>
+
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle mb-0">
+
+                <thead class="table-light">
+
+                    <tr>
+
+                        <th width="25%">Student Name</th>
+
+                        <th width="10%">Standard</th>
+
+                        <th width="12%">Status</th>
+
+                        <th width="15%">Last Evaluation</th>
+
+                        <th width="18%" class="text-center">
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="studentTableBody">
+
+                    {% for student in students %}
+
+                    <tr
+                        class="student-row"
+                        data-status="{% if student.today_evaluation %}completed{% else %}pending{% endif %}"
+                    >
+
+
+                        <td>
+
+                            <strong>
+
+                                {{ student.student_name }}
+
+                            </strong>
+
+                        </td>
+
+                        <td>
+
+                            {{ student.standard }}
+
+                        </td>
+
+                        <!-- Status -->
+
+                        <td>
+
+                            {% if student.today_evaluation %}
+
+                                <span class="badge bg-success px-3 py-2">
+                                    ✓ Evaluated
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-warning text-dark px-3 py-2">
+                                    ⏳ Pending
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <!-- Last Evaluation -->
+
+                        <td>
+
+                            {% if student.last_evaluation %}
+
+                                {{ student.last_evaluation.evaluation_date.strftime("%d-%m-%Y") }}
+
+                            {% else %}
+
+                                <span class="text-muted">
+
+                                    Never Evaluated
+
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td class="text-center">
+
+                            {% if student.today_evaluation %}
+
+                                <a
+                                    href="{{ url_for(
+                                        'evaluation_student.view_evaluation',
+                                        evaluation_id=student.today_evaluation.id
+                                    ) }}"
+                                    class="btn btn-success btn-sm"
+                                >
+                                    <i class="bi bi-eye"></i>
+                                    View
+                                </a>
+
+                            {% else %}
+
+                                <a
+                                    href="{{ url_for(
+                                        'evaluation_student.evaluate_student',
+                                        student_id=student.id,
+                                        evaluation_date=evaluation_date.strftime('%Y-%m-%d')
+                                    ) }}"
+                                    class="btn btn-primary btn-sm"
+                                >
+                                    <i class="bi bi-pencil-square"></i>
+                                    Evaluation
+                                </a>
+
+                            {% endif %}
+
+                            <a
+                                href="{{ url_for(
+                                    'evaluation_student.view_student_evaluations',
+                                    student_id=student.id
+                                ) }}"
+                                class="btn btn-outline-secondary btn-sm"
+                            >
+                                <i class="bi bi-clock-history"></i>
+                                History
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+            
+
+        </div>
+
+    </div>
+
+    {% else %}
+
+    <div class="alert alert-info shadow-sm">
+
+        {% if is_admin %}
+
+            Select an Abhyasika and Evaluation Date, then click
+            <strong>Load Students</strong>.
+
+        {% else %}
+
+            Select an Evaluation Date, then click
+            <strong>Load Students</strong>.
+
+        {% endif %}
+
+    </div>
+
+    {% endif %}
+
 </div>
+
+{% endblock %}
+
+{% block js %}
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const searchBox = document.getElementById("studentSearch");
+    const pendingOnly = document.getElementById("pendingOnly");
+    const rows = document.querySelectorAll(".student-row");
+
+    function filterStudents() {
+
+        const keyword = searchBox.value.trim().toLowerCase();
+
+        rows.forEach(function (row) {
+
+            const text = row.textContent.toLowerCase();
+            const status = row.dataset.status;
+
+            let visible = text.includes(keyword);
+
+            if (pendingOnly.checked && status === "completed") {
+
+                visible = false;
+
+            }
+
+            row.style.display = visible ? "" : "none";
+
+        });
+
+    }
+
+    if (searchBox) {
+
+        searchBox.addEventListener("input", filterStudents);
+
+    }
+
+    if (pendingOnly) {
+
+        pendingOnly.addEventListener("change", filterStudents);
+
+    }
+
+});
+
+</script>
 
 {% endblock %}

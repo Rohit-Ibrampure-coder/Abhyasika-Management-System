@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}
-Student Evaluation
+Edit Student Evaluation
 {% endblock %}
 
 {% block content %}
@@ -14,7 +14,7 @@ Student Evaluation
 
             <h4 class="mb-0">
 
-                विद्यार्थी मूल्यांकन
+                विद्यार्थी मूल्यांकन संपादित करा
 
             </h4>
 
@@ -24,10 +24,12 @@ Student Evaluation
 
             <form
                 method="POST"
-                action="{{ url_for('evaluation_student.save_student_evaluation', student_id=student.id) }}"
+                action="{{ url_for('evaluation_student.update_student_evaluation', evaluation_id=evaluation.id) }}"
             >
 
                 <div class="row g-3">
+
+                    <!-- Student Name -->
 
                     <div class="col-md-6">
 
@@ -46,6 +48,8 @@ Student Evaluation
 
                     </div>
 
+                    <!-- Standard -->
+
                     <div class="col-md-3">
 
                         <label class="form-label">
@@ -63,6 +67,8 @@ Student Evaluation
 
                     </div>
 
+                    <!-- Evaluation Date -->
+
                     <div class="col-md-3">
 
                         <label class="form-label">
@@ -73,13 +79,14 @@ Student Evaluation
 
                         <input
                             type="date"
-                            name="evaluation_date"
                             class="form-control"
-                            value="{{ evaluation_date.strftime('%Y-%m-%d') }}"
-                            required
+                            value="{{ evaluation.evaluation_date }}"
+                            readonly
                         >
 
                     </div>
+
+                    <!-- School -->
 
                     <div class="col-12">
 
@@ -99,72 +106,90 @@ Student Evaluation
                     </div>
 
                     <div class="col-12">
+
                         <hr>
-                    </div>
-
-                    {% if existing_evaluation %}
-
-                    <div class="alert alert-warning">
-
-                        <strong>
-                            This student has already been evaluated for {{ today }}.
-                        </strong>
 
                     </div>
 
-                    {% endif %}
+                    <!-- Core Questions -->
 
                     <div class="col-12">
+
                         <h5 class="mb-3">
+
                             मूलभूत प्रश्न
+
                         </h5>
-                    </div>
-
-                    <div class="list-group mb-4">
-
-                        {% for question in core_questions %}
-
-                        <label class="list-group-item">
-
-                            <input
-                                class="form-check-input me-2"
-                                type="checkbox"
-                                name="question_{{ question.id }}"
-                            >
-
-                            {{ loop.index }}.
-                            {{ question.question_text }}
-
-                        </label>
-
-                        {% endfor %}
 
                     </div>
 
                     <div class="col-12">
-                        <h5 class="mb-3">
-                            {{ current_month }} महिन्याचे प्रश्न
-                        </h5>
+
+                        <div class="list-group mb-4">
+
+                            {% for question in core_questions %}
+
+                            <label class="list-group-item">
+
+                                <input
+                                    class="form-check-input me-2"
+                                    type="checkbox"
+                                    name="question_{{ question.id }}"
+
+                                    {% if answer_dict.get(question.id) %}
+                                    checked
+                                    {% endif %}
+                                >
+
+                                {{ loop.index }}.
+                                {{ question.question_text }}
+
+                            </label>
+
+                            {% endfor %}
+
+                        </div>
+
                     </div>
 
-                    <div class="list-group">
+                    <!-- Monthly Questions -->
 
-                        {% for question in month_questions %}
+                    <div class="col-12">
 
-                        <label class="list-group-item">
+                        <h5 class="mb-3">
 
-                            <input
-                                class="form-check-input me-2"
-                                type="checkbox"
-                                name="question_{{ question.id }}"
-                            >
+                            {{ current_month }} महिन्याचे प्रश्न
 
-                            {{ loop.index }}.
-                            {{ question.question_text }}
+                        </h5>
 
-                        </label>
+                    </div>
 
-                        {% endfor %}
+                    <div class="col-12">
+
+                        <div class="list-group">
+
+                            {% for question in month_questions %}
+
+                            <label class="list-group-item">
+
+                                <input
+                                    class="form-check-input me-2"
+                                    type="checkbox"
+                                    name="question_{{ question.id }}"
+
+                                    {% if answer_dict.get(question.id) %}
+                                    checked
+                                    {% endif %}
+                                >
+
+                                {{ loop.index }}.
+                                {{ question.question_text }}
+
+                            </label>
+
+                            {% endfor %}
+
+                        </div>
 
                     </div>
 
@@ -173,31 +198,18 @@ Student Evaluation
                 <div class="d-flex justify-content-between mt-4">
 
                     <a
-                        href="{{ url_for('evaluation_student.student_evaluation_home') }}"
+                        href="{{ url_for('evaluation_student.view_student_evaluations', student_id=student.id) }}"
                         class="btn btn-secondary"
                     >
                         Back
                     </a>
 
-                    {% if not existing_evaluation %}
-
                     <button
                         type="submit"
-                        class="btn btn-primary"
+                        class="btn btn-warning"
                     >
-                        Save Evaluation
+                        Update Evaluation
                     </button>
-
-                    {% else %}
-
-                    <button
-                        class="btn btn-secondary"
-                        disabled
-                    >
-                        Already Evaluated
-                    </button>
-
-                    {% endif %}
 
                 </div>
 

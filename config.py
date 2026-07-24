@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+ALLOW_FUTURE_EVALUATION = True
 
 class Config:
 
@@ -92,3 +93,4 @@ class Config:
     MAX_TEACHER_PHOTO_SIZE = int(
         2 * 1024 * 1024
     )
+

@@ -40,7 +40,8 @@ class StudentEvaluationAnswer(db.Model):
 
     answer = db.Column(
         db.Boolean,
-        nullable=False
+        nullable=False,
+        default=False
     )
 
     created_at = db.Column(
