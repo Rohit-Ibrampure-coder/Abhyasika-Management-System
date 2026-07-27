@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% block css %}
+
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/evaluation_report.css') }}"
+>
+
+{% endblock %}
+
+{% block title %}
+विद्यार्थी मूल्यांकन अहवाल
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <div class="report-container">
+
+        <div class="report-card">
+
+            <!-- ==========================================
+                        Report Header
+            =========================================== -->
+
+            <div class="report-header">
+
+                <img
+                    src="{{ url_for('static', filename='images/logo-icon.png') }}"
+                    alt="NGO Logo"
+                    class="report-logo"
+                >
+
+                <h1 class="ngo-name">
+
+                    श्री लक्ष्मीकेशव प्रतिष्ठान, सातारा
+
+                </h1>
+
+                <h2 class="report-title">
+
+                    विद्यार्थी मूल्यांकन अहवाल
+
+                </h2>
+
+            </div>
+
+            <hr class="report-divider">
+
+            <!-- ==========================================
+                    Student Information
+            ========================================== -->
+
+            <div class="student-info">
+
+                <table class="student-info-table">
+
+                    <tbody>
+
+                        <tr>
+
+                            <th>
+
+                                विद्यार्थी नाव
+
+                            </th>
+
+                            <td>
+
+                                {{ student.student_name }}
+
+                            </td>
+
+                        </tr>
+
+                        <tr>
+
+                            <th>
+
+                                अभ्यासिका
+
+                            </th>
+
+                            <td>
+
+                                {{ student.abhyasika.name }}
+
+                            </td>
+
+                        </tr>
+
+                        <tr>
+
+                            <th>
+
+                                इयत्ता
+
+                            </th>
+
+                            <td>
+
+                                {{ student.standard }}
+
+                            </td>
+
+                        </tr>
+
+                        <tr>
+
+                            <th>
+
+                                महिना
+
+                            </th>
+
+                            <td>
+
+                                {{ month_name }}
+
+                            </td>
+
+                        </tr>
+
+                        <tr>
+
+                            <th>
+
+                                शैक्षणिक वर्ष
+
+                            </th>
+
+                            <td>
+
+                                {{ academic_year }}
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <!-- ==========================================
+                    Evaluation Table
+            ========================================== -->
+
+            <div class="table-responsive">
+
+                <table class="evaluation-report-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th class="serial-column">
+
+                                क्र.
+
+                            </th>
+
+                            <th class="question-column">
+
+                                प्रश्न
+
+                            </th>
+
+                            {% for day in range(1, total_days + 1) %}
+
+                            <th class="day-column">
+
+                                {{ day }}
+
+                            </th>
+
+                            {% endfor %}
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for question in questions %}
+
+                        <tr>
+
+                            <!-- Serial Number -->
+
+                            <td class="serial-column">
+
+                                {{ loop.index }}
+
+                            </td>
+
+                            <!-- Question -->
+
+                            <td class="question-column">
+
+                                {{ question.question_text }}
+
+                            </td>
+
+                            <!-- Dynamic Days -->
+
+                            {% for day in range(1, total_days + 1) %}
+
+                            <td class="day-column">
+
+                                {% set answer = evaluation_map.get((question.id, day)) %}
+
+                                {% if answer is sameas true %}
+
+                                    ✓
+
+                                {% elif answer is sameas false %}
+
+                                    ✗
+
+                                {% endif %}
+
+                            </td>
+
+                            {% endfor %}
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <!-- ==========================================
+                    Signature Section
+            =========================================== -->
+
+            <div class="signature-section">
+
+                <div class="signature-box">
+
+                    <div class="signature-line"></div>
+
+                    <p>
+
+                        पालक स्वाक्षरी
+
+                    </p>
+
+                </div>
+
+                <div class="signature-box">
+
+                    <div class="signature-line"></div>
+
+                    <p>
+
+                        विद्यार्थी स्वाक्षरी
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
