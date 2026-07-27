@@ -254,6 +254,67 @@ def evaluate_student(student_id):
             .all()
         )
 
+    # ------------------------------------------
+    # Student Navigation
+    # ------------------------------------------
+
+    students = Student.query.filter_by(
+        abhyasika_id=student.abhyasika_id
+    ).order_by(
+        Student.student_name
+    ).all()
+
+    total_students = len(students)
+
+    current_index = 0
+
+    previous_student = None
+    next_student = None
+
+    for index, s in enumerate(students):
+
+        if s.id == student.id:
+
+            current_index = index + 1
+
+            if index > 0:
+                previous_student = students[index - 1]
+
+            if index < total_students - 1:
+                next_student = students[index + 1]
+
+            break
+
+    # ------------------------------------------
+    # Previous Evaluation
+    # ------------------------------------------
+
+    previous_evaluation_id = request.args.get(
+        "previous_evaluation_id",
+        type=int
+    )
+
+    # ------------------------------------------
+    # Evaluation Progress
+    # ------------------------------------------
+
+    completed_students = StudentEvaluation.query.filter(
+        StudentEvaluation.abhyasika_id == student.abhyasika_id,
+        StudentEvaluation.evaluation_date == evaluation_date
+    ).count()
+
+    pending_students = total_students - completed_students
+
+    if total_students > 0:
+
+        progress_percentage = round(
+            (completed_students / total_students) * 100
+        )
+
+    else:
+
+        progress_percentage = 0
+
     return render_template(
 
         "evaluation/student/evaluation_form.html",
@@ -266,7 +327,23 @@ def evaluate_student(student_id):
 
         core_questions=core_questions,
 
-        month_questions=month_questions
+        month_questions=month_questions,
+
+        current_index=current_index,
+
+        total_students=total_students,
+
+        previous_student=previous_student,
+
+        next_student=next_student,
+
+        completed_students=completed_students,
+
+        pending_students=pending_students,
+
+        progress_percentage=progress_percentage,
+
+        previous_evaluation_id=previous_evaluation_id
 
     )
 
@@ -388,6 +465,15 @@ def save_student_evaluation(student_id):
                 evaluation_date=evaluation_date.strftime("%Y-%m-%d")
             )
         )
+
+    # ------------------------------------------
+    # Get Submit Action
+    # ------------------------------------------
+
+    action = request.form.get(
+        "action",
+        "save"
+    )
 
     # ------------------------------------------
     # Duplicate Evaluation Check
@@ -528,13 +614,68 @@ def save_student_evaluation(student_id):
 
         db.session.commit()
 
+
         flash(
-
             f"Student evaluation for {evaluation_date.strftime('%d-%m-%Y')} saved successfully.",
-
             "success"
-
         )
+
+        # ------------------------------------------
+        # Save & Next
+        # ------------------------------------------
+
+        if action == "save_next":
+
+            students = Student.query.filter_by(
+                abhyasika_id=student.abhyasika_id
+            ).order_by(
+                Student.student_name
+            ).all()
+
+            current_index = None
+
+            for index, s in enumerate(students):
+
+                if s.id == student.id:
+
+                    current_index = index
+                    break
+
+            if current_index is not None:
+
+                for next_student in students[current_index + 1:]:
+
+                    existing = StudentEvaluation.query.filter_by(
+                        student_id=next_student.id,
+                        evaluation_date=evaluation_date
+                    ).first()
+
+                    if not existing:
+
+                        return redirect(
+                            url_for(
+                                "evaluation_student.evaluate_student",
+                                student_id=next_student.id,
+                                evaluation_date=evaluation_date.strftime("%Y-%m-%d"),
+                                previous_evaluation_id=evaluation.id
+                            )
+                        )
+
+            flash(
+                "🎉 All remaining students have been evaluated.",
+                "success"
+            )
+
+            return redirect(
+                url_for(
+                    "evaluation_student.student_evaluation_home",
+                    evaluation_date=evaluation_date.strftime("%Y-%m-%d")
+                )
+            )
+
+        # ------------------------------------------
+        # Normal Save
+        # ------------------------------------------
 
         return redirect(
 

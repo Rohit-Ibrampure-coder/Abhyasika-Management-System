@@ -98,6 +98,70 @@ Student Evaluation
 
                     </div>
 
+
+                    <div class="card border-primary mb-4">
+
+                        <div class="card-body">
+
+                            <div class="row align-items-center">
+
+                                <div class="col-md-4">
+
+                                    <h5 class="mb-1">
+                                        {{ student.student_name }}
+                                    </h5>
+
+                                    <small class="text-muted">
+                                        Standard : {{ student.standard }}
+                                    </small>
+
+                                </div>
+
+                                <div class="col-md-4 text-center">
+
+                                    <h6 class="mb-2">
+
+                                        Student {{ current_index }} of {{ total_students }}
+
+                                    </h6>
+
+                                    <div class="progress">
+
+                                        <div
+                                            class="progress-bar"
+                                            style="width: {{ progress_percentage }}%;"
+                                        >
+                                            {{ progress_percentage }}%
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="col-md-4 text-end">
+
+                                    <span class="badge bg-success">
+
+                                        Completed :
+                                        {{ completed_students }}
+
+                                    </span>
+
+                                    <span class="badge bg-warning text-dark">
+
+                                        Pending :
+                                        {{ pending_students }}
+
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
                     <div class="col-12">
                         <hr>
                     </div>
@@ -170,23 +234,66 @@ Student Evaluation
 
                 </div>
 
-                <div class="d-flex justify-content-between mt-4">
+                <div class="d-flex justify-content-between align-items-center mt-4">
 
-                    <a
-                        href="{{ url_for('evaluation_student.student_evaluation_home') }}"
-                        class="btn btn-secondary"
-                    >
-                        Back
-                    </a>
+                    <div class="d-flex gap-2">
+
+                        <a
+                            href="{{ url_for('evaluation_student.student_evaluation_home') }}"
+                            class="btn btn-secondary"
+                        >
+                            <i class="bi bi-arrow-left me-1"></i>
+                            Back
+                        </a>
+
+                        {% if previous_evaluation_id %}
+
+                        <a
+                            href="{{ url_for(
+                                'evaluation_student.edit_student_evaluation',
+                                evaluation_id=previous_evaluation_id
+                            ) }}"
+                            class="btn btn-outline-secondary"
+                        >
+                            <i class="bi bi-pencil-square me-1"></i>
+
+                            Previous Evaluation
+
+                        </a>
+
+                        {% endif %}
+
+                    </div>
 
                     {% if not existing_evaluation %}
 
-                    <button
-                        type="submit"
-                        class="btn btn-primary"
-                    >
-                        Save Evaluation
-                    </button>
+                    <div class="d-flex gap-2">
+
+                        <button
+                            type="submit"
+                            name="action"
+                            value="save"
+                            class="btn btn-primary"
+                        >
+                            <i class="bi bi-check-circle me-1"></i>
+
+                            Save
+
+                        </button>
+
+                        <button
+                            type="submit"
+                            name="action"
+                            value="save_next"
+                            class="btn btn-success"
+                        >
+                            <i class="bi bi-arrow-right-circle me-1"></i>
+
+                            Save & Next
+
+                        </button>
+
+                    </div>
 
                     {% else %}
 
