@@ -90,7 +90,7 @@ Evaluation
         <!-- Visible for Admin & Teacher -->
         <!-- ========================= -->
 
-        <div class="{% if is_admin %}col-lg-6{% else %}col-lg-12{% endif %}">
+        <div class="col-lg-6">
 
             <div class="card shadow-sm border-0 h-100">
 
@@ -188,6 +188,8 @@ Evaluation
 
         </div>
 
+        {% endif %}
+
         <!-- Evaluation Reports -->
 
         <div class="col-lg-6">
@@ -222,22 +224,20 @@ Evaluation
 
                     </div>
 
-                    <button
-                        class="btn btn-secondary"
-                        disabled
+                    <a
+                        href="{{ url_for('evaluation_report.student_report_selection') }}"
+                        class="btn btn-danger"
                     >
 
-                        Coming Soon
+                        Open Module
 
-                    </button>
+                    </a>
 
                 </div>
 
             </div>
 
         </div>
-
-        {% endif %}
 
     </div>
 

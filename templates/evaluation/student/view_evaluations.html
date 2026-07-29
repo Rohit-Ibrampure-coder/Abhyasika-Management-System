@@ -50,15 +50,18 @@ Student Evaluations
 
                         <tr>
 
-                            <th style="width:70px;">
-                                #
+                            <th class="text-center" style="width:70px;">
+                                No.
                             </th>
 
-                            <th>
+                            <th class="text-center">
                                 Evaluation Date
                             </th>
 
-                            <th style="width:180px;">
+                            <th
+                                class="text-center"
+                                style="width:260px;"
+                            >
                                 Action
                             </th>
 
@@ -86,6 +89,8 @@ Student Evaluations
 
                             <td>
 
+                                <!-- View -->
+
                                 <a
                                     href="{{ url_for('evaluation_student.view_evaluation', evaluation_id=evaluation.id) }}"
                                     class="btn btn-info btn-sm"
@@ -93,12 +98,33 @@ Student Evaluations
                                     View
                                 </a>
 
+                                <!-- Edit -->
+
                                 <a
                                     href="{{ url_for('evaluation_student.edit_student_evaluation', evaluation_id=evaluation.id) }}"
                                     class="btn btn-warning btn-sm"
                                 >
                                     Edit
                                 </a>
+
+                                <!-- Delete -->
+
+                                <form
+                                    action="{{ url_for('evaluation_student.delete_student_evaluation', evaluation_id=evaluation.id) }}"
+                                    method="POST"
+                                    class="d-inline delete-evaluation-form"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-danger btn-sm"
+                                        data-student="{{ student.student_name }}"
+                                        data-date="{{ evaluation.evaluation_date.strftime('%d-%m-%Y') }}"
+                                    >
+                                        Delete
+                                    </button>
+
+                                </form>
 
                             </td>
 
@@ -144,4 +170,114 @@ Student Evaluations
 
 </div>
 
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const deleteForms = document.querySelectorAll(".delete-evaluation-form");
+
+    deleteForms.forEach(function (form) {
+
+        form.addEventListener("submit", function (event) {
+
+            // Prevent immediate form submission
+            event.preventDefault();
+
+            // Delete button
+            const button = form.querySelector("button[type='submit']");
+
+            // Prevent multiple clicks
+            if (button.disabled) {
+                return;
+            }
+
+            // Read button data
+            const studentName = button.dataset.student;
+            const evaluationDate = button.dataset.date;
+
+            Swal.fire({
+
+                title: "Delete Student Evaluation?",
+
+                html: `
+                    <div class="text-start">
+
+                        <p class="mb-2">
+                            <strong>Student:</strong><br>
+                            ${studentName}
+                        </p>
+
+                        <p class="mb-3">
+                            <strong>Evaluation Date:</strong><br>
+                            ${evaluationDate}
+                        </p>
+
+                        <div class="alert alert-danger mb-0">
+
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+
+                            This evaluation and all related answers will be permanently deleted.
+
+                            <br><br>
+
+                            <strong>This action cannot be undone.</strong>
+
+                        </div>
+
+                    </div>
+                `,
+
+                icon: "warning",
+
+                showCancelButton: true,
+
+                confirmButtonText: "Yes, Delete",
+
+                cancelButtonText: "Cancel",
+
+                confirmButtonColor: "#dc3545",
+
+                cancelButtonColor: "#6c757d",
+
+                reverseButtons: true,
+
+                focusCancel: true,
+
+                allowOutsideClick: false,
+
+                allowEscapeKey: true
+
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+
+                    // Show loading only after confirmation
+                    button.disabled = true;
+
+                    button.innerHTML =
+                        '<span class="spinner-border spinner-border-sm me-2"></span>Please Wait...';
+
+                    // Submit form
+                    form.submit();
+
+                } else {
+
+                    // Restore button if user cancels
+                    button.disabled = false;
+
+                    button.innerHTML = "Delete";
+
+                }
+
+            });
+
+        });
+
+    });
+
+});
+
+</script>
+
 {% endblock %}
+

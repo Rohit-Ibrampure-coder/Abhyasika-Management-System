@@ -71,12 +71,19 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     /* ==========================================
-       BUTTON LOADING
+        BUTTON LOADING
     ========================================== */
 
     document.querySelectorAll("form").forEach(function (form) {
 
         form.addEventListener("submit", function () {
+
+            // Skip forms that use SweetAlert confirmation
+            if (form.classList.contains("delete-evaluation-form")) {
+
+                return;
+
+            }
 
             const button = form.querySelector("button[type='submit']");
 

@@ -269,6 +269,35 @@
 
             </div>
 
+            <div class="d-flex justify-content-end mb-3">
+
+                <a
+                    href="{{ url_for(
+                        'evaluation_report.student_monthly_report_print',
+                        student_id=student.id,
+                        month=month,
+                        year=year
+                    ) }}"
+                    target="_blank"
+                    class="btn btn-primary"
+                >
+                    <i class="bi bi-printer"></i>
+                    Print Report
+                </a>
+
+            </div>
+
+            <a
+                href="{{ url_for('evaluation_report.student_report_selection') }}"
+                class="btn btn-secondary me-2"
+            >
+
+                <i class="bi bi-arrow-left me-2"></i>
+
+                Back
+
+            </a>
+
         </div>
 
     </div>

@@ -1,8 +1,6 @@
 from flask import (
     Blueprint,
-    render_template,
-    redirect,
-    url_for
+    render_template
 )
 
 from flask_login import (
@@ -15,6 +13,7 @@ evaluation_bp = Blueprint(
     __name__
 )
 
+
 # ==========================================
 # Evaluation Home
 # ==========================================
@@ -23,15 +22,7 @@ evaluation_bp = Blueprint(
 @login_required
 def evaluation_home():
 
-    # Teacher → Directly open Student Evaluation
-    if current_user.role == "teacher":
-
-        return redirect(
-            url_for("evaluation_student.student_evaluation_home")
-        )
-
-    # Admin → Evaluation Dashboard
     return render_template(
         "evaluation/evaluation_home.html",
-        is_admin=True
+        is_admin=(current_user.role == "admin")
     )

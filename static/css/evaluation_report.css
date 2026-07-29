@@ -370,3 +370,44 @@ body{
     }
 
 }
+
+
+/* ==========================================
+   Print Styles
+========================================== */
+
+@media print {
+
+    .btn,
+
+    .navbar,
+
+    .sidebar,
+
+    .breadcrumb,
+
+    footer,
+
+    .page-title,
+
+    .no-print {
+
+        display: none !important;
+
+    }
+
+    body {
+
+        background: white !important;
+
+    }
+
+    .card {
+
+        border: none !important;
+
+        box-shadow: none !important;
+
+    }
+
+}

@@ -6,7 +6,8 @@ from flask import (
     url_for,
     flash,
     redirect,
-    session
+    session,
+    abort
 )
 
 from flask_login import (
@@ -23,6 +24,8 @@ from models.student_evaluation_answer import StudentEvaluationAnswer
 from models.student_evaluation_question import StudentEvaluationQuestion
 from models.student_evaluation_question_group import StudentEvaluationQuestionGroup
 from datetime import date, datetime
+
+from models.teacher_abhyasika import TeacherAbhyasika
 
 evaluation_student_bp = Blueprint(
     "evaluation_student",
@@ -1021,3 +1024,67 @@ def update_student_evaluation(evaluation_id):
                 evaluation_id=evaluation.id
             )
         )
+
+
+@evaluation_student_bp.route(
+    "/student/evaluation/<int:evaluation_id>/delete",
+    methods=["POST"]
+)
+@login_required
+def delete_student_evaluation(evaluation_id):
+
+    # ==========================================
+    # Get Evaluation
+    # ==========================================
+
+    evaluation = StudentEvaluation.query.get_or_404(
+        evaluation_id
+    )
+
+    student = evaluation.student
+
+    # ==========================================
+    # Teacher Permission
+    # ==========================================
+
+    if current_user.role == "teacher":
+
+        assignment = TeacherAbhyasika.query.filter_by(
+
+            teacher_id=current_user.id,
+
+            abhyasika_id=student.abhyasika_id
+
+        ).first()
+
+        if not assignment:
+
+            abort(403)
+
+    # ==========================================
+    # Delete Evaluation
+    # ==========================================
+
+    db.session.delete(evaluation)
+
+    db.session.commit()
+
+    flash(
+
+        "Student evaluation deleted successfully.",
+
+        "success"
+
+    )
+
+    return redirect(
+
+        url_for(
+
+            "evaluation_student.view_student_evaluations",
+
+            student_id=student.id
+
+        )
+
+    )
