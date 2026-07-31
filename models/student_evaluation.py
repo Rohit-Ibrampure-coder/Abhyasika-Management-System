@@ -57,6 +57,7 @@ class StudentEvaluation(db.Model):
         server_default=db.func.now()
     )
 
+
     # ==========================================
     # Relationships
     # ==========================================
@@ -79,6 +80,13 @@ class StudentEvaluation(db.Model):
     evaluation_answers = db.relationship(
         "StudentEvaluationAnswer",
         back_populates="evaluation",
+        cascade="all, delete-orphan"
+    )
+
+    result = db.relationship(
+        "StudentEvaluationResult",
+        back_populates="evaluation",
+        uselist=False,
         cascade="all, delete-orphan"
     )
 

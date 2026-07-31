@@ -24,6 +24,7 @@ from models.student_evaluation_answer import StudentEvaluationAnswer
 from models.student_evaluation_question import StudentEvaluationQuestion
 from models.student_evaluation_question_group import StudentEvaluationQuestionGroup
 from datetime import date, datetime
+from models.student_evaluation_result import StudentEvaluationResult
 
 from models.teacher_abhyasika import TeacherAbhyasika
 
@@ -589,6 +590,8 @@ def save_student_evaluation(student_id):
         # Save Answers
         # ------------------------------------------
 
+        obtained_marks = 0
+
         for question in all_questions:
 
             answer = (
@@ -596,6 +599,9 @@ def save_student_evaluation(student_id):
                     f"question_{question.id}"
                 ) is not None
             )
+
+            if answer:
+                obtained_marks += 1
 
             db.session.add(
 
@@ -610,6 +616,37 @@ def save_student_evaluation(student_id):
                 )
 
             )
+
+        # ------------------------------------------
+        # Save Evaluation Result
+        # ------------------------------------------
+
+        total_questions = len(all_questions)
+
+        if total_questions > 0:
+
+            percentage = round(
+                (obtained_marks / total_questions) * 100,
+                2
+            )
+
+        else:
+
+            percentage = 0.00
+
+        evaluation_result = StudentEvaluationResult(
+
+            evaluation_id=evaluation.id,
+
+            total_questions=total_questions,
+
+            obtained_marks=obtained_marks,
+
+            percentage=percentage
+
+        )
+
+        db.session.add(evaluation_result)
 
         # ------------------------------------------
         # Commit
@@ -735,11 +772,65 @@ def view_student_evaluations(student_id):
 
     student = Student.query.get_or_404(student_id)
 
-    evaluations = StudentEvaluation.query.filter_by(
+    # ------------------------------------------
+    # Pagination
+    # ------------------------------------------
+
+    page = request.args.get(
+        "page",
+        1,
+        type=int
+    )
+
+    pagination = StudentEvaluation.query.filter_by(
         student_id=student.id
     ).order_by(
         StudentEvaluation.evaluation_date.desc()
-    ).all()
+    ).paginate(
+        page=page,
+        per_page=10,
+        error_out=False
+    )
+
+    evaluations = pagination.items
+
+    # ------------------------------------------
+    # Evaluation Summary
+    # ------------------------------------------
+
+    total_evaluations = pagination.total
+
+    average_percentage = 0.00
+
+    best_percentage = 0.00
+
+    latest_percentage = 0.00
+
+    if total_evaluations > 0:
+
+        percentages = [
+
+            evaluation.result.percentage
+
+            for evaluation in evaluations
+
+            if evaluation.result
+
+        ]
+
+        if percentages:
+
+            average_percentage = round(
+
+                sum(percentages) / len(percentages),
+
+                2
+
+            )
+
+            best_percentage = max(percentages)
+
+            latest_percentage = percentages[0]
 
     return render_template(
 
@@ -747,7 +838,17 @@ def view_student_evaluations(student_id):
 
         student=student,
 
-        evaluations=evaluations
+        evaluations=evaluations,
+
+        pagination=pagination,
+
+        total_evaluations=total_evaluations,
+
+        average_percentage=average_percentage,
+
+        best_percentage=best_percentage,
+
+        latest_percentage=latest_percentage
 
     )
 
@@ -976,6 +1077,8 @@ def update_student_evaluation(evaluation_id):
         # Update Answers
         # ------------------------------------------
 
+        obtained_marks = 0
+
         for question in all_questions:
 
             answer = (
@@ -983,6 +1086,9 @@ def update_student_evaluation(evaluation_id):
                     f"question_{question.id}"
                 ) is not None
             )
+
+            if answer:
+                obtained_marks += 1
 
             evaluation_answer = StudentEvaluationAnswer.query.filter_by(
                 evaluation_id=evaluation.id,
@@ -992,6 +1098,49 @@ def update_student_evaluation(evaluation_id):
             if evaluation_answer:
 
                 evaluation_answer.answer = answer
+
+        # ------------------------------------------
+        # Update Evaluation Result
+        # ------------------------------------------
+
+        total_questions = len(all_questions)
+
+        if total_questions > 0:
+
+            percentage = round(
+                (obtained_marks / total_questions) * 100,
+                2
+            )
+
+        else:
+
+            percentage = 0.00
+
+        evaluation_result = StudentEvaluationResult.query.filter_by(
+            evaluation_id=evaluation.id
+        ).first()
+
+        if evaluation_result:
+
+            evaluation_result.total_questions = total_questions
+            evaluation_result.obtained_marks = obtained_marks
+            evaluation_result.percentage = percentage
+
+        else:
+
+            evaluation_result = StudentEvaluationResult(
+
+                evaluation_id=evaluation.id,
+
+                total_questions=total_questions,
+
+                obtained_marks=obtained_marks,
+
+                percentage=percentage
+
+            )
+
+            db.session.add(evaluation_result)
 
         db.session.commit()
 

@@ -914,48 +914,6 @@ Add Student
 <script>
 
 /* ==========================================
-   Auto Capitalize Student Name
-========================================== */
-
-const studentName = document.querySelector(
-    'input[name="student_name"]'
-);
-
-if(studentName){
-
-    studentName.addEventListener("input", function(){
-
-        this.value = this.value.replace(
-            /\b\w/g,
-            letter => letter.toUpperCase()
-        );
-
-    });
-
-}
-
-/* ==========================================
-   Auto Capitalize Parent Name
-========================================== */
-
-const parentName = document.querySelector(
-    'input[name="parent_name"]'
-);
-
-if(parentName){
-
-    parentName.addEventListener("input", function(){
-
-        this.value = this.value.replace(
-            /\b\w/g,
-            letter => letter.toUpperCase()
-        );
-
-    });
-
-}
-
-/* ==========================================
    Mobile Number Validation
 ========================================== */
 

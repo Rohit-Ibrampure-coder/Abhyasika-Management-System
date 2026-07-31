@@ -88,6 +88,54 @@ Student Evaluation Details
 
             <hr>
 
+            {% if evaluation.result %}
+
+                <div class="card border-success mb-4">
+
+                    <div class="card-header bg-success text-white">
+
+                        <h5 class="mb-0">
+                            Evaluation Result
+                        </h5>
+
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="row text-center">
+
+                            <div class="col-md-4">
+
+                                <h6>Total Questions</h6>
+
+                                <h3>{{ evaluation.result.total_questions }}</h3>
+
+                            </div>
+
+                            <div class="col-md-4">
+
+                                <h6>Obtained Marks</h6>
+
+                                <h3>{{ evaluation.result.obtained_marks }}</h3>
+
+                            </div>
+
+                            <div class="col-md-4">
+
+                                <h6>Percentage</h6>
+
+                                <h3>{{ evaluation.result.percentage }}%</h3>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% endif %}
+
             <h5 class="mb-3">
 
                 मूलभूत प्रश्न

@@ -190,12 +190,14 @@ Add Teacher
                     </label>
 
                     <input
-                        type="tel"
+                        type="text"
                         id="mobile"
                         name="mobile"
                         class="form-control"
                         placeholder="Enter 10-digit mobile number"
                         maxlength="10"
+                        inputmode="numeric"
+                        pattern="[0-9]{10}"
                         autocomplete="off"
                         required
                     >
@@ -404,52 +406,38 @@ function togglePassword(){
 ========================================== */
 
 const mobileInput = document.getElementById("mobile");
-
 const mobileHelp = document.getElementById("mobileHelp");
 
-mobileInput.addEventListener(
+mobileInput.addEventListener("input", function () {
 
-    "input",
+    // Allow only digits
+    this.value = this.value.replace(/\D/g, "");
 
-    function(){
-
-        this.value = this.value.replace(/\D/g,'');
-
-        if(this.value.length === 10){
-
-            this.classList.remove("is-invalid");
-
-            this.classList.add("is-valid");
-
-            mobileHelp.innerHTML =
-
-                "✓ Valid mobile number";
-
-            mobileHelp.className =
-
-                "text-success";
-
-        }
-
-        else{
-
-            this.classList.remove("is-valid");
-
-            this.classList.add("is-invalid");
-
-            mobileHelp.innerHTML =
-
-                "Mobile number must contain exactly 10 digits.";
-
-            mobileHelp.className =
-
-                "text-danger";
-
-        }
-
+    // Limit to exactly 10 digits
+    if (this.value.length > 10) {
+        this.value = this.value.slice(0, 10);
     }
 
-);
+    if (this.value.length === 10) {
+
+        this.classList.remove("is-invalid");
+        this.classList.add("is-valid");
+
+        mobileHelp.innerHTML = "✓ Valid mobile number";
+        mobileHelp.className = "text-success";
+
+    } else {
+
+        this.classList.remove("is-valid");
+        this.classList.add("is-invalid");
+
+        mobileHelp.innerHTML =
+            "Mobile number must contain exactly 10 digits.";
+
+        mobileHelp.className = "text-danger";
+    }
+
+});
 
 /* ==========================================
    Username Availability
