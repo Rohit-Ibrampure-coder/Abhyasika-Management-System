@@ -1,0 +1,408 @@
+{% extends "base.html" %}
+
+{% block title %}
+विद्यार्थी प्रगती व मूल्यांकन अहवाल
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- ==========================================
+        Page Header
+    =========================================== -->
+
+    <div class="page-header mb-4">
+
+        <h2 class="fw-bold">
+
+            विद्यार्थी प्रगती व मूल्यांकन अहवाल
+
+        </h2>
+
+        <p class="text-muted mb-0">
+
+            विद्यार्थ्याचा प्रगती व मूल्यांकन अहवाल पाहण्यासाठी विद्यार्थी निवडा.
+
+        </p>
+
+    </div>
+
+    <!-- ==========================================
+        Search Card
+    =========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-body">
+
+            <form method="GET">
+
+                <div class="row g-3 align-items-center">
+
+                    <div class="col-lg-9">
+
+                        <div class="input-group">
+
+                            <span class="input-group-text">
+
+                                <i class="bi bi-search"></i>
+
+                            </span>
+
+                            <input
+                                type="text"
+                                name="search"
+                                class="form-control"
+                                placeholder="विद्यार्थी किंवा पालकाचे नाव शोधा..."
+                                value="{{ search }}"
+                            >
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg-3">
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary w-100"
+                        >
+
+                            <i class="bi bi-search me-2"></i>
+
+                            शोधा
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <!-- ==========================================
+        Student List
+    =========================================== -->
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-white">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <h5 class="mb-0">
+
+                    विद्यार्थी यादी
+
+                </h5>
+
+                <span class="badge bg-primary fs-6">
+
+                    एकूण विद्यार्थी :
+                    {{ report_students|length }}
+
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th
+                                class="text-center"
+                                style="width:70px;"
+                            >
+                                क्र.
+                            </th>
+
+                            <th
+                                class="text-center"
+                                style="width:90px;"
+                            >
+                                फोटो
+                            </th>
+
+                            <th>
+                                विद्यार्थी
+                            </th>
+
+                            <th
+                                class="text-center"
+                                style="width:180px;"
+                            >
+                                अभ्यासिका
+                            </th>
+
+                            <th
+                                class="text-center"
+                                style="width:170px;"
+                            >
+                                <i class="bi bi-clipboard-data me-1"></i>
+
+                                एकूण मूल्यांकन
+                            </th>
+
+                            <th
+                                class="text-center"
+                                style="width:180px;"
+                            >
+                                <i class="bi bi-calendar-check me-1"></i>
+
+                                शेवटचे मूल्यांकन
+                            </th>
+
+                            <th
+                                class="text-center"
+                                style="width:220px;"
+                            >
+                                कृती
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for item in report_students %}
+
+                        {% set student = item.student %}
+
+                        <tr>
+
+                            <td class="text-center">
+
+                                {{ loop.index }}
+
+                            </td>
+
+                            <!-- ==========================================
+                                Student Photo
+                            =========================================== -->
+
+                            <td
+                                class="text-center align-middle"
+                                style="width:90px;"
+                            >
+
+                                <div
+                                    class="d-flex
+                                        justify-content-center
+                                        align-items-center"
+                                >
+
+                                    {% if student.photo %}
+
+                                        <img
+
+                                            src="{{ url_for(
+                                                'static',
+                                                filename='uploads/students/' + student.photo
+                                            ) }}"
+
+                                            alt="{{ student.student_name }}"
+
+                                            class="rounded-circle border shadow-sm"
+
+                                            width="48"
+
+                                            height="48"
+
+                                            style="
+                                                object-fit: cover;
+                                                object-position: center;
+                                            "
+
+                                        >
+
+                                    {% else %}
+
+                                        <div
+                                            class="
+                                                rounded-circle
+                                                text-white
+                                                fw-bold
+                                                d-flex
+                                                justify-content-center
+                                                align-items-center
+                                                shadow-sm
+                                            "
+
+                                            style="
+                                                width:48px;
+                                                height:48px;
+                                                background:#2563EB;
+                                                font-size:18px;
+                                                font-weight:700;
+                                                user-select:none;
+                                            "
+
+                                        >
+
+                                            {{ student.student_name[0]|upper }}
+
+                                        </div>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </td>
+
+                            <!-- Student Name -->
+
+                            <td>
+
+                                <div class="fw-semibold">
+
+                                    {{ student.student_name }}
+
+                                </div>
+
+                                <small class="text-muted">
+
+                                    {{ student.parent_name }}
+
+                                </small>
+
+                            </td>
+
+                            <!-- Abhyasika -->
+
+                            <td class="text-center">
+
+                                {{ item.abhyasika }}
+
+                            </td>
+
+                            <!-- Total Evaluations -->
+
+                            <td class="text-center">
+
+                                {% if item.total_evaluations > 0 %}
+
+                                    <span class="badge bg-success">
+
+                                        {{ item.total_evaluations }}
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span
+                                        class="badge bg-warning text-dark"
+                                    >
+
+                                        अद्याप नाही
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <!-- Last Evaluation -->
+
+                            <td class="text-center">
+
+                                {% if item.last_evaluation %}
+
+                                    {{ item.last_evaluation.strftime("%d-%m-%Y") }}
+
+                                {% else %}
+
+                                    <span class="text-muted">
+
+                                        अद्याप नाही
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <!-- Action -->
+
+                            <td class="text-center">
+
+                                <a
+
+                                    href="{{ url_for(
+                                        'student_evaluation_report.student_progress_report',
+                                        student_id=student.id
+                                    ) }}"
+
+                                    class="btn btn-primary btn-sm px-3"
+
+                                    title="विद्यार्थी प्रगती व मूल्यांकन अहवाल"
+
+                                >
+
+                                    <i class="bi bi-graph-up-arrow me-2"></i>
+
+                                    अहवाल पहा
+
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+
+                            <td
+                                colspan="7"
+                                class="text-center py-5"
+                            >
+
+                                <i
+                                    class="bi bi-search display-4 text-muted"
+                                ></i>
+
+                                <h5 class="mt-3">
+
+                                    कोणताही विद्यार्थी आढळला नाही
+
+                                </h5>
+
+                                <p class="text-muted mb-0">
+
+                                    कृपया दुसरे नाव शोधा.
+
+                                </p>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

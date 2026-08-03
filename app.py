@@ -23,6 +23,7 @@ from routes.evaluation_question import evaluation_question_bp
 from routes.evaluation import evaluation_bp
 from routes.evaluation_student import evaluation_student_bp
 from routes.evaluation_report import evaluation_report_bp
+from routes.student_evaluation_report import student_evaluation_report_bp
 
 from branding import (
     APP_NAME,
@@ -87,6 +88,7 @@ app.register_blueprint(evaluation_bp)
 app.register_blueprint(evaluation_question_bp)
 app.register_blueprint(evaluation_student_bp)
 app.register_blueprint(evaluation_report_bp)
+app.register_blueprint(student_evaluation_report_bp)
 
 
 

@@ -1,0 +1,784 @@
+{% extends "base.html" %}
+
+{% block title %}
+विद्यार्थी प्रगती व मूल्यांकन अहवाल
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- ==========================================
+        Student Information
+    =========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-white">
+
+            <h4 class="mb-0">
+
+                <i class="bi bi-person-circle me-2"></i>
+
+                विद्यार्थी माहिती
+
+            </h4>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row align-items-center">
+
+                <!-- Student Photo -->
+
+                <div class="col-lg-2 text-center">
+
+                    {% if student.photo %}
+
+                        <img
+
+                            src="{{ url_for(
+                                'static',
+                                filename='uploads/students/' + student.photo
+                            ) }}"
+
+                            class="rounded-circle border shadow"
+
+                            width="120"
+
+                            height="120"
+
+                            style="object-fit:cover;"
+
+                        >
+
+                    {% else %}
+
+                        <div
+
+                            class="
+                                rounded-circle
+                                bg-primary
+                                text-white
+                                fw-bold
+                                d-inline-flex
+                                justify-content-center
+                                align-items-center
+                            "
+
+                            style="
+                                width:120px;
+                                height:120px;
+                                font-size:50px;
+                            "
+
+                        >
+
+                            {{ student.student_name[0] }}
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+                <!-- Student Details -->
+
+                <div class="col-lg-10">
+
+                    <div class="row g-4">
+
+                        <div class="col-md-6">
+
+                            <strong>विद्यार्थी नाव</strong>
+
+                            <br>
+
+                            {{ student.student_name }}
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <strong>पालकाचे नाव</strong>
+
+                            <br>
+
+                            {{ student.parent_name }}
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <strong>इयत्ता</strong>
+
+                            <br>
+
+                            {{ student.standard }}
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <strong>अभ्यासिका</strong>
+
+                            <br>
+
+                            {{ student.abhyasika.name }}
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <strong>प्रवेश दिनांक</strong>
+
+                            <br>
+
+                            {{ student.admission_date.strftime("%d-%m-%Y") }}
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <strong>एकूण मूल्यांकन</strong>
+
+                            <br>
+
+                            {{ evaluations|length }}
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <strong>पहिले मूल्यांकन</strong>
+
+                            <br>
+
+                            {% if first_evaluation %}
+
+                                {{ first_evaluation.evaluation_date.strftime("%d-%m-%Y") }}
+
+                            {% else %}
+
+                                -
+
+                            {% endif %}
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <strong>शेवटचे मूल्यांकन</strong>
+
+                            <br>
+
+                            {% if last_evaluation %}
+
+                                {{ last_evaluation.evaluation_date.strftime("%d-%m-%Y") }}
+
+                            {% else %}
+
+                                -
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ==========================================
+        Progress Summary
+    =========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-white">
+
+            <h4 class="mb-0">
+
+                <i class="bi bi-bar-chart-fill me-2"></i>
+
+                प्रगतीचा सारांश
+
+            </h4>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row g-4">
+
+                <!-- Total -->
+
+                <div class="col-xl-3 col-md-6">
+
+                    <div class="card border-0 shadow-sm h-100">
+
+                        <div class="card-body text-center">
+
+                            <i class="bi bi-clipboard-check display-5 text-primary"></i>
+
+                            <h6 class="mt-3">
+
+                                एकूण मूल्यांकन
+
+                            </h6>
+
+                            <h2 class="fw-bold text-primary">
+
+                                {{ total_evaluations }}
+
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Average -->
+
+                <div class="col-xl-3 col-md-6">
+
+                    <div class="card border-0 shadow-sm h-100">
+
+                        <div class="card-body text-center">
+
+                            <i class="bi bi-graph-up-arrow display-5 text-info"></i>
+
+                            <h6 class="mt-3">
+
+                                सरासरी टक्केवारी
+
+                            </h6>
+
+                            <h2 class="fw-bold text-info">
+
+                                {{ average_percentage }}%
+
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Best -->
+
+                <div class="col-xl-3 col-md-6">
+
+                    <div class="card border-0 shadow-sm h-100">
+
+                        <div class="card-body text-center">
+
+                            <i class="bi bi-trophy-fill display-5 text-success"></i>
+
+                            <h6 class="mt-3">
+
+                                सर्वोत्तम टक्केवारी
+
+                            </h6>
+
+                            <h2 class="fw-bold text-success">
+
+                                {{ best_percentage }}%
+
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Latest -->
+
+                <div class="col-xl-3 col-md-6">
+
+                    <div class="card border-0 shadow-sm h-100">
+
+                        <div class="card-body text-center">
+
+                            <i class="bi bi-calendar-check-fill display-5 text-warning"></i>
+
+                            <h6 class="mt-3">
+
+                                शेवटची टक्केवारी
+
+                            </h6>
+
+                            <h2 class="fw-bold text-warning">
+
+                                {{ latest_percentage }}%
+
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ==========================================
+        Progress Graph
+    =========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-white">
+
+            <h4 class="mb-0">
+
+                <i class="bi bi-graph-up-arrow me-2"></i>
+
+                विद्यार्थी प्रगती आलेख
+
+            </h4>
+
+        </div>
+
+        <div class="card-body p-4">
+
+            <div
+                class="position-relative"
+                style="height:380px;"
+            >
+
+                <canvas
+
+                    id="progressChart"
+
+                    data-chart-labels='{{ chart_labels | default([], true) | tojson | safe }}'
+
+                    data-chart-percentages='{{ chart_percentages | default([], true) | tojson | safe }}'
+
+                ></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
+
+{% block js %}
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const canvas = document.getElementById("progressChart");
+
+    if (!canvas) {
+
+        return;
+
+    }
+
+    const labels = JSON.parse(
+
+        canvas.dataset.chartLabels || "[]"
+
+    );
+
+    const percentages = JSON.parse(
+
+        canvas.dataset.chartPercentages || "[]"
+
+    );
+
+    if (labels.length === 0 || percentages.length === 0) {
+
+        canvas.parentElement.innerHTML = `
+
+            <div class="text-center py-5">
+
+                <i class="bi bi-bar-chart-line display-4 text-muted"></i>
+
+                <h5 class="mt-3">
+
+                    अद्याप कोणतेही मूल्यांकन उपलब्ध नाही.
+
+                </h5>
+
+                <p class="text-muted mb-0">
+
+                    विद्यार्थी मूल्यांकन झाल्यानंतर आलेख येथे दिसेल.
+
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+    const ctx = canvas.getContext("2d");
+
+    // ==========================================
+    // Gradient
+    // ==========================================
+
+    const gradient = ctx.createLinearGradient(
+
+        0,
+
+        0,
+
+        0,
+
+        380
+
+    );
+
+    gradient.addColorStop(
+
+        0,
+
+        "rgba(37,99,235,0.35)"
+
+    );
+
+    gradient.addColorStop(
+
+        1,
+
+        "rgba(37,99,235,0.03)"
+
+    );
+
+    // ==========================================
+    // Performance Zones
+    // ==========================================
+
+    const performanceZones = {
+
+        id: "performanceZones",
+
+        beforeDraw(chart) {
+
+            const {
+
+                ctx,
+
+                chartArea,
+
+                scales
+
+            } = chart;
+
+            if (!chartArea) {
+
+                return;
+
+            }
+
+            const {
+
+                left,
+
+                right
+
+            } = chartArea;
+
+            const y = scales.y;
+
+            ctx.save();
+
+            // Excellent
+
+            ctx.fillStyle = "rgba(22,163,74,0.08)";
+
+            ctx.fillRect(
+
+                left,
+
+                y.getPixelForValue(100),
+
+                right - left,
+
+                y.getPixelForValue(60) -
+
+                y.getPixelForValue(100)
+
+            );
+
+            // Average
+
+            ctx.fillStyle = "rgba(245,158,11,0.08)";
+
+            ctx.fillRect(
+
+                left,
+
+                y.getPixelForValue(60),
+
+                right - left,
+
+                y.getPixelForValue(35) -
+
+                y.getPixelForValue(60)
+
+            );
+
+            // Needs Improvement
+
+            ctx.fillStyle = "rgba(239,68,68,0.08)";
+
+            ctx.fillRect(
+
+                left,
+
+                y.getPixelForValue(35),
+
+                right - left,
+
+                y.getPixelForValue(0) -
+
+                y.getPixelForValue(35)
+
+            );
+
+            ctx.restore();
+
+        }
+
+    };
+
+    // ==========================================
+    // Chart
+    // ==========================================
+
+    new Chart(ctx, {
+
+        type: "line",
+
+        plugins: [
+
+            performanceZones
+
+        ],
+
+        data: {
+
+            labels: labels,
+
+            datasets: [
+
+                {
+
+                    label: "प्रगती",
+
+                    data: percentages,
+
+                    fill: true,
+
+                    backgroundColor: gradient,
+
+                    borderColor: "#2563EB",
+
+                    borderWidth: 4,
+
+                    tension: 0.45,
+
+                    cubicInterpolationMode: "monotone",
+
+                    pointRadius: 6,
+
+                    pointHoverRadius: 9,
+
+                    pointBackgroundColor: "#FFFFFF",
+
+                    pointBorderColor: "#2563EB",
+
+                    pointBorderWidth: 3,
+
+                    pointHoverBackgroundColor: "#2563EB",
+
+                    pointHoverBorderColor: "#FFFFFF",
+
+                    pointHoverBorderWidth: 3
+
+                }
+
+            ]
+
+        },
+
+        options: {
+
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            interaction: {
+
+                intersect: false,
+
+                mode: "index"
+
+            },
+
+            animation: {
+
+                duration: 1500,
+
+                easing: "easeOutQuart"
+
+            },
+
+            plugins: {
+
+                legend: {
+
+                    display: false
+
+                },
+
+                tooltip: {
+
+                    backgroundColor: "#0F172A",
+
+                    titleColor: "#FFFFFF",
+
+                    bodyColor: "#FFFFFF",
+
+                    cornerRadius: 10,
+
+                    padding: 12,
+
+                    displayColors: false,
+
+                    callbacks: {
+
+                        title: function(context) {
+
+                            return "दिनांक : " +
+
+                                context[0].label;
+
+                        },
+
+                        label: function(context) {
+
+                            return "टक्केवारी : " +
+
+                                context.parsed.y +
+
+                                "%";
+
+                        },
+
+                        footer: function(context) {
+
+                            return "मूल्यांकन क्रमांक : " +
+
+                                (context[0].dataIndex + 1);
+
+                        }
+
+                    }
+
+                }
+
+            },
+
+            scales: {
+
+                x: {
+
+                    grid: {
+
+                        display: false
+
+                    },
+
+                    border: {
+
+                        display: false
+
+                    },
+
+                    ticks: {
+
+                        color: "#475569",
+
+                        font: {
+
+                            size: 13,
+
+                            weight: "600"
+
+                        }
+
+                    }
+
+                },
+
+                y: {
+
+                    min: 0,
+
+                    max: 100,
+
+                    beginAtZero: true,
+
+                    ticks: {
+
+                        stepSize: 10,
+
+                        color: "#475569",
+
+                        callback: function(value) {
+
+                            return value + "%";
+
+                        }
+
+                    },
+
+                    grid: {
+
+                        color: "#E2E8F0"
+
+                    },
+
+                    border: {
+
+                        display: false
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    });
+
+});
+
+</script>
+
+{% endblock %}
