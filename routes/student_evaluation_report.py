@@ -4,17 +4,20 @@ from datetime import datetime
 from flask import (
     Blueprint,
     render_template,
-    request
+    request,
+    abort
 )
 
 from flask_login import (
-    login_required
+    login_required,
+    current_user
 )
 
 from models.achievement import Achievement
 from models.remark import Remark
 from models.student_evaluation import StudentEvaluation
 from models.abhyasika import Abhyasika
+from models.teacher_abhyasika import TeacherAbhyasika
 from sqlalchemy import func
 from collections import defaultdict
 from models.student import Student
@@ -41,12 +44,133 @@ student_evaluation_report_bp = Blueprint(
 @login_required
 def report_home():
 
+    # ==========================================
+    # Search
+    # ==========================================
+
     search = request.args.get(
         "search",
         ""
+    ).strip()
+
+
+    # ==========================================
+    # Selected Abhyasika
+    # ==========================================
+
+    abhyasika_id = request.args.get(
+        "abhyasika_id",
+        type=int
     )
 
+
+    # ==========================================
+    # Determine Allowed Abhyasikas
+    # ==========================================
+
+    if current_user.role == "admin":
+
+        # Admin can see all Abhyasikas
+
+        allowed_abhyasikas = (
+            Abhyasika.query
+            .order_by(
+                Abhyasika.name
+            )
+            .all()
+        )
+
+        allowed_abhyasika_ids = [
+            abhyasika.id
+            for abhyasika in allowed_abhyasikas
+        ]
+
+    elif current_user.role == "teacher":
+
+        # Teacher can only see assigned Abhyasikas
+
+        teacher_assignments = (
+            TeacherAbhyasika.query
+            .filter_by(
+                teacher_id=current_user.id
+            )
+            .all()
+        )
+
+        allowed_abhyasika_ids = [
+            assignment.abhyasika_id
+            for assignment in teacher_assignments
+        ]
+
+        allowed_abhyasikas = (
+            Abhyasika.query
+            .filter(
+                Abhyasika.id.in_(
+                    allowed_abhyasika_ids
+                )
+            )
+            .order_by(
+                Abhyasika.name
+            )
+            .all()
+        )
+
+    else:
+
+        abort(403)
+
+
+    # ==========================================
+    # Validate Selected Abhyasika
+    # ==========================================
+
+    if (
+        abhyasika_id is not None
+        and
+        abhyasika_id not in allowed_abhyasika_ids
+    ):
+
+        # Do not allow a teacher/admin to
+        # access an Abhyasika outside their scope.
+
+        abhyasika_id = None
+
+
+    # ==========================================
+    # Student Query
+    # ==========================================
+
     query = Student.query
+
+
+    # ==========================================
+    # Teacher Security Restriction
+    # ==========================================
+
+    if current_user.role == "teacher":
+
+        query = query.filter(
+            Student.abhyasika_id.in_(
+                allowed_abhyasika_ids
+            )
+        )
+
+
+    # ==========================================
+    # Admin / Teacher Abhyasika Filter
+    # ==========================================
+
+    if abhyasika_id is not None:
+
+        query = query.filter(
+            Student.abhyasika_id ==
+            abhyasika_id
+        )
+
+
+    # ==========================================
+    # Search Filter
+    # ==========================================
 
     if search:
 
@@ -66,41 +190,74 @@ def report_home():
 
         )
 
-    students = query.order_by(
 
-        Student.student_name
+    # ==========================================
+    # Load Students
+    # ==========================================
 
-    ).all()
+    students = (
+        query
+        .order_by(
+            Student.student_name
+        )
+        .all()
+    )
+
+
+    # ==========================================
+    # Prepare Report Students
+    # ==========================================
 
     report_students = []
 
     for student in students:
 
-        total_evaluations = StudentEvaluation.query.filter_by(
-            student_id=student.id
-        ).count()
+        total_evaluations = (
+            StudentEvaluation.query
+            .filter_by(
+                student_id=student.id
+            )
+            .count()
+        )
 
-        last_evaluation = StudentEvaluation.query.filter_by(
-            student_id=student.id
-        ).order_by(
-            StudentEvaluation.evaluation_date.desc()
-        ).first()
+
+        last_evaluation = (
+            StudentEvaluation.query
+            .filter_by(
+                student_id=student.id
+            )
+            .order_by(
+                StudentEvaluation.evaluation_date.desc()
+            )
+            .first()
+        )
+
 
         report_students.append({
 
             "student": student,
 
-            "abhyasika": student.abhyasika.name
-            if student.abhyasika else "-",
+            "abhyasika": (
+                student.abhyasika.name
+                if student.abhyasika
+                else "-"
+            ),
 
-            "total_evaluations": total_evaluations,
+            "total_evaluations":
+                total_evaluations,
 
             "last_evaluation": (
                 last_evaluation.evaluation_date
-                if last_evaluation else None
+                if last_evaluation
+                else None
             )
 
         })
+
+
+    # ==========================================
+    # Render
+    # ==========================================
 
     return render_template(
 
@@ -108,7 +265,11 @@ def report_home():
 
         report_students=report_students,
 
-        search=search
+        search=search,
+
+        abhyasikas=allowed_abhyasikas,
+
+        selected_abhyasika_id=abhyasika_id
 
     )
 
@@ -137,6 +298,32 @@ def get_academic_year(target_date):
         f"{start_year}-{str(end_year)[-2:]}"
     )
 
+
+# ==========================================
+# Teacher Student Access Check
+# ==========================================
+
+def teacher_can_access_student(student):
+
+    if current_user.role == "admin":
+
+        return True
+
+    if current_user.role != "teacher":
+
+        return False
+
+    assignment = (
+        TeacherAbhyasika.query
+        .filter_by(
+            teacher_id=current_user.id,
+            abhyasika_id=student.abhyasika_id
+        )
+        .first()
+    )
+
+    return assignment is not None
+
 # ==========================================
 # Student Progress Report
 # ==========================================
@@ -148,6 +335,10 @@ def get_academic_year(target_date):
 def student_progress_report(student_id):
 
     student = Student.query.get_or_404(student_id)
+
+    if not teacher_can_access_student(student):
+
+        abort(403)
 
     # ==========================================
     # Attendance Information
@@ -1687,6 +1878,10 @@ def student_question_details(student_id):
     student = Student.query.get_or_404(
         student_id
     )
+
+    if not teacher_can_access_student(student):
+
+        abort(403)
 
     # ==========================================
     # Get all evaluations

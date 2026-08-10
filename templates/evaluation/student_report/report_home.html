@@ -29,18 +29,34 @@
     </div>
 
     <!-- ==========================================
-        Search Card
-    =========================================== -->
+        Search & Abhyasika Filter
+    ========================================== -->
 
     <div class="card shadow-sm border-0 mb-4">
 
         <div class="card-body">
 
-            <form method="GET">
+            <form
+                method="GET"
+                action="{{ url_for(
+                    'student_evaluation_report.report_home'
+                ) }}"
+            >
 
-                <div class="row g-3 align-items-center">
+                <div class="row g-3 align-items-end">
 
-                    <div class="col-lg-9">
+                    <!-- ==========================================
+                        Student / Parent Search
+                    ========================================== -->
+
+                    <div class="col-lg-6">
+
+                        <label
+                            for="studentSearch"
+                            class="form-label fw-semibold"
+                        >
+                            विद्यार्थी शोधा
+                        </label>
 
                         <div class="input-group">
 
@@ -52,6 +68,7 @@
 
                             <input
                                 type="text"
+                                id="studentSearch"
                                 name="search"
                                 class="form-control"
                                 placeholder="विद्यार्थी किंवा पालकाचे नाव शोधा..."
@@ -62,7 +79,92 @@
 
                     </div>
 
-                    <div class="col-lg-3">
+
+                    <!-- ==========================================
+                        Abhyasika Filter
+                    ========================================== -->
+
+                    {% if current_user.role == "admin" %}
+
+                    <div class="col-lg-4">
+
+                        <label
+                            for="abhyasikaFilter"
+                            class="form-label fw-semibold"
+                        >
+                            अभ्यासिका
+                        </label>
+
+                        <select
+                            id="abhyasikaFilter"
+                            name="abhyasika_id"
+                            class="form-select"
+                        >
+
+                            <option value="">
+                                सर्व अभ्यासिका
+                            </option>
+
+                            {% for abhyasika in abhyasikas %}
+
+                            <option
+                                value="{{ abhyasika.id }}"
+                                {% if selected_abhyasika_id == abhyasika.id %}
+                                    selected
+                                {% endif %}
+                            >
+
+                                {{ abhyasika.name }}
+
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    {% else %}
+
+                    <!-- ==========================================
+                        Teacher Assigned Abhyasika
+                    ========================================== -->
+
+                    <div class="col-lg-4">
+
+                        <label
+                            class="form-label fw-semibold"
+                        >
+                            अभ्यासिका
+                        </label>
+
+                        <div class="form-control bg-light">
+
+                            {% if abhyasikas|length == 1 %}
+
+                                {{ abhyasikas[0].name }}
+
+                            {% else %}
+
+                                {{ abhyasikas
+                                    | map(attribute='name')
+                                    | join(', ')
+                                }}
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                    {% endif %}
+
+
+                    <!-- ==========================================
+                        Search Button
+                    ========================================== -->
+
+                    <div class="col-lg-2">
 
                         <button
                             type="submit"
