@@ -561,14 +561,20 @@ def student_profile(student_id):
         attendance_percentage = 0
 
     # ==========================================
-    # Latest Remark
+    # Teacher Remarks
     # ==========================================
 
-    latest_remark = Remark.query.filter_by(
-        student_id=student.id
-    ).order_by(
-        Remark.created_at.desc()
-    ).first()
+    remarks = (
+        Remark.query
+        .filter_by(
+            student_id=student.id
+        )
+        .order_by(
+            Remark.created_at.desc()
+        )
+        .limit(3)
+        .all()
+    )
 
     # ==========================================
     # Latest Achievements
@@ -597,16 +603,6 @@ def student_profile(student_id):
 
             can_manage_student = True
 
-    if current_user.role == "teacher":
-
-        assignment = TeacherAbhyasika.query.filter_by(
-            teacher_id=current_user.id,
-            abhyasika_id=student.abhyasika_id
-        ).first()
-
-        if assignment:
-
-            can_manage_remark = True
 
     # ==========================================
     # Render Template
@@ -618,7 +614,7 @@ def student_profile(student_id):
 
         student=student,
 
-        latest_remark=latest_remark,
+        remarks=remarks,
 
         achievements=achievements,
 

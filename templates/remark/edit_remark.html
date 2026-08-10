@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit Teacher Remark
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- ==========================================
+         Page Header
+    =========================================== -->
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+
+        <div>
+
+            <h1 class="page-title mb-1">
+
+                <i class="bi bi-pencil-square me-2"></i>
+
+                Edit Teacher Remark
+
+            </h1>
+
+            <p class="page-subtitle mb-0">
+
+                Update the selected remark for this student.
+
+            </p>
+
+        </div>
+
+
+        <a
+            href="{{ url_for(
+                'remark.manage_remark',
+                student_id=student.id
+            ) }}"
+            class="btn btn-outline-secondary"
+        >
+
+            <i class="bi bi-arrow-left me-2"></i>
+
+            Back to Remarks
+
+        </a>
+
+    </div>
+
+
+    <!-- ==========================================
+         Student Information
+    =========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-body">
+
+            <div class="row align-items-center g-3">
+
+                <div class="col-md-2 text-center">
+
+                    <div class="profile-avatar mx-auto">
+
+                        <i class="bi bi-person-fill"></i>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-10">
+
+                    <h3 class="profile-name mb-2">
+
+                        {{ student.student_name }}
+
+                    </h3>
+
+                    <p class="profile-school mb-2">
+
+                        {{ student.school_college_name }}
+
+                    </p>
+
+                    <div class="d-flex flex-wrap gap-2">
+
+                        <span class="badge bg-primary">
+
+                            {{ student.standard }}
+
+                        </span>
+
+                        {% if student.stream %}
+
+                            <span class="badge bg-info text-dark">
+
+                                {{ student.stream }}
+
+                            </span>
+
+                        {% endif %}
+
+                        <span class="badge bg-success">
+
+                            {{ student.status }}
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==========================================
+         Edit Remark
+    =========================================== -->
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-white">
+
+            <h4 class="mb-0">
+
+                <i class="bi bi-chat-left-text me-2 text-primary"></i>
+
+                Edit Remark
+
+            </h4>
+
+        </div>
+
+
+        <div class="card-body">
+
+            <form method="POST">
+
+                <div class="mb-4">
+
+                    <label
+                        for="remark"
+                        class="form-label fw-semibold"
+                    >
+
+                        Teacher Remark
+
+                    </label>
+
+                    <textarea
+                        id="remark"
+                        name="remark"
+                        class="form-control"
+                        rows="7"
+                        maxlength="2000"
+                        required
+                    >{{ remark.remark }}</textarea>
+
+                    <div class="form-text">
+
+                        Update the remark and save your changes.
+
+                    </div>
+
+                </div>
+
+
+                <div class="d-flex justify-content-end gap-2">
+
+                    <a
+                        href="{{ url_for(
+                            'remark.manage_remark',
+                            student_id=student.id
+                        ) }}"
+                        class="btn btn-outline-secondary"
+                    >
+
+                        Cancel
+
+                    </a>
+
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+
+                        <i class="bi bi-check-circle me-2"></i>
+
+                        Update Remark
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

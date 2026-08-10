@@ -9,54 +9,38 @@
 <div class="container-fluid py-4">
 
     <!-- ==========================================
-        Student Information
-    =========================================== -->
+        Student Report Header
+    ========================================== -->
 
     <div class="card shadow-sm border-0 mb-4">
 
-        <div class="card-header bg-white">
+        <div class="card-body p-4">
 
-            <h4 class="mb-0">
+            <div class="row align-items-center g-4">
 
-                <i class="bi bi-person-circle me-2"></i>
+                <!-- ==========================================
+                    Student Photo
+                ========================================== -->
 
-                विद्यार्थी माहिती
-
-            </h4>
-
-        </div>
-
-        <div class="card-body">
-
-            <div class="row align-items-center">
-
-                <!-- Student Photo -->
-
-                <div class="col-lg-2 text-center">
+                <div class="col-lg-auto text-center">
 
                     {% if student.photo %}
 
                         <img
-
                             src="{{ url_for(
                                 'static',
                                 filename='uploads/students/' + student.photo
                             ) }}"
-
-                            class="rounded-circle border shadow"
-
+                            alt="{{ student.student_name }}"
+                            class="rounded-circle border shadow-sm"
                             width="120"
-
                             height="120"
-
-                            style="object-fit:cover;"
-
+                            style="object-fit: cover;"
                         >
 
                     {% else %}
 
                         <div
-
                             class="
                                 rounded-circle
                                 bg-primary
@@ -66,13 +50,11 @@
                                 justify-content-center
                                 align-items-center
                             "
-
                             style="
                                 width:120px;
                                 height:120px;
-                                font-size:50px;
+                                font-size:48px;
                             "
-
                         >
 
                             {{ student.student_name[0] }}
@@ -83,105 +65,87 @@
 
                 </div>
 
-                <!-- Student Details -->
 
-                <div class="col-lg-10">
+                <!-- ==========================================
+                    Student Details
+                ========================================== -->
 
-                    <div class="row g-4">
+                <div class="col-lg">
 
-                        <div class="col-md-6">
+                    <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
 
-                            <strong>विद्यार्थी नाव</strong>
-
-                            <br>
+                        <h2 class="fw-bold mb-0">
 
                             {{ student.student_name }}
 
-                        </div>
+                        </h2>
 
-                        <div class="col-md-6">
+                        {% if student.status %}
 
-                            <strong>पालकाचे नाव</strong>
+                            <span class="badge bg-success">
 
-                            <br>
+                                {{ student.status }}
 
-                            {{ student.parent_name }}
+                            </span>
 
-                        </div>
+                        {% endif %}
 
-                        <div class="col-md-6">
+                    </div>
 
-                            <strong>इयत्ता</strong>
 
-                            <br>
+                    <div class="row g-3 mt-1">
 
-                            {{ student.standard }}
+                        <div class="col-md-4">
 
-                        </div>
+                            <div class="text-muted small">
+                                इयत्ता
+                            </div>
 
-                        <div class="col-md-6">
-
-                            <strong>अभ्यासिका</strong>
-
-                            <br>
-
-                            {{ student.abhyasika.name }}
+                            <div class="fw-semibold">
+                                {{ student.standard }}
+                            </div>
 
                         </div>
 
-                        <div class="col-md-6">
 
-                            <strong>प्रवेश दिनांक</strong>
+                        <div class="col-md-4">
 
-                            <br>
+                            <div class="text-muted small">
+                                अभ्यासिका
+                            </div>
 
-                            {{ student.admission_date.strftime("%d-%m-%Y") }}
+                            <div class="fw-semibold">
 
-                        </div>
+                                {{ student.abhyasika.name
+                                if student.abhyasika
+                                else "-" }}
 
-                        <div class="col-md-6">
-
-                            <strong>एकूण मूल्यांकन</strong>
-
-                            <br>
-
-                            {{ evaluations|length }}
+                            </div>
 
                         </div>
 
-                        <div class="col-md-6">
 
-                            <strong>पहिले मूल्यांकन</strong>
+                        <div class="col-md-4">
 
-                            <br>
+                            <div class="text-muted small">
+                                प्रवेश दिनांक
+                            </div>
 
-                            {% if first_evaluation %}
+                            <div class="fw-semibold">
 
-                                {{ first_evaluation.evaluation_date.strftime("%d-%m-%Y") }}
+                                {% if student.admission_date %}
 
-                            {% else %}
+                                    {{ student.admission_date.strftime(
+                                        "%d-%m-%Y"
+                                    ) }}
 
-                                -
+                                {% else %}
 
-                            {% endif %}
+                                    -
 
-                        </div>
+                                {% endif %}
 
-                        <div class="col-md-6">
-
-                            <strong>शेवटचे मूल्यांकन</strong>
-
-                            <br>
-
-                            {% if last_evaluation %}
-
-                                {{ last_evaluation.evaluation_date.strftime("%d-%m-%Y") }}
-
-                            {% else %}
-
-                                -
-
-                            {% endif %}
+                            </div>
 
                         </div>
 
@@ -196,132 +160,106 @@
     </div>
 
     <!-- ==========================================
-        Progress Summary
-    =========================================== -->
+        Attendance Information
+    ========================================== -->
 
     <div class="card shadow-sm border-0 mb-4">
 
         <div class="card-header bg-white">
 
-            <h4 class="mb-0">
+            <div class="d-flex justify-content-between align-items-center gap-3">
 
-                <i class="bi bi-bar-chart-fill me-2"></i>
+                <h4 class="mb-0">
 
-                प्रगतीचा सारांश
+                    <i class="bi bi-calendar-check-fill me-2 text-success"></i>
 
-            </h4>
+                    उपस्थिती माहिती
+
+                </h4>
+
+                <span class="badge bg-success ms-2 flex-shrink-0">
+
+                    {{ "%.2f"|format(
+                        overall_attendance_percentage
+                    ) }}%
+
+                </span>
+
+            </div>
 
         </div>
 
+
         <div class="card-body">
 
-            <div class="row g-4">
+            <!-- Overall Attendance -->
 
-                <!-- Total -->
+            <div class="row g-3 mb-4">
 
-                <div class="col-xl-3 col-md-6">
+                <div class="col-md-3">
 
-                    <div class="card border-0 shadow-sm h-100">
+                    <div class="border rounded-3 p-3 text-center h-100">
 
-                        <div class="card-body text-center">
+                        <div class="text-muted small">
+                            एकूण दिवस
+                        </div>
 
-                            <i class="bi bi-clipboard-check display-5 text-primary"></i>
-
-                            <h6 class="mt-3">
-
-                                एकूण मूल्यांकन
-
-                            </h6>
-
-                            <h2 class="fw-bold text-primary">
-
-                                {{ total_evaluations }}
-
-                            </h2>
-
+                        <div class="fs-3 fw-bold">
+                            {{ overall_attendance_days }}
                         </div>
 
                     </div>
 
                 </div>
 
-                <!-- Average -->
 
-                <div class="col-xl-3 col-md-6">
+                <div class="col-md-3">
 
-                    <div class="card border-0 shadow-sm h-100">
+                    <div class="border rounded-3 p-3 text-center h-100">
 
-                        <div class="card-body text-center">
+                        <div class="text-muted small">
+                            उपस्थित
+                        </div>
 
-                            <i class="bi bi-graph-up-arrow display-5 text-info"></i>
-
-                            <h6 class="mt-3">
-
-                                सरासरी टक्केवारी
-
-                            </h6>
-
-                            <h2 class="fw-bold text-info">
-
-                                {{ average_percentage }}%
-
-                            </h2>
-
+                        <div class="fs-3 fw-bold text-success">
+                            {{ overall_present_days }}
                         </div>
 
                     </div>
 
                 </div>
 
-                <!-- Best -->
 
-                <div class="col-xl-3 col-md-6">
+                <div class="col-md-3">
 
-                    <div class="card border-0 shadow-sm h-100">
+                    <div class="border rounded-3 p-3 text-center h-100">
 
-                        <div class="card-body text-center">
+                        <div class="text-muted small">
+                            अनुपस्थित
+                        </div>
 
-                            <i class="bi bi-trophy-fill display-5 text-success"></i>
-
-                            <h6 class="mt-3">
-
-                                सर्वोत्तम टक्केवारी
-
-                            </h6>
-
-                            <h2 class="fw-bold text-success">
-
-                                {{ best_percentage }}%
-
-                            </h2>
-
+                        <div class="fs-3 fw-bold text-danger">
+                            {{ overall_absent_days }}
                         </div>
 
                     </div>
 
                 </div>
 
-                <!-- Latest -->
 
-                <div class="col-xl-3 col-md-6">
+                <div class="col-md-3">
 
-                    <div class="card border-0 shadow-sm h-100">
+                    <div class="border rounded-3 p-3 text-center h-100">
 
-                        <div class="card-body text-center">
+                        <div class="text-muted small">
+                            उपस्थिती
+                        </div>
 
-                            <i class="bi bi-calendar-check-fill display-5 text-warning"></i>
+                        <div class="fs-3 fw-bold text-primary">
 
-                            <h6 class="mt-3">
-
-                                शेवटची टक्केवारी
-
-                            </h6>
-
-                            <h2 class="fw-bold text-warning">
-
-                                {{ latest_percentage }}%
-
-                            </h2>
+                            {{ "%.2f"|format(
+                                overall_attendance_percentage
+                            ) }}%
 
                         </div>
 
@@ -330,6 +268,218 @@
                 </div>
 
             </div>
+
+            <!-- ==========================================
+                Year-wise Attendance
+            ========================================== -->
+
+            {% if attendance_year_summary %}
+
+            <div class="mt-3">
+
+                {% for year_data in attendance_year_summary %}
+
+                <div class="border rounded-3 mb-3 overflow-hidden">
+
+                    <!-- Academic Year Header -->
+
+                    <button
+                        class="btn w-100 text-start p-3"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#attendanceYear{{ loop.index }}"
+                        aria-expanded="{% if loop.first %}true{% else %}false{% endif %}"
+                        aria-controls="attendanceYear{{ loop.index }}"
+                    >
+
+                        <div class="d-flex justify-content-between align-items-center">
+
+                            <div>
+
+                                <i class="bi bi-calendar3 me-2 text-primary"></i>
+
+                                <span class="fw-semibold">
+
+                                    शैक्षणिक वर्ष
+                                    {{ year_data.academic_year }}
+
+                                </span>
+
+                            </div>
+
+                            <div class="d-flex align-items-center gap-2">
+
+                                <span class="badge bg-primary">
+
+                                    {{ "%.2f"|format(
+                                        year_data.percentage
+                                    ) }}%
+
+                                </span>
+
+                                <i class="bi bi-chevron-down text-muted"></i>
+
+                            </div>
+
+                        </div>
+
+                    </button>
+
+
+                    <!-- Year Details -->
+
+                    <div
+                        id="attendanceYear{{ loop.index }}"
+                        class="collapse {% if loop.first %}show{% endif %}"
+                    >
+
+                        <div class="p-3 border-top">
+
+                            <div class="table-responsive">
+
+                                <table class="table table-sm align-middle mb-0">
+
+                                    <thead class="table-light">
+
+                                        <tr>
+
+                                            <th>
+                                                महिना
+                                            </th>
+
+                                            <th class="text-center">
+                                                उपस्थित
+                                            </th>
+
+                                            <th class="text-center">
+                                                अनुपस्थित
+                                            </th>
+
+                                            <th class="text-center">
+                                                एकूण
+                                            </th>
+
+                                            <th class="text-center">
+                                                उपस्थिती
+                                            </th>
+
+                                        </tr>
+
+                                    </thead>
+
+                                    <tbody>
+
+                                        {% for month in year_data.months %}
+
+                                        <tr>
+
+                                            <td class="fw-medium">
+
+                                                {{ month.month }}
+
+                                            </td>
+
+                                            <td class="text-center">
+
+                                                {{ month.present }}
+
+                                            </td>
+
+                                            <td class="text-center">
+
+                                                {{ month.absent }}
+
+                                            </td>
+
+                                            <td class="text-center">
+
+                                                {{ month.total }}
+
+                                            </td>
+
+                                            <td class="text-center">
+
+                                                <strong>
+
+                                                    {{ "%.2f"|format(
+                                                        month.percentage
+                                                    ) }}%
+
+                                                </strong>
+
+                                                {% if month.change is not none %}
+
+                                                    {% if month.change > 0 %}
+
+                                                        <div class="small text-success">
+
+                                                            ↑
+                                                            {{ "%.2f"|format(
+                                                                month.change
+                                                            ) }}%
+
+                                                        </div>
+
+                                                    {% elif month.change < 0 %}
+
+                                                        <div class="small text-danger">
+
+                                                            ↓
+                                                            {{ "%.2f"|format(
+                                                                month.change|abs
+                                                            ) }}%
+
+                                                        </div>
+
+                                                    {% else %}
+
+                                                        <div class="small text-muted">
+
+                                                            → 0%
+
+                                                        </div>
+
+                                                    {% endif %}
+
+                                                {% endif %}
+
+                                            </td>
+
+                                        </tr>
+
+                                        {% endfor %}
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+            {% else %}
+
+            <div class="text-center text-muted py-3">
+
+                <i class="bi bi-calendar-x fs-3"></i>
+
+                <div class="mt-2">
+
+                    उपस्थिती माहिती उपलब्ध नाही.
+
+                </div>
+
+            </div>
+
+            {% endif %}
 
         </div>
 
@@ -376,6 +526,1579 @@
 
     </div>
 
+
+
+    <!-- ==========================================
+        Progress Summary
+    ========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-white">
+
+            <h4 class="mb-0">
+
+                <i class="bi bi-graph-up-arrow me-2 text-primary"></i>
+
+                प्रगतीचा सारांश
+
+            </h4>
+
+        </div>
+
+
+        <div class="card-body">
+
+            <!-- ==========================================
+                Key Performance Numbers
+            ========================================== -->
+
+            <div class="row g-3">
+
+                <!-- Starting -->
+
+                <div class="col-md-3">
+
+                    <div class="border rounded-3 p-3 h-100">
+
+                        <div class="text-muted small mb-1">
+
+                            सुरुवातीची कामगिरी
+
+                        </div>
+
+                        <div class="fs-4 fw-bold">
+
+                            {% if first_evaluation
+                                and first_evaluation.result %}
+
+                                {{ "%.2f"|format(
+                                    first_evaluation.result.percentage
+                                ) }}%
+
+                            {% else %}
+
+                                -
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Latest -->
+
+                <div class="col-md-3">
+
+                    <div class="border rounded-3 p-3 h-100">
+
+                        <div class="text-muted small mb-1">
+
+                            सध्याची कामगिरी
+
+                        </div>
+
+                        <div class="fs-4 fw-bold text-primary">
+
+                            {{ "%.2f"|format(
+                                latest_percentage
+                            ) }}%
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Highest -->
+
+                <div class="col-md-3">
+
+                    <div class="border rounded-3 p-3 h-100">
+
+                        <div class="text-muted small mb-1">
+
+                            सर्वोत्तम कामगिरी
+
+                        </div>
+
+                        <div class="fs-4 fw-bold text-success">
+
+                            {{ "%.2f"|format(
+                                highest_percentage
+                            ) }}%
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Overall Change -->
+
+                <div class="col-md-3">
+
+                    <div class="border rounded-3 p-3 h-100">
+
+                        <div class="text-muted small mb-1">
+
+                            एकूण बदल
+
+                        </div>
+
+                        {% if overall_improvement > 0 %}
+
+                            <div class="fs-4 fw-bold text-success">
+
+                                ↑ {{ "%.2f"|format(
+                                    overall_improvement
+                                ) }}%
+
+                            </div>
+
+                        {% elif overall_improvement < 0 %}
+
+                            <div class="fs-4 fw-bold text-danger">
+
+                                ↓ {{ "%.2f"|format(
+                                    overall_improvement|abs
+                                ) }}%
+
+                            </div>
+
+                        {% else %}
+
+                            <div class="fs-4 fw-bold text-muted">
+
+                                → 0.00%
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ==========================================
+                Performance Interpretation
+            ========================================== -->
+
+            <div class="mt-4 p-3 rounded-3 bg-light">
+
+                <div class="d-flex align-items-start gap-3">
+
+                    <div>
+
+                        {% if overall_improvement > 0 %}
+
+                            <i class="
+                                bi bi-arrow-up-circle-fill
+                                text-success
+                                fs-4
+                            "></i>
+
+                        {% elif overall_improvement < 0 %}
+
+                            <i class="
+                                bi bi-arrow-down-circle-fill
+                                text-danger
+                                fs-4
+                            "></i>
+
+                        {% else %}
+
+                            <i class="
+                                bi bi-dash-circle-fill
+                                text-secondary
+                                fs-4
+                            "></i>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div>
+
+                        <div class="fw-bold mb-1">
+
+                            {{ observation_title }}
+
+                        </div>
+
+                        <div class="text-muted">
+
+                            {{ observation_message }}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ==========================================
+                Trend Information
+            ========================================== -->
+
+            {% if total_evaluations >= 2 %}
+
+            <div class="row g-3 mt-2">
+
+                <div class="col-md-6">
+
+                    <div class="small text-muted">
+
+                        शेवटच्या मूल्यांकनातील बदल
+
+                    </div>
+
+                    <div class="fw-semibold">
+
+                        {% if latest_change > 0 %}
+
+                            <span class="text-success">
+
+                                ↑ {{ "%.2f"|format(
+                                    latest_change
+                                ) }}%
+
+                            </span>
+
+                        {% elif latest_change < 0 %}
+
+                            <span class="text-danger">
+
+                                ↓ {{ "%.2f"|format(
+                                    latest_change|abs
+                                ) }}%
+
+                            </span>
+
+                        {% else %}
+
+                            <span class="text-muted">
+
+                                → 0.00%
+
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <div class="small text-muted">
+
+                        सकारात्मक बदलांची सातत्यता
+
+                    </div>
+
+                    <div class="fw-semibold">
+
+                        {{ consistency }}%
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+    
+    <!-- ==========================================
+        Question-wise Performance
+    ========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-white">
+
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+                <div>
+
+                    <h4 class="mb-1">
+
+                        <i class="bi bi-list-check me-2 text-primary"></i>
+
+                        प्रश्नवार कामगिरी
+
+                    </h4>
+
+                    <div class="text-muted small">
+
+                        मुख्य प्रश्नांवरील विद्यार्थ्याची एकूण कामगिरी
+
+                    </div>
+
+                </div>
+
+                <span class="badge bg-primary">
+
+                    {{ core_question_summary|length }}
+                    प्रश्न
+
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="card-body">
+
+            {% if core_question_summary %}
+
+
+                <!-- ==========================================
+                    Overall Question Performance
+                ========================================== -->
+
+                {% set total_yes = namespace(value=0) %}
+                {% set total_no = namespace(value=0) %}
+
+
+                {% for item in core_question_summary %}
+
+                    {% set total_yes.value =
+                        total_yes.value + item.yes_count %}
+
+                    {% set total_no.value =
+                        total_no.value + item.no_count %}
+
+                {% endfor %}
+
+
+                {% set total_answers =
+                    total_yes.value + total_no.value %}
+
+
+                {% if total_answers > 0 %}
+
+                    {% set overall_question_percentage =
+                        (
+                            total_yes.value /
+                            total_answers
+                        ) * 100 %}
+
+                {% else %}
+
+                    {% set overall_question_percentage = 0 %}
+
+                {% endif %}
+
+
+                <!-- ==========================================
+                    Four Key Numbers
+                ========================================== -->
+
+                <div class="row g-3">
+
+
+                    <!-- Questions -->
+
+                    <div class="col-6 col-md-3">
+
+                        <div class="border rounded-3 p-3 h-100">
+
+                            <div class="text-muted small mb-1">
+
+                                मुख्य प्रश्न
+
+                            </div>
+
+                            <div class="fs-4 fw-bold">
+
+                                {{ core_question_summary|length }}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Yes -->
+
+                    <div class="col-6 col-md-3">
+
+                        <div class="border rounded-3 p-3 h-100">
+
+                            <div class="text-muted small mb-1">
+
+                                होय
+
+                            </div>
+
+                            <div class="fs-4 fw-bold text-success">
+
+                                {{ total_yes.value }}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- No -->
+
+                    <div class="col-6 col-md-3">
+
+                        <div class="border rounded-3 p-3 h-100">
+
+                            <div class="text-muted small mb-1">
+
+                                नाही
+
+                            </div>
+
+                            <div class="fs-4 fw-bold text-danger">
+
+                                {{ total_no.value }}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Performance -->
+
+                    <div class="col-6 col-md-3">
+
+                        <div class="border rounded-3 p-3 h-100">
+
+                            <div class="text-muted small mb-1">
+
+                                एकूण कामगिरी
+
+                            </div>
+
+                            <div class="fs-4 fw-bold text-primary">
+
+                                {{ "%.2f"|format(
+                                    overall_question_percentage
+                                ) }}%
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ==========================================
+                    Short Interpretation
+                ========================================== -->
+
+                <div class="mt-3 p-3 rounded-3 bg-light">
+
+                    <div class="d-flex align-items-start gap-2">
+
+                        <i class="bi bi-info-circle-fill text-primary mt-1"></i>
+
+                        <div class="small">
+
+                            विद्यार्थ्याने मुख्य प्रश्नांमध्ये
+
+                            <strong>
+                                {{ total_yes.value }}
+                            </strong>
+
+                            वेळा "होय" नोंदवले असून,
+
+                            <strong>
+                                {{ total_no.value }}
+                            </strong>
+
+                            वेळा "नाही" नोंदवले आहे.
+
+                            एकूण प्रश्नवार कामगिरी
+
+                            <strong>
+                                {{ "%.2f"|format(
+                                    overall_question_percentage
+                                ) }}%
+                            </strong>
+
+                            आहे.
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ==========================================
+                    Detailed Button
+                ========================================== -->
+
+                <div class="d-flex justify-content-end mt-3">
+
+                    <a
+                        href="{{ url_for(
+                            'student_evaluation_report.student_question_details',
+                            student_id=student.id
+                        ) }}"
+                        class="btn btn-primary"
+                    >
+
+                        <i class="bi bi-list-check me-2"></i>
+
+                        सविस्तर प्रश्नवार कामगिरी
+
+                    </a>
+
+                </div>
+
+
+            {% else %}
+
+                <div class="text-center py-4 text-muted">
+
+                    <i class="bi bi-clipboard-x fs-3"></i>
+
+                    <div class="mt-2">
+
+                        प्रश्नवार मूल्यांकन माहिती उपलब्ध नाही.
+
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <!-- ==========================================
+        Evaluation Marks Summary
+    ========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-white">
+
+            <div class="d-flex justify-content-between align-items-center gap-3">
+
+                <h4 class="mb-0">
+
+                    <i class="bi bi-bar-chart-fill me-2 text-primary"></i>
+
+                    मूल्यांकन गुणांचा आढावा
+
+                </h4>
+
+                {% if evaluation_year_summary %}
+
+                <span class="badge bg-primary ms-2 flex-shrink-0">
+
+                    {{ evaluation_year_summary|length }}
+                    शैक्षणिक वर्षे
+
+                </span>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <div class="card-body p-0">
+
+            {% if evaluation_year_summary %}
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th>
+                                शैक्षणिक वर्ष
+                            </th>
+
+                            <th class="text-center">
+                                मूल्यांकन
+                            </th>
+
+                            <th class="text-center">
+                                मिळालेले गुण
+                            </th>
+
+                            <th class="text-center">
+                                एकूण गुण
+                            </th>
+
+                            <th class="text-center">
+                                कामगिरी
+                            </th>
+
+                            <th class="text-center">
+                                बदल
+                            </th>
+
+                            <th class="text-center" style="width: 100px;">
+                                कृती
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for year in evaluation_year_summary %}
+
+                        <tr>
+
+                            <!-- Academic Year -->
+
+                            <td class="fw-semibold">
+
+                                {{ year.academic_year }}
+
+                            </td>
+
+
+                            <!-- Evaluation Count -->
+
+                            <td class="text-center">
+
+                                {{ year.evaluation_count }}
+
+                            </td>
+
+
+                            <!-- Obtained Marks -->
+
+                            <td class="text-center">
+
+                                <span class="fw-semibold">
+
+                                    {{ year.obtained_marks }}
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- Total Marks -->
+
+                            <td class="text-center">
+
+                                {{ year.total_marks }}
+
+                            </td>
+
+
+                            <!-- Percentage -->
+
+                            <td class="text-center">
+
+                                <span class="fw-bold text-primary">
+
+                                    {{ "%.2f"|format(
+                                        year.percentage
+                                    ) }}%
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- Change -->
+
+                            <td class="text-center">
+
+                                {% if year.change is none %}
+
+                                    <span class="text-muted">
+                                        —
+                                    </span>
+
+                                {% elif year.change > 0 %}
+
+                                    <span class="text-success fw-semibold">
+
+                                        <i class="bi bi-arrow-up"></i>
+
+                                        +{{ "%.2f"|format(
+                                            year.change
+                                        ) }}%
+
+                                    </span>
+
+                                {% elif year.change < 0 %}
+
+                                    <span class="text-danger fw-semibold">
+
+                                        <i class="bi bi-arrow-down"></i>
+
+                                        {{ "%.2f"|format(
+                                            year.change
+                                        ) }}%
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="text-muted fw-semibold">
+
+                                        0.00%
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td class="text-center">
+
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-primary btn-sm"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#yearDetails{{ loop.index }}"
+                                    aria-expanded="false"
+                                    aria-controls="yearDetails{{ loop.index }}"
+                                >
+
+                                    <i class="bi bi-chevron-down me-1"></i>
+
+                                    महिने
+
+                                </button>
+
+                            </td>
+
+                        </tr>
+
+                        <tr
+                            class="collapse"
+                            id="yearDetails{{ loop.index }}"
+                        >
+
+                            <td colspan="7" class="bg-light">
+
+                                <div class="p-3">
+
+                                    <h6 class="fw-semibold mb-3">
+
+                                        <i class="bi bi-calendar3 me-2 text-primary"></i>
+
+                                        {{ year.academic_year }} —
+                                        महिनानुसार मूल्यांकन
+
+                                    </h6>
+
+
+                                    {% if year.months %}
+
+                                    <div class="table-responsive">
+
+                                        <table class="table table-sm table-bordered align-middle mb-0">
+
+                                            <thead>
+
+                                                <tr>
+
+                                                    <th>
+                                                        महिना
+                                                    </th>
+
+                                                    <th class="text-center">
+                                                        मूल्यांकन
+                                                    </th>
+
+                                                    <th class="text-center">
+                                                        मिळालेले गुण
+                                                    </th>
+
+                                                    <th class="text-center">
+                                                        एकूण गुण
+                                                    </th>
+
+                                                    <th class="text-center">
+                                                        %
+                                                    </th>
+
+                                                    <th class="text-center">
+                                                        बदल
+                                                    </th>
+
+                                                </tr>
+
+                                            </thead>
+
+
+                                            <tbody>
+
+                                                {% for month in year.months %}
+
+                                                <tr>
+
+                                                    <td class="fw-semibold">
+
+                                                        {{ month.month }}
+
+                                                    </td>
+
+
+                                                    <td class="text-center">
+
+                                                        {{ month.evaluation_count }}
+
+                                                    </td>
+
+
+                                                    <td class="text-center">
+
+                                                        {{ month.obtained_marks }}
+
+                                                    </td>
+
+
+                                                    <td class="text-center">
+
+                                                        {{ month.total_marks }}
+
+                                                    </td>
+
+
+                                                    <td class="text-center">
+
+                                                        <span class="fw-bold text-primary">
+
+                                                            {{ "%.2f"|format(
+                                                                month.percentage
+                                                            ) }}%
+
+                                                        </span>
+
+                                                    </td>
+
+                                                    <td class="text-center">
+
+                                                        {% if month.change is none %}
+
+                                                            <span class="text-muted">
+                                                                —
+                                                            </span>
+
+                                                        {% elif month.change > 0 %}
+
+                                                            <span class="text-success fw-semibold">
+
+                                                                <i class="bi bi-arrow-up"></i>
+
+                                                                +{{ "%.2f"|format(
+                                                                    month.change
+                                                                ) }}%
+
+                                                            </span>
+
+                                                        {% elif month.change < 0 %}
+
+                                                            <span class="text-danger fw-semibold">
+
+                                                                <i class="bi bi-arrow-down"></i>
+
+                                                                {{ "%.2f"|format(
+                                                                    month.change
+                                                                ) }}%
+
+                                                            </span>
+
+                                                        {% else %}
+
+                                                            <span class="text-muted fw-semibold">
+
+                                                                0.00%
+
+                                                            </span>
+
+                                                        {% endif %}
+
+                                                    </td>
+
+                                                </tr>
+
+                                                {% endfor %}
+
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
+
+                                    {% else %}
+
+                                    <div class="text-muted text-center py-3">
+
+                                        या वर्षासाठी महिन्यानुसार मूल्यांकन उपलब्ध नाही.
+
+                                    </div>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {% else %}
+
+            <div class="text-center py-5">
+
+                <i class="bi bi-bar-chart display-4 text-muted"></i>
+
+                <h5 class="mt-3">
+                    मूल्यांकन माहिती उपलब्ध नाही
+                </h5>
+
+                <p class="text-muted mb-0">
+                    अद्याप मूल्यांकन नोंद उपलब्ध नाही.
+                </p>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <!-- ==========================================
+        Evaluation History
+    ========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <!-- Card Header -->
+
+        <div class="card-header bg-white">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div class="d-flex align-items-center gap-3">
+
+                    <h4 class="mb-0">
+
+                        <i class="bi bi-clock-history me-2 text-primary"></i>
+
+                        मूल्यांकन इतिहास
+
+                    </h4>
+
+                    <span class="badge bg-primary px-3 py-2">
+
+                        {{ evaluation_history|length }} मूल्यांकन
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Card Body -->
+
+        <div class="card-body p-0">
+
+            {% if evaluation_history %}
+
+            <div class="row p-3">
+
+                <div class="col-md-5">
+
+                    <div class="input-group">
+
+                        <span class="input-group-text">
+
+                            <i class="bi bi-search"></i>
+
+                        </span>
+
+                        <input
+
+                            type="text"
+
+                            id="evaluationHistorySearch"
+
+                            class="form-control"
+
+                            placeholder="दिनांक किंवा शिक्षक शोधा..."
+
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="table-responsive">
+
+                <table
+
+                    id="evaluationHistoryTable"
+
+                    class="table table-hover align-middle mb-0"
+
+                >
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th
+                                class="text-center"
+                                style="width:140px;"
+                            >
+                                दिनांक
+                            </th>
+
+                            <th>
+                                शिक्षक
+                            </th>
+
+                            <th
+                                class="text-center"
+                                style="width:130px;"
+                            >
+                                गुण
+                            </th>
+
+                            <th
+                                class="text-center"
+                                style="width:130px;"
+                            >
+                                टक्केवारी
+                            </th>
+
+                            <th
+                                class="text-center"
+                                style="width:150px;"
+                            >
+                                स्थिती
+                            </th>
+
+                            <th
+                                class="text-center"
+                                style="width:120px;"
+                            >
+                                कृती
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for item in evaluation_history %}
+
+                        <tr>
+
+                            <!-- Date -->
+
+                            <td class="text-center">
+
+                                {{ item.date.strftime("%d-%m-%Y") }}
+
+                            </td>
+
+                            <!-- Teacher -->
+
+                            <td>
+
+                                <i class="bi bi-person-workspace me-2 text-secondary"></i>
+
+                                {{ item.teacher }}
+
+                            </td>
+
+                            <!-- Marks -->
+
+                            <td class="text-center">
+
+                                <span class="fw-semibold">
+
+                                    {{ item.obtained_marks }}
+
+                                    /
+
+                                    {{ item.total_questions }}
+
+                                </span>
+
+                            </td>
+
+                            <!-- Percentage -->
+
+                            <td class="text-center">
+
+                                <span class="fw-bold text-primary">
+
+                                    {{ "%.2f"|format(item.percentage) }}%
+
+                                </span>
+
+                            </td>
+
+                            <!-- Status -->
+
+                            <td class="text-center">
+
+                                <span
+                                    class="badge rounded-pill bg-{{ item.status_color }}"
+                                >
+
+                                    {{ item.status }}
+
+                                </span>
+
+                            </td>
+
+                            <!-- Action -->
+
+                            <td class="text-center">
+
+                                <a
+
+                                    href="{{ url_for(
+
+                                        'evaluation_student.view_evaluation',
+
+                                        evaluation_id=item.id,
+
+                                        from='report'
+
+                                    ) }}"
+
+                                    class="btn btn-outline-primary btn-sm rounded-circle"
+
+                                    style="
+                                        width:38px;
+                                        height:38px;
+                                    "
+
+                                    title="मूल्यांकन तपशील पहा"
+
+                                    data-bs-toggle="tooltip"
+
+                                    data-bs-placement="top"
+
+                                >
+
+                                    <i class="bi bi-eye-fill"></i>
+
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {% else %}
+
+            <div class="text-center py-5">
+
+                <i
+                    class="bi bi-clock-history display-4 text-muted"
+                ></i>
+
+                <h5 class="mt-3">
+
+                    मूल्यांकन इतिहास उपलब्ध नाही
+
+                </h5>
+
+                <p class="text-muted mb-0">
+
+                    अद्याप या विद्यार्थ्याचे कोणतेही मूल्यांकन झालेले नाही.
+
+                </p>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <!-- ==========================================
+        Student Achievements
+    ========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <!-- Card Header -->
+
+        <div class="card-header bg-white">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div class="d-flex align-items-center gap-3">
+
+                    <h4 class="mb-0">
+
+                        <i class="bi bi-trophy-fill me-2 text-warning"></i>
+
+                        विद्यार्थ्याचे यश
+
+                    </h4>
+
+                    <span class="badge bg-warning text-dark px-3 py-2">
+
+                        {{ achievements|length }}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Card Body -->
+
+        <div class="card-body">
+
+            {% if achievements %}
+
+                <div class="row g-3">
+
+                    {% for achievement in achievements %}
+
+                        <div class="col-12">
+
+                            <div
+                                class="border rounded-3 p-3"
+                            >
+
+                                <div
+                                    class="d-flex align-items-start"
+                                >
+
+                                    <!-- Trophy -->
+
+                                    <div
+                                        class="me-3"
+                                        style="min-width:42px;"
+                                    >
+
+                                        <div
+                                            class="d-flex align-items-center justify-content-center rounded-circle bg-warning-subtle"
+                                            style="
+                                                width:42px;
+                                                height:42px;
+                                            "
+                                        >
+
+                                            <i
+                                                class="bi bi-trophy-fill text-warning"
+                                            ></i>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <!-- Achievement Content -->
+
+                                    <div class="flex-grow-1">
+
+                                        <div
+                                            class="d-flex justify-content-between align-items-start gap-3"
+                                        >
+
+                                            <h6
+                                                class="fw-bold mb-1"
+                                            >
+
+                                                {{ achievement.title }}
+
+                                            </h6>
+
+
+                                            {% if achievement.achievement_date %}
+
+                                                <small
+                                                    class="text-muted text-nowrap"
+                                                >
+
+                                                    <i
+                                                        class="bi bi-calendar3 me-1"
+                                                    ></i>
+
+                                                    {{
+                                                        achievement.achievement_date.strftime(
+                                                            "%d-%m-%Y"
+                                                        )
+                                                    }}
+
+                                                </small>
+
+                                            {% endif %}
+
+                                        </div>
+
+
+                                        {% if achievement.description %}
+
+                                            <p
+                                                class="text-muted mb-0 small"
+                                            >
+
+                                                {{ achievement.description }}
+
+                                            </p>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <!-- No Achievement -->
+
+                <div
+                    class="text-center py-4"
+                >
+
+                    <i
+                        class="bi bi-trophy display-5 text-muted"
+                    ></i>
+
+                    <h6 class="mt-3 mb-1">
+
+                        अद्याप कोणतेही यश नोंदवलेले नाही
+
+                    </h6>
+
+                    <p
+                        class="text-muted small mb-0"
+                    >
+
+                        विद्यार्थ्याचे यश नोंदवल्यानंतर ते येथे दिसेल.
+
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <!-- ==========================================
+        Teacher Remarks
+    ========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <!-- Card Header -->
+
+        <div class="card-header bg-white">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <h4 class="mb-0 d-flex align-items-center">
+
+                        <i class="bi bi-chat-left-text-fill me-2 text-primary"></i>
+
+                        <span>
+                            शिक्षकांच्या नोंदी
+                        </span>
+
+                        <span class="badge bg-primary ms-2">
+
+                            {{ teacher_remarks|length }}
+
+                        </span>
+
+                    </h4>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Card Body -->
+
+        <div class="card-body">
+
+            {% if grouped_teacher_remarks %}
+
+                <div class="d-flex flex-column gap-3">
+
+                    {% for teacher_id, teacher_data in grouped_teacher_remarks.items() %}
+
+                        <div class="border rounded-3 p-3">
+
+                            <!-- Teacher -->
+
+                            <div class="d-flex align-items-center mb-3">
+
+                                <div
+                                    class="rounded-circle bg-primary bg-opacity-10
+                                        d-flex align-items-center justify-content-center me-2"
+                                    style="
+                                        width:36px;
+                                        height:36px;
+                                    "
+                                >
+
+                                    <i class="bi bi-person-workspace text-primary"></i>
+
+                                </div>
+
+
+                                <div>
+
+                                    <div class="fw-semibold">
+
+                                        {{ teacher_data.teacher.name }}
+
+                                    </div>
+
+                                    <small class="text-muted">
+
+                                        शिक्षक
+
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Remarks -->
+
+                            <div class="d-flex flex-column gap-2">
+
+                                {% for remark in teacher_data.remarks %}
+
+                                    <div class="d-flex align-items-start">
+
+                                        <i
+                                            class="bi bi-dot text-primary fs-4 me-1"
+                                        ></i>
+
+                                        <div class="flex-grow-1">
+
+                                            {{ remark.remark }}
+
+                                        </div>
+
+                                    </div>
+
+                                {% endfor %}
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <!-- No Remarks -->
+
+                <div class="text-center py-4">
+
+                    <i
+                        class="bi bi-chat-left-text display-6 text-muted"
+                    ></i>
+
+                    <h6 class="mt-3 mb-1">
+
+                        शिक्षकांच्या नोंदी उपलब्ध नाहीत
+
+                    </h6>
+
+                    <p class="text-muted mb-0">
+
+                        या विद्यार्थ्यासाठी अद्याप कोणतीही शिक्षक नोंद उपलब्ध नाही.
+
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
 </div>
 {% endblock %}
 
@@ -385,6 +2108,10 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
+    // ==========================================
+    // Canvas
+    // ==========================================
+
     const canvas = document.getElementById("progressChart");
 
     if (!canvas) {
@@ -393,16 +2120,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
 
+    // ==========================================
+    // Data
+    // ==========================================
+
     const labels = JSON.parse(
-
         canvas.dataset.chartLabels || "[]"
-
     );
 
     const percentages = JSON.parse(
-
         canvas.dataset.chartPercentages || "[]"
-
     );
 
     if (labels.length === 0 || percentages.length === 0) {
@@ -411,17 +2138,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
             <div class="text-center py-5">
 
-                <i class="bi bi-bar-chart-line display-4 text-muted"></i>
+                <i class="bi bi-bar-chart-line display-3 text-secondary"></i>
 
                 <h5 class="mt-3">
 
-                    अद्याप कोणतेही मूल्यांकन उपलब्ध नाही.
+                    अद्याप कोणतेही मूल्यांकन उपलब्ध नाही
 
                 </h5>
 
                 <p class="text-muted mb-0">
 
-                    विद्यार्थी मूल्यांकन झाल्यानंतर आलेख येथे दिसेल.
+                    विद्यार्थी मूल्यांकन झाल्यानंतर येथे आलेख दिसेल.
 
                 </p>
 
@@ -455,7 +2182,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         0,
 
-        "rgba(37,99,235,0.35)"
+        "rgba(37,99,235,0.30)"
 
     );
 
@@ -463,12 +2190,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         1,
 
-        "rgba(37,99,235,0.03)"
+        "rgba(37,99,235,0.02)"
 
     );
 
     // ==========================================
-    // Performance Zones
+    // Performance Zone Plugin
     // ==========================================
 
     const performanceZones = {
@@ -505,9 +2232,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
             ctx.save();
 
-            // Excellent
+            // Excellent (60-100)
 
-            ctx.fillStyle = "rgba(22,163,74,0.08)";
+            ctx.fillStyle = "rgba(22,163,74,0.06)";
 
             ctx.fillRect(
 
@@ -523,9 +2250,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
             );
 
-            // Average
+            // Average (35-60)
 
-            ctx.fillStyle = "rgba(245,158,11,0.08)";
+            ctx.fillStyle = "rgba(245,158,11,0.06)";
 
             ctx.fillRect(
 
@@ -541,9 +2268,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
             );
 
-            // Needs Improvement
+            // Low (0-35)
 
-            ctx.fillStyle = "rgba(239,68,68,0.08)";
+            ctx.fillStyle = "rgba(239,68,68,0.06)";
 
             ctx.fillRect(
 
@@ -564,6 +2291,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
     };
+
+    Chart.register(ChartDataLabels);
 
     // ==========================================
     // Chart
@@ -587,7 +2316,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 {
 
-                    label: "प्रगती",
+                    label: "Percentage",
 
                     data: percentages,
 
@@ -605,11 +2334,57 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     pointRadius: 6,
 
-                    pointHoverRadius: 9,
+                    pointHoverRadius: 11,
 
-                    pointBackgroundColor: "#FFFFFF",
+                    pointHitRadius: 20,
 
-                    pointBorderColor: "#2563EB",
+                    pointBackgroundColor:function(context){
+
+                        const value=context.raw;
+
+                        const max=Math.max(...percentages);
+
+                        const min=Math.min(...percentages);
+
+                        if(value===max){
+
+                            return "#16A34A";
+
+                        }
+
+                        if(value===min){
+
+                            return "#DC2626";
+
+                        }
+
+                        return "#FFFFFF";
+
+                    },
+
+                    pointBorderColor:function(context){
+
+                        const value=context.raw;
+
+                        const max=Math.max(...percentages);
+
+                        const min=Math.min(...percentages);
+
+                        if(value===max){
+
+                            return "#16A34A";
+
+                        }
+
+                        if(value===min){
+
+                            return "#DC2626";
+
+                        }
+
+                        return "#2563EB";
+
+                    },
 
                     pointBorderWidth: 3,
 
@@ -617,7 +2392,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     pointHoverBorderColor: "#FFFFFF",
 
-                    pointHoverBorderWidth: 3
+                    pointHoverBorderWidth: 4
 
                 }
 
@@ -631,19 +2406,35 @@ document.addEventListener("DOMContentLoaded", function () {
 
             maintainAspectRatio: false,
 
-            interaction: {
-
-                intersect: false,
-
-                mode: "index"
-
-            },
-
             animation: {
 
                 duration: 1500,
 
                 easing: "easeOutQuart"
+
+            },
+
+            interaction: {
+
+                mode: "index",
+
+                intersect: false
+
+            },
+
+            layout: {
+
+                padding: {
+
+                    top: 15,
+
+                    left: 10,
+
+                    right: 15,
+
+                    bottom: 10
+
+                }
 
             },
 
@@ -655,6 +2446,32 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 },
 
+                datalabels: {
+
+                    color: "#1E293B",
+
+                    anchor: "end",
+
+                    align: "top",
+
+                    offset: 6,
+
+                    font: {
+
+                        weight: "bold",
+
+                        size: 12
+
+                    },
+
+                    formatter: function(value) {
+
+                        return value + "%";
+
+                    }
+
+                },
+
                 tooltip: {
 
                     backgroundColor: "#0F172A",
@@ -663,17 +2480,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     bodyColor: "#FFFFFF",
 
-                    cornerRadius: 10,
-
-                    padding: 12,
+                    footerColor: "#CBD5E1",
 
                     displayColors: false,
+
+                    cornerRadius: 12,
+
+                    padding: 14,
+
+                    caretPadding: 8,
 
                     callbacks: {
 
                         title: function(context) {
 
-                            return "दिनांक : " +
+                            return "📅 दिनांक : " +
 
                                 context[0].label;
 
@@ -681,7 +2502,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         label: function(context) {
 
-                            return "टक्केवारी : " +
+                            return "📈 टक्केवारी : " +
 
                                 context.parsed.y +
 
@@ -689,11 +2510,53 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         },
 
-                        footer: function(context) {
+                        footer:function(context){
 
-                            return "मूल्यांकन क्रमांक : " +
+                            const value=context[0].parsed.y;
 
-                                (context[0].dataIndex + 1);
+                            let performance="";
+
+                            if(value>=90){
+
+                                performance="🏆 उत्कृष्ट";
+
+                            }
+
+                            else if(value>=75){
+
+                                performance="🟢 खूप चांगली प्रगती";
+
+                            }
+
+                            else if(value>=60){
+
+                                performance="🟡 सुधारणा होत आहे";
+
+                            }
+
+                            else if(value>=40){
+
+                                performance="🟠 लक्ष आवश्यक";
+
+                            }
+
+                            else{
+
+                                performance="🔴 तात्काळ लक्ष आवश्यक";
+
+                            }
+
+                            return [
+
+                                performance,
+
+                                "",
+
+                                "मूल्यांकन क्रमांक : "+
+
+                                (context[0].dataIndex+1)
+
+                            ];
 
                         }
 
@@ -747,7 +2610,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         stepSize: 10,
 
-                        color: "#475569",
+                        color: "#64748B",
+
+                        font: {
+
+                            size: 12
+
+                        },
 
                         callback: function(value) {
 
@@ -759,7 +2628,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     grid: {
 
-                        color: "#E2E8F0"
+                        color: "#E2E8F0",
+
+                        drawBorder: false
 
                     },
 
@@ -774,6 +2645,47 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
         }
+
+    });
+
+});
+
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const searchInput = document.getElementById(
+
+        "evaluationHistorySearch"
+
+    );
+
+    if (!searchInput) {
+
+        return;
+
+    }
+
+    searchInput.addEventListener("keyup", function () {
+
+        const value = this.value.toLowerCase();
+
+        const rows = document.querySelectorAll(
+
+            "#evaluationHistoryTable tbody tr"
+
+        );
+
+        rows.forEach(function (row) {
+
+            row.style.display =
+
+                row.innerText.toLowerCase().includes(value)
+
+                ? ""
+
+                : "none";
+
+        });
 
     });
 

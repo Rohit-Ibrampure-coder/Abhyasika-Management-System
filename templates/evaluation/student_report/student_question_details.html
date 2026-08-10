@@ -1,0 +1,733 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+Question-wise Performance
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- ==========================================
+         Page Header
+    ========================================== -->
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+
+        <div>
+
+            <h1 class="page-title">
+
+                <i class="bi bi-list-check me-2"></i>
+
+                प्रश्नवार कामगिरी
+
+            </h1>
+
+            <p class="page-subtitle mb-0">
+
+                विद्यार्थ्याच्या मूल्यांकनाची सविस्तर प्रश्नवार कामगिरी.
+
+            </p>
+
+        </div>
+
+
+        <a
+            href="{{ url_for(
+                'student_evaluation_report.student_progress_report',
+                student_id=student.id
+            ) }}"
+            class="btn btn-outline-secondary"
+        >
+
+            <i class="bi bi-arrow-left me-2"></i>
+
+            अहवालाकडे परत
+
+        </a>
+
+    </div>
+
+
+    <!-- ==========================================
+         Student Information
+    ========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-body">
+
+            <div class="row g-3 align-items-center">
+
+                <div class="col-md-6">
+
+                    <div class="text-muted small">
+
+                        विद्यार्थी
+
+                    </div>
+
+                    <div class="fw-bold fs-5">
+
+                        {{ student.student_name }}
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <div class="text-muted small">
+
+                        इयत्ता
+
+                    </div>
+
+                    <div class="fw-semibold">
+
+                        {{ student.standard }}
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <div class="text-muted small">
+
+                        अभ्यासिका
+
+                    </div>
+
+                    <div class="fw-semibold">
+
+                        {{ student.abhyasika.abhyasika_name
+                           if student.abhyasika
+                           else "-" }}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==========================================
+         Overall Core Questions
+    ========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-white">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <h4 class="mb-0">
+
+                    <i class="bi bi-check2-square me-2 text-primary"></i>
+
+                    मुख्य प्रश्न
+
+                </h4>
+
+                {% if core_questions %}
+
+                <span class="badge bg-primary">
+
+                    {{ core_questions|length }}
+                    प्रश्न
+
+                </span>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <div class="card-body p-0">
+
+            {% if core_questions %}
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th
+                                class="text-center"
+                                style="width:70px;"
+                            >
+                                क्र.
+                            </th>
+
+                            <th>
+                                प्रश्न
+                            </th>
+
+                            <th
+                                class="text-center"
+                                style="width:100px;"
+                            >
+                                होय
+                            </th>
+
+                            <th
+                                class="text-center"
+                                style="width:100px;"
+                            >
+                                नाही
+                            </th>
+
+                            <th
+                                class="text-center"
+                                style="width:110px;"
+                            >
+                                गुण
+                            </th>
+
+                            <th
+                                class="text-center"
+                                style="width:120px;"
+                            >
+                                कामगिरी
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for question in core_questions %}
+
+                        {% set question_data =
+                            core_question_counts.get(
+                                question.id
+                            )
+                        %}
+
+                        <tr>
+
+                            <td class="text-center">
+
+                                {{ loop.index }}
+
+                            </td>
+
+
+                            <td>
+
+                                <span class="fw-medium">
+
+                                    {{ question.question_text }}
+
+                                </span>
+
+                            </td>
+
+
+                            <td class="text-center">
+
+                                <span class="badge bg-success">
+
+                                    {{ question_data.yes
+                                       if question_data
+                                       else 0 }}
+
+                                </span>
+
+                            </td>
+
+
+                            <td class="text-center">
+
+                                <span class="badge bg-danger">
+
+                                    {{ question_data.no
+                                       if question_data
+                                       else 0 }}
+
+                                </span>
+
+                            </td>
+
+                            <td class="text-center">
+
+                                {% if question_data and question_data.total_marks > 0 %}
+
+                                    <span class="fw-bold text-primary">
+
+                                        {{ question_data.obtained_marks }}
+                                        /
+                                        {{ question_data.total_marks }}
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="text-muted">
+
+                                        0 / 0
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td class="text-center">
+
+                                {% if question_data %}
+
+                                    {% if question_data.percentage >= 75 %}
+
+                                    <span class="fw-bold text-success">
+
+                                        {{ "%.2f"|format(
+                                            question_data.percentage
+                                        ) }}%
+
+                                    </span>
+
+                                    {% elif question_data.percentage >= 50 %}
+
+                                    <span class="fw-bold text-warning">
+
+                                        {{ "%.2f"|format(
+                                            question_data.percentage
+                                        ) }}%
+
+                                    </span>
+
+                                    {% else %}
+
+                                    <span class="fw-bold text-danger">
+
+                                        {{ "%.2f"|format(
+                                            question_data.percentage
+                                        ) }}%
+
+                                    </span>
+
+                                    {% endif %}
+
+                                {% else %}
+
+                                    <span class="text-muted">
+
+                                        0.00%
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {% else %}
+
+            <div class="text-center py-5 text-muted">
+
+                <i class="bi bi-list-check display-5"></i>
+
+                <h6 class="mt-3">
+
+                    प्रश्न माहिती उपलब्ध नाही.
+
+                </h6>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+   <!-- ==========================================
+        Academic Year-wise Evaluation Details
+    ========================================== -->
+
+    {% if evaluation_years %}
+
+    <div class="accordion" id="evaluationYearsAccordion">
+
+        {% for academic_year, year_evaluations in evaluation_years.items() %}
+
+        <div class="card shadow-sm border-0 mb-3">
+
+            <!-- ==========================================
+                Academic Year Header
+            ========================================== -->
+
+            <div class="card-header bg-white p-0">
+
+                <button
+                    class="btn w-100 text-start px-4 py-3"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#year{{ loop.index }}"
+                    aria-expanded="{% if loop.first %}true{% else %}false{% endif %}"
+                    aria-controls="year{{ loop.index }}"
+                >
+
+                    <div class="d-flex justify-content-between align-items-center gap-3">
+
+                        <div class="d-flex align-items-center gap-2">
+
+                            <i class="bi bi-calendar3 text-primary"></i>
+
+                            <span class="fw-semibold">
+
+                                शैक्षणिक वर्ष {{ academic_year }}
+
+                            </span>
+
+                        </div>
+
+                        <div class="d-flex align-items-center gap-2">
+
+                            <span class="badge bg-primary">
+
+                                {{ year_evaluations|length }}
+                                मूल्यांकन
+
+                            </span>
+
+                            <i class="bi bi-chevron-down"></i>
+
+                        </div>
+
+                    </div>
+
+                </button>
+
+            </div>
+
+
+            <!-- ==========================================
+                Academic Year Content
+            ========================================== -->
+
+            <div
+                id="year{{ loop.index }}"
+                class="accordion-collapse collapse {% if loop.first %}show{% endif %}"
+                data-bs-parent="#evaluationYearsAccordion"
+            >
+
+                <div class="card-body">
+
+                    <!-- ==========================================
+                        Individual Evaluations
+                    ========================================== -->
+
+                    <div
+                        class="accordion"
+                        id="evaluations{{ loop.index }}"
+                    >
+
+                        {% for item in year_evaluations %}
+
+                        {% set evaluation_key =
+                            loop.index0|string ~
+                            '-' ~
+                            loop.index|string
+                        %}
+
+
+                        <div class="border rounded-3 mb-3 overflow-hidden">
+
+
+                            <!-- ==========================================
+                                Evaluation Header
+                            ========================================== -->
+
+                            <button
+                                class="btn w-100 text-start p-3"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#evaluation{{ loop.index }}{{ loop.index0 }}"
+                                aria-expanded="false"
+                            >
+
+                                <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap">
+
+
+                                    <!-- Date -->
+
+                                    <div>
+
+                                        <div class="fw-semibold">
+
+                                            <i class="bi bi-calendar-event me-2 text-primary"></i>
+
+                                            {{ item.evaluation.evaluation_date.strftime(
+                                                "%d-%m-%Y"
+                                            ) }}
+
+                                        </div>
+
+                                        <div class="text-muted small ms-4">
+
+                                            {{ item.current_month }}
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <!-- Result -->
+
+                                    <div class="d-flex align-items-center gap-2">
+
+
+                                        {% if item.evaluation.result %}
+
+                                        <span class="badge bg-primary">
+
+                                            {{ item.evaluation.result.obtained_marks }}
+
+                                            /
+
+                                            {{ item.evaluation.result.total_questions }}
+
+                                        </span>
+
+
+                                        <span class="badge bg-success">
+
+                                            {{ "%.2f"|format(
+                                                item.evaluation.result.percentage
+                                            ) }}%
+
+                                        </span>
+
+                                        {% endif %}
+
+
+                                        <i class="bi bi-chevron-down text-muted"></i>
+
+                                    </div>
+
+                                </div>
+
+                            </button>
+
+
+                            <!-- ==========================================
+                                Evaluation Details
+                            ========================================== -->
+
+                            <div
+                                id="evaluation{{ loop.index }}{{ loop.index0 }}"
+                                class="collapse"
+                            >
+
+                                <div class="border-top p-3">
+
+
+                                    {% if item.month_questions %}
+
+                                    <div class="d-flex align-items-center gap-2 mb-3">
+
+                                        <i class="bi bi-calendar-check text-primary"></i>
+
+                                        <h6 class="fw-semibold mb-0">
+
+                                            {{ item.current_month }}
+                                            महिन्याचे प्रश्न
+
+                                        </h6>
+
+                                    </div>
+
+
+                                    <div class="table-responsive">
+
+                                        <table
+                                            class="table table-sm table-hover align-middle mb-0"
+                                        >
+
+                                            <thead class="table-light">
+
+                                                <tr>
+
+                                                    <th
+                                                        class="text-center"
+                                                        style="width:60px;"
+                                                    >
+
+                                                        क्र.
+
+                                                    </th>
+
+                                                    <th>
+
+                                                        प्रश्न
+
+                                                    </th>
+
+                                                    <th
+                                                        class="text-center"
+                                                        style="width:110px;"
+                                                    >
+
+                                                        उत्तर
+
+                                                    </th>
+
+                                                </tr>
+
+                                            </thead>
+
+
+                                            <tbody>
+
+                                                {% for question
+                                                    in item.month_questions %}
+
+                                                <tr>
+
+                                                    <td class="text-center">
+
+                                                        {{ loop.index }}
+
+                                                    </td>
+
+                                                    <td>
+
+                                                        {{ question.question_text }}
+
+                                                    </td>
+
+                                                    <td class="text-center">
+
+                                                        {% if item.answer_dict.get(
+                                                            question.id
+                                                        ) %}
+
+                                                            <span class="badge bg-success">
+
+                                                                ✓ होय
+
+                                                            </span>
+
+                                                        {% else %}
+
+                                                            <span class="badge bg-danger">
+
+                                                                ✗ नाही
+
+                                                            </span>
+
+                                                        {% endif %}
+
+                                                    </td>
+
+                                                </tr>
+
+                                                {% endfor %}
+
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
+
+
+                                    {% else %}
+
+                                    <div class="text-muted small">
+
+                                        <i class="bi bi-info-circle me-1"></i>
+
+                                        या महिन्यासाठी प्रश्न उपलब्ध नाहीत.
+
+                                    </div>
+
+                                    {% endif %}
+
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    {% else %}
+
+
+    <!-- ==========================================
+        No Evaluation
+    ========================================== -->
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body text-center py-5">
+
+            <i class="bi bi-clipboard-x display-4 text-muted"></i>
+
+            <h5 class="mt-3">
+
+                मूल्यांकन माहिती उपलब्ध नाही.
+
+            </h5>
+
+            <p class="text-muted mb-0">
+
+                या विद्यार्थ्याचे अद्याप कोणतेही मूल्यांकन उपलब्ध नाही.
+
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% endif %}
+
+
+</div>
+
+{% endblock %}

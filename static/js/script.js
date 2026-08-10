@@ -79,7 +79,10 @@ document.addEventListener("DOMContentLoaded", function () {
         form.addEventListener("submit", function () {
 
             // Skip forms that use SweetAlert confirmation
-            if (form.classList.contains("delete-evaluation-form")) {
+            if (
+                form.classList.contains("delete-evaluation-form") ||
+                form.classList.contains("delete-remark-form")
+            ) {
 
                 return;
 

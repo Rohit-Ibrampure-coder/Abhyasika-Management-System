@@ -866,6 +866,18 @@ def view_evaluation(evaluation_id):
         evaluation_id
     )
 
+    # ==========================================
+    # Source Page
+    # ==========================================
+
+    from_page = request.args.get(
+
+        "from",
+
+        ""
+
+    )
+
     student = evaluation.student
 
     answers = StudentEvaluationAnswer.query.filter_by(
@@ -927,7 +939,9 @@ def view_evaluation(evaluation_id):
 
         month_questions=month_questions,
 
-        answer_dict=answer_dict
+        answer_dict=answer_dict,
+
+        from_page=from_page
 
     )
 

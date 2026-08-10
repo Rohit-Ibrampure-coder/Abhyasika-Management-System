@@ -6302,3 +6302,15 @@ REMARK CARD
     flex-shrink:0;
 
 }
+
+/* ==========================================
+   Teacher Remark - Student Photo
+========================================== */
+
+.student-profile-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+}
