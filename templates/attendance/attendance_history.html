@@ -583,6 +583,620 @@ Attendance History
 
     </div>
 
+        <!-- ========================================== -->
+    <!-- Student Attendance Records -->
+    <!-- ========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4 section-card">
+
+        <!-- Section Header -->
+
+        <div class="card-header">
+
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+                <h5 class="mb-0">
+
+                    <i class="bi bi-people me-2 text-primary"></i>
+
+                    विद्यार्थी उपस्थिती नोंद
+
+                </h5>
+
+                {% if student_attendance_summary %}
+
+                <span class="badge bg-primary">
+
+                    {{ student_attendance_summary|length }}
+
+                    विद्यार्थी
+
+                </span>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        <!-- ========================================== -->
+        <!-- Student Attendance Filters -->
+        <!-- ========================================== -->
+
+        <div class="card-body border-bottom">
+
+            <form
+                method="GET"
+                action="{{ url_for('attendance.attendance_history') }}"
+            >
+
+                <!-- Preserve Attendance Session Filters -->
+
+                <input
+                    type="hidden"
+                    name="teacher_id"
+                    value="{{ selected_teacher or '' }}"
+                >
+
+                <input
+                    type="hidden"
+                    name="abhyasika_id"
+                    value="{{ selected_abhyasika or '' }}"
+                >
+
+                <input
+                    type="hidden"
+                    name="from_date"
+                    value="{{ from_date or '' }}"
+                >
+
+                <input
+                    type="hidden"
+                    name="to_date"
+                    value="{{ to_date or '' }}"
+                >
+
+                <div class="row g-3 align-items-end">
+
+
+                    <!-- ==================================
+                        Student Search
+                    =================================== -->
+
+                    <div class="col-lg-6">
+
+                        <label
+                            for="studentAttendanceSearch"
+                            class="form-label fw-semibold"
+                        >
+
+                            विद्यार्थी शोधा
+
+                        </label>
+
+                        <div class="input-group">
+
+                            <span class="input-group-text">
+
+                                <i class="bi bi-search"></i>
+
+                            </span>
+
+                            <input
+                                type="text"
+                                id="studentAttendanceSearch"
+                                name="student_search"
+                                class="form-control"
+                                value="{{ student_search }}"
+                                placeholder="विद्यार्थ्याचे नाव शोधा..."
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ==================================
+                        Abhyasika Filter
+                    =================================== -->
+
+                    <div class="col-lg-4">
+
+                        <label
+                            for="studentAbhyasikaFilter"
+                            class="form-label fw-semibold"
+                        >
+
+                            अभ्यासिका
+
+                        </label>
+
+
+                        {% if current_user.role == "admin" %}
+
+                            <select
+                                id="studentAbhyasikaFilter"
+                                name="student_abhyasika_id"
+                                class="form-select"
+                            >
+
+                                <option value="">
+
+                                    सर्व अभ्यासिका
+
+                                </option>
+
+
+                                {% for item in abhyasikas %}
+
+                                    <option
+                                        value="{{ item.id }}"
+                                        {% if student_abhyasika_id == item.id %}
+                                            selected
+                                        {% endif %}
+                                    >
+
+                                        {{ item.name }}
+
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        {% else %}
+
+                            <!-- Teacher -->
+
+                            <div class="form-control bg-light">
+
+                                {% if abhyasika %}
+
+                                    {{ abhyasika.name }}
+
+                                {% else %}
+
+                                    सर्व नियुक्त अभ्यासिका
+
+                                {% endif %}
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- ==================================
+                        Buttons
+                    =================================== -->
+
+                    <div class="col-lg-2">
+
+                        <div class="d-flex gap-2">
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary flex-grow-1"
+                            >
+
+                                <i class="bi bi-search me-1"></i>
+
+                                Search
+
+                            </button>
+
+
+                            <a
+                                href="{{ url_for(
+                                    'attendance.attendance_history'
+                                ) }}"
+                                class="btn btn-outline-secondary"
+                                title="फिल्टर साफ करा"
+                            >
+
+                                <i class="bi bi-arrow-counterclockwise"></i>
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+        <!-- ========================================== -->
+        <!-- Student Attendance Summary Cards -->
+        <!-- ========================================== -->
+
+        <div class="card-body border-bottom">
+
+            <div class="row g-3">
+
+
+                <!-- Total Students -->
+
+                <div class="col-xl-3 col-md-6">
+
+                    <div class="student-attendance-stat">
+
+                        <div class="text-muted small">
+
+                            एकूण विद्यार्थी
+
+                        </div>
+
+                        <div class="fw-bold fs-4 text-primary">
+
+                            {{ student_attendance_summary|length }}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Total Present -->
+
+                <div class="col-xl-3 col-md-6">
+
+                    <div class="student-attendance-stat">
+
+                        <div class="text-muted small">
+
+                            एकूण उपस्थिती
+
+                        </div>
+
+                        <div class="fw-bold fs-4 text-success">
+
+                            {{ student_attendance_summary
+                               |sum(attribute='present_days') }}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Total Absent -->
+
+                <div class="col-xl-3 col-md-6">
+
+                    <div class="student-attendance-stat">
+
+                        <div class="text-muted small">
+
+                            एकूण अनुपस्थिती
+
+                        </div>
+
+                        <div class="fw-bold fs-4 text-danger">
+
+                            {{ student_attendance_summary
+                               |sum(attribute='absent_days') }}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Total Records -->
+
+                <div class="col-xl-3 col-md-6">
+
+                    <div class="student-attendance-stat">
+
+                        <div class="text-muted small">
+
+                            एकूण उपस्थिती नोंदी
+
+                        </div>
+
+                        <div class="fw-bold fs-4 text-dark">
+
+                            {{ student_attendance_summary
+                               |sum(attribute='total_days') }}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+        <!-- ========================================== -->
+        <!-- Student Attendance Table -->
+        <!-- ========================================== -->
+
+        <div class="card-body p-0">
+
+            {% if student_attendance_summary %}
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th
+                                class="text-center"
+                                style="width: 70px;"
+                            >
+
+                                क्र.
+
+                            </th>
+
+
+                            <th>
+
+                                विद्यार्थी
+
+                            </th>
+
+
+                            <th>
+
+                                अभ्यासिका
+
+                            </th>
+
+
+                            <th class="text-center">
+
+                                उपस्थित
+
+                            </th>
+
+
+                            <th class="text-center">
+
+                                अनुपस्थित
+
+                            </th>
+
+
+                            <th class="text-center">
+
+                                एकूण
+
+                            </th>
+
+
+                            <th class="text-center">
+
+                                उपस्थिती
+
+                            </th>
+
+
+                            <th
+                                class="text-center"
+                                style="width: 100px;"
+                            >
+
+                                कृती
+
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for item in student_attendance_summary %}
+
+                        <tr>
+
+
+                            <!-- Serial Number -->
+
+                            <td class="text-center">
+
+                                {{ loop.index }}
+
+                            </td>
+
+
+                            <!-- Student -->
+
+                            <td>
+
+                                <div class="fw-semibold">
+
+                                    {{ item.student.student_name }}
+
+                                </div>
+
+                                {% if item.student.standard %}
+
+                                <div class="small text-muted">
+
+                                    {{ item.student.standard }}
+
+                                </div>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- Abhyasika -->
+
+                            <td>
+
+                                {% if item.student.abhyasika %}
+
+                                    {{ item.student.abhyasika.name }}
+
+                                {% else %}
+
+                                    -
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- Present -->
+
+                            <td class="text-center">
+
+                                <span class="badge bg-success">
+
+                                    {{ item.present_days }}
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- Absent -->
+
+                            <td class="text-center">
+
+                                <span class="badge bg-danger">
+
+                                    {{ item.absent_days }}
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- Total -->
+
+                            <td class="text-center">
+
+                                <span class="fw-semibold">
+
+                                    {{ item.total_days }}
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- Percentage -->
+
+                            <td class="text-center">
+
+                                {% if item.percentage >= 75 %}
+
+                                <span class="fw-bold text-success">
+
+                                    {{ "%.2f"|format(
+                                        item.percentage
+                                    ) }}%
+
+                                </span>
+
+                                {% elif item.percentage >= 50 %}
+
+                                <span class="fw-bold text-warning">
+
+                                    {{ "%.2f"|format(
+                                        item.percentage
+                                    ) }}%
+
+                                </span>
+
+                                {% else %}
+
+                                <span class="fw-bold text-danger">
+
+                                    {{ "%.2f"|format(
+                                        item.percentage
+                                    ) }}%
+
+                                </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- Action -->
+
+                            <td class="text-center">
+
+                                <a
+                                    href="{{ url_for(
+                                        'attendance.student_attendance_history',
+                                        student_id=item.student.id
+                                    ) }}"
+                                    class="btn btn-sm btn-primary"
+                                    title="विद्यार्थ्याची उपस्थिती पहा"
+                                >
+
+                                    <i class="bi bi-eye me-1"></i>
+
+                                    पहा
+
+                                </a>
+
+                            </td>
+
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {% else %}
+
+            <!-- Empty State -->
+
+            <div class="text-center py-5">
+
+                <i
+                    class="bi bi-calendar-x text-muted"
+                    style="font-size: 2.5rem;"
+                ></i>
+
+                <h6 class="fw-semibold mt-3">
+
+                    विद्यार्थी उपस्थिती नोंद उपलब्ध नाही.
+
+                </h6>
+
+                <p class="text-muted mb-0">
+
+                    निवडलेल्या फिल्टरनुसार कोणतीही उपस्थिती नोंद सापडली नाही.
+
+                </p>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
     {% if pagination.pages > 1 %}
 
     <nav class="mt-4">
@@ -691,5 +1305,55 @@ Attendance History
     {% endif %}
 
 </div>
+
+<style>
+
+    .student-attendance-stat {
+
+        border: 1px solid #e5e7eb;
+
+        border-radius: 10px;
+
+        padding: 14px 16px;
+
+        background: #f8fafc;
+
+    }
+
+
+    .student-attendance-stat .fs-4 {
+
+        line-height: 1.2;
+
+        margin-top: 4px;
+
+    }
+
+
+    .student-attendance-stat:hover {
+
+        border-color: #cbd5e1;
+
+    }
+
+
+    .student-attendance-stat .small {
+
+        margin-bottom: 4px;
+
+    }
+
+
+    @media (max-width: 767.98px) {
+
+        .student-attendance-stat {
+
+            padding: 12px 14px;
+
+        }
+
+    }
+
+</style>
 
 {% endblock %}

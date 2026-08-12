@@ -4,75 +4,95 @@
 अहवाल
 {% endblock %}
 
+
 {% block content %}
 
-<div class="container-fluid">
+<div class="container-fluid py-4">
 
     <!-- ==========================================
-        Page Header
-    =========================================== -->
+         Page Header
+    ========================================== -->
 
-    <div class="page-header mb-4 d-flex justify-content-between align-items-center">
+    <div class="page-header mb-4">
 
         <div>
 
             <h2 class="fw-bold mb-1">
-
                 अहवाल
-
             </h2>
 
             <p class="text-muted mb-0">
-
                 अभ्यासिका, विद्यार्थी व विद्यार्थ्यांच्या प्रगतीसंबंधी विविध अहवाल पाहा.
-
             </p>
 
         </div>
 
     </div>
 
+
     <!-- ==========================================
-        Reports
-    =========================================== -->
+         Report Modules
+    ========================================== -->
 
     <div class="row g-4">
 
-        <!-- Daily Abhyasika Report -->
 
-        <div class="col-lg-4 col-md-6">
+        <!-- ==========================================
+             Daily Abhyasika Report
+        ========================================== -->
 
-            <div class="card shadow border-primary h-100">
+        <div class="col-xl-6 col-lg-6">
 
-                <div class="card-body text-center p-4">
+            <div class="card shadow-sm border-0 h-100 report-module-card">
 
-                    <i class="bi bi-journal-richtext display-4 text-primary"></i>
+                <div class="card-body p-4 p-xl-5 text-center d-flex flex-column">
 
-                    <h4 class="mt-3">
+                    <!-- Icon -->
+
+                    <div class="report-icon text-primary mx-auto mb-3">
+
+                        <i class="bi bi-journal-richtext"></i>
+
+                    </div>
+
+
+                    <!-- Title -->
+
+                    <h4 class="fw-bold mb-2">
 
                         दैनंदिन अभ्यासिका अहवाल
 
                     </h4>
 
-                    <p class="text-muted">
 
-                        सर्व दैनंदिन अभ्यासिका अहवाल पाहा.
+                    <!-- Description -->
+
+                    <p class="text-muted mb-4">
+
+                        अभ्यासिकेतील दैनंदिन उपक्रम,
+                        उपस्थिती आणि अहवालाची माहिती पाहा.
 
                     </p>
 
-                    <a
 
-                        href="{{ url_for('daily_report.daily_report_history') }}"
+                    <!-- Action -->
 
-                        class="btn btn-primary"
+                    <div class="mt-auto">
 
-                    >
+                        <a
+                            href="{{ url_for(
+                                'daily_report.daily_report_history'
+                            ) }}"
+                            class="btn btn-primary px-4"
+                        >
 
-                        <i class="bi bi-eye me-2"></i>
+                            <i class="bi bi-eye me-2"></i>
 
-                        अहवाल पहा
+                            अहवाल पहा
 
-                    </a>
+                        </a>
+
+                    </div>
 
                 </div>
 
@@ -80,49 +100,64 @@
 
         </div>
 
+
         <!-- ==========================================
-            Student Progress & Evaluation Report
+             Student Progress & Evaluation Report
         ========================================== -->
 
-        <div class="col-lg-4 col-md-6">
+        <div class="col-xl-6 col-lg-6">
 
-            <div class="card shadow border-primary h-100">
+            <div class="card shadow-sm border-0 h-100 report-module-card">
 
-                <div class="card-body text-center p-4">
+                <div class="card-body p-4 p-xl-5 text-center d-flex flex-column">
 
-                    <i
-                        class="bi bi-graph-up-arrow
-                            display-4
-                            text-primary"
-                    ></i>
+                    <!-- Icon -->
 
-                    <h4 class="mt-3">
+                    <div class="report-icon text-primary mx-auto mb-3">
+
+                        <i class="bi bi-graph-up-arrow"></i>
+
+                    </div>
+
+
+                    <!-- Title -->
+
+                    <h4 class="fw-bold mb-2">
 
                         विद्यार्थी प्रगती व मूल्यांकन अहवाल
 
                     </h4>
 
-                    <p class="text-muted">
+
+                    <!-- Description -->
+
+                    <p class="text-muted mb-4">
 
                         विद्यार्थ्यांची प्रगती, मूलभूत कौशल्यांचे
-                        विश्लेषण, महिनानुसार प्रगती व
-                        मूल्यांकन अहवाल पाहा.
+                        विश्लेषण, महिनानुसार प्रगती आणि
+                        मूल्यांकनाची माहिती पाहा.
 
                     </p>
 
-                    <a
 
-                        href="{{ url_for('student_evaluation_report.report_home') }}"
+                    <!-- Action -->
 
-                        class="btn btn-primary"
+                    <div class="mt-auto">
 
-                    >
+                        <a
+                            href="{{ url_for(
+                                'student_evaluation_report.report_home'
+                            ) }}"
+                            class="btn btn-primary px-4"
+                        >
 
-                        <i class="bi bi-eye me-2"></i>
+                            <i class="bi bi-eye me-2"></i>
 
-                        अहवाल पहा
+                            अहवाल पहा
 
-                    </a>
+                        </a>
+
+                    </div>
 
                 </div>
 
@@ -130,8 +165,105 @@
 
         </div>
 
+
     </div>
 
 </div>
+
+
+<style>
+
+    .report-module-card {
+
+        min-height: 240px;
+
+        border: 1px solid #e5e7eb !important;
+
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease,
+            border-color 0.2s ease;
+
+    }
+
+
+    .report-module-card:hover {
+
+        transform: translateY(-2px);
+
+        box-shadow:
+            0 8px 20px rgba(15, 23, 42, 0.08) !important;
+
+        border-color: #2563eb !important;
+
+    }
+
+
+    .report-icon {
+
+        width: 64px;
+
+        height: 64px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        border-radius: 14px;
+
+        background: #eff6ff;
+
+        font-size: 2.2rem;
+
+    }
+
+
+    .report-module-card h4 {
+
+        color: #1e293b;
+
+        font-size: 1.25rem;
+
+    }
+
+
+    .report-module-card p {
+
+        max-width: 480px;
+
+        margin-left: auto;
+
+        margin-right: auto;
+
+        line-height: 1.6;
+
+        font-size: 0.9rem;
+
+    }
+
+
+    @media (max-width: 767.98px) {
+
+        .report-module-card {
+
+            min-height: auto;
+
+        }
+
+        .report-icon {
+
+            width: 58px;
+
+            height: 58px;
+
+            font-size: 2rem;
+
+        }
+
+    }
+
+</style>
 
 {% endblock %}
