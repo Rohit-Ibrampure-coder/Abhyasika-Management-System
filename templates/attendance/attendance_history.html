@@ -603,13 +603,11 @@ Attendance History
 
                 </h5>
 
-                {% if student_attendance_summary %}
+                {% if student_total > 0 %}
 
                 <span class="badge bg-primary">
 
-                    {{ student_attendance_summary|length }}
-
-                    विद्यार्थी
+                    {{ student_total }} विद्यार्थी
 
                 </span>
 
@@ -832,7 +830,7 @@ Attendance History
 
                         <div class="fw-bold fs-4 text-primary">
 
-                            {{ student_attendance_summary|length }}
+                            {{ student_total }}
 
                         </div>
 
@@ -855,8 +853,7 @@ Attendance History
 
                         <div class="fw-bold fs-4 text-success">
 
-                            {{ student_attendance_summary
-                               |sum(attribute='present_days') }}
+                            {{ student_total_present }}
 
                         </div>
 
@@ -879,8 +876,7 @@ Attendance History
 
                         <div class="fw-bold fs-4 text-danger">
 
-                            {{ student_attendance_summary
-                               |sum(attribute='absent_days') }}
+                            {{ student_total_absent }}
 
                         </div>
 
@@ -903,8 +899,7 @@ Attendance History
 
                         <div class="fw-bold fs-4 text-dark">
 
-                            {{ student_attendance_summary
-                               |sum(attribute='total_days') }}
+                            {{ student_total_records }}
 
                         </div>
 
@@ -1011,7 +1006,7 @@ Attendance History
 
                             <td class="text-center">
 
-                                {{ loop.index }}
+                                {{ ((student_page - 1) * student_per_page) + loop.index }}
 
                             </td>
 
@@ -1196,6 +1191,242 @@ Attendance History
         </div>
 
     </div>
+
+    <!-- ========================================== -->
+    <!-- Student Attendance Pagination -->
+    <!-- ========================================== -->
+
+    {% if student_total_pages > 1 %}
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mt-3 mb-4">
+
+        <!-- Showing Information -->
+
+        <div class="text-muted small">
+
+            दाखवत आहे
+
+            <strong>
+                {{ ((student_page - 1) * student_per_page) + 1 }}
+            </strong>
+
+            ते
+
+            <strong>
+                {{
+                    [
+                        student_page * student_per_page,
+                        student_total
+                    ] | min
+                }}
+            </strong>
+
+            पैकी
+
+            <strong>
+                {{ student_total }}
+            </strong>
+
+            विद्यार्थी
+
+        </div>
+
+
+        <!-- Pagination -->
+
+        <nav aria-label="Student attendance pagination">
+
+            <ul class="pagination mb-0">
+
+                <!-- Previous -->
+
+                <li
+                    class="page-item
+                    {% if student_page == 1 %}
+                        disabled
+                    {% endif %}"
+                >
+
+                    {% if student_page > 1 %}
+
+                    <a
+                        class="page-link"
+                        href="{{ url_for(
+                            'attendance.attendance_history',
+
+                            student_page=student_page - 1,
+
+                            page=pagination.page,
+
+                            student_search=student_search,
+
+                            student_abhyasika_id=student_abhyasika_id,
+
+                            abhyasika_id=selected_abhyasika,
+
+                            teacher_id=selected_teacher,
+
+                            from_date=from_date,
+
+                            to_date=to_date
+                        ) }}"
+                    >
+
+                        <i class="bi bi-chevron-left"></i>
+
+                        मागील
+
+                    </a>
+
+                    {% else %}
+
+                    <span class="page-link">
+
+                        <i class="bi bi-chevron-left"></i>
+
+                        मागील
+
+                    </span>
+
+                    {% endif %}
+
+                </li>
+
+
+                <!-- Page Numbers -->
+
+                {% for p in range(1, student_total_pages + 1) %}
+
+                    {% if
+                        p == 1
+                        or
+                        p == student_total_pages
+                        or
+                        (
+                            p >= student_page - 2
+                            and
+                            p <= student_page + 2
+                        )
+                    %}
+
+                        <li
+                            class="page-item
+                            {% if p == student_page %}
+                                active
+                            {% endif %}"
+                        >
+
+                            <a
+                                class="page-link"
+                                href="{{ url_for(
+                                    'attendance.attendance_history',
+
+                                    student_page=p,
+
+                                    page=pagination.page,
+
+                                    student_search=student_search,
+
+                                    student_abhyasika_id=student_abhyasika_id,
+
+                                    abhyasika_id=selected_abhyasika,
+
+                                    teacher_id=selected_teacher,
+
+                                    from_date=from_date,
+
+                                    to_date=to_date
+                                ) }}"
+                            >
+
+                                {{ p }}
+
+                            </a>
+
+                        </li>
+
+                    {% elif
+                        p == student_page - 3
+                        or
+                        p == student_page + 3
+                    %}
+
+                        <li class="page-item disabled">
+
+                            <span class="page-link">
+
+                                ...
+
+                            </span>
+
+                        </li>
+
+                    {% endif %}
+
+                {% endfor %}
+
+
+                <!-- Next -->
+
+                <li
+                    class="page-item
+                    {% if student_page == student_total_pages %}
+                        disabled
+                    {% endif %}"
+                >
+
+                    {% if student_page < student_total_pages %}
+
+                    <a
+                        class="page-link"
+                        href="{{ url_for(
+                            'attendance.attendance_history',
+
+                            student_page=student_page + 1,
+
+                            page=pagination.page,
+
+                            student_search=student_search,
+
+                            student_abhyasika_id=student_abhyasika_id,
+
+                            abhyasika_id=selected_abhyasika,
+
+                            teacher_id=selected_teacher,
+
+                            from_date=from_date,
+
+                            to_date=to_date
+                        ) }}"
+                    >
+
+                        पुढील
+
+                        <i class="bi bi-chevron-right"></i>
+
+                    </a>
+
+                    {% else %}
+
+                    <span class="page-link">
+
+                        पुढील
+
+                        <i class="bi bi-chevron-right"></i>
+
+                    </span>
+
+                    {% endif %}
+
+                </li>
+
+            </ul>
+
+        </nav>
+
+    </div>
+
+    {% endif %}
 
     {% if pagination.pages > 1 %}
 
