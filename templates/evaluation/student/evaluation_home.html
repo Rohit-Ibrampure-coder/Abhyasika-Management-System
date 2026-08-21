@@ -10,21 +10,46 @@ Student Evaluation
 
     <!-- Page Header -->
 
-    <div class="mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-        <h2 class="fw-bold mb-1">
-            विद्यार्थी मूल्यांकन
-        </h2>
+        <div>
 
-        <p class="text-muted mb-0">
+            <h2 class="fw-bold mb-1">
+                विद्यार्थी मूल्यांकन
+            </h2>
 
-            {% if is_admin %}
-                Select an Abhyasika and Evaluation Date to manage student evaluations.
-            {% else %}
-                Select an Evaluation Date to manage student evaluations.
-            {% endif %}
+            <p class="text-muted mb-0">
 
-        </p>
+                {% if is_admin %}
+                    Select an Abhyasika and Evaluation Date to manage student evaluations.
+                {% else %}
+                    Select an Evaluation Date to manage student evaluations.
+                {% endif %}
+
+            </p>
+
+        </div>
+
+
+        <!-- Mulyankan Student Selection -->
+
+        <div>
+
+            <a
+                href="{{ url_for(
+                    'evaluation_student.select_mulyankan_students',
+                    abhyasika_id=selected_abhyasika
+                ) }}"
+                class="btn btn-primary"
+            >
+
+                <i class="bi bi-people-fill me-1"></i>
+
+                विद्यार्थी निवडा
+
+            </a>
+
+        </div>
 
     </div>
 

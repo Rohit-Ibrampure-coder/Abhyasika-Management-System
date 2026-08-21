@@ -85,3 +85,13 @@ class Abhyasika(db.Model):
         back_populates="abhyasika",
         cascade="all, delete-orphan"
     )
+
+    # ==========================================
+    # Vidyarthi Mulyankan Students
+    # ==========================================
+
+    mulyankan_students = db.relationship(
+        "StudentMulyankan",
+        back_populates="abhyasika",
+        cascade="all, delete-orphan"
+    )

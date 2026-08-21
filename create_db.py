@@ -16,6 +16,8 @@ from models.student_evaluation import StudentEvaluation
 from models.student_evaluation_answer import StudentEvaluationAnswer
 from models.student_evaluation_question_group import StudentEvaluationQuestionGroup
 from models.student_evaluation_result import StudentEvaluationResult
+from models.student_mulyankan import StudentMulyankan
+
 
 with app.app_context():
     db.create_all()

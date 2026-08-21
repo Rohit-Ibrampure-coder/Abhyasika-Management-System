@@ -24,6 +24,7 @@ from routes.evaluation import evaluation_bp
 from routes.evaluation_student import evaluation_student_bp
 from routes.evaluation_report import evaluation_report_bp
 from routes.student_evaluation_report import student_evaluation_report_bp
+from models.student_mulyankan import StudentMulyankan
 
 from branding import (
     APP_NAME,

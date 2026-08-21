@@ -153,6 +153,17 @@ class Student(db.Model):
     )
 
     # ==========================================
+    # Vidyarthi Mulyankan Selection
+    # ==========================================
+
+    mulyankan_selection = db.relationship(
+        "StudentMulyankan",
+        back_populates="student",
+        uselist=False,
+        cascade="all, delete-orphan"
+    )
+
+    # ==========================================
     # String Representation
     # ==========================================
 

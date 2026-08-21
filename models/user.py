@@ -93,5 +93,15 @@ class User(UserMixin, db.Model):
         cascade="all, delete-orphan"
     )
 
+    # ==========================================
+    # Vidyarthi Mulyankan Selection
+    # ==========================================
+
+    mulyankan_selections = db.relationship(
+        "StudentMulyankan",
+        back_populates="added_by_user",
+        cascade="all, delete-orphan"
+    )
+
     def __repr__(self):
         return f"<User {self.username}>"

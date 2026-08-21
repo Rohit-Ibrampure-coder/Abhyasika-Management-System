@@ -1,0 +1,1878 @@
+{% extends "base.html" %}
+
+{% block title %}
+विद्यार्थी मूल्यांकन - विद्यार्थी निवड
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- ========================================== -->
+    <!-- Page Header -->
+    <!-- ========================================== -->
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">
+                विद्यार्थी मूल्यांकन - विद्यार्थी निवड
+            </h2>
+
+            <p class="text-muted mb-0">
+                मूल्यांकनासाठी विद्यार्थ्यांची कायमस्वरूपी निवड करा.
+            </p>
+        </div>
+
+        <a
+            href="{{ url_for('evaluation_student.student_evaluation_home') }}"
+            class="btn btn-secondary"
+        >
+            <i class="bi bi-arrow-left me-1"></i>
+            Back
+        </a>
+
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- Filter Card -->
+    <!-- ========================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header">
+            <h5 class="mb-0">
+                Student Selection
+            </h5>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row g-3 align-items-end">
+
+                <!-- ========================================== -->
+                <!-- Abhyasika -->
+                <!-- ========================================== -->
+
+                <div class="col-lg-4 col-md-6">
+
+                    <label
+                        class="form-label fw-semibold"
+                        for="abhyasikaFilter"
+                    >
+                        Abhyasika
+                    </label>
+
+                    <select
+                        id="abhyasikaFilter"
+                        class="form-select"
+                    >
+
+                        {% if is_admin %}
+
+                        <option
+                            value=""
+                            {% if not selected_abhyasika_id %}
+                                selected
+                            {% endif %}
+                        >
+                            -- All Abhyasikas --
+                        </option>
+
+                        {% endif %}
+
+                        {% for abhyasika in abhyasikas %}
+
+                        <option
+                            value="{{ abhyasika.id }}"
+                            {% if selected_abhyasika_id == abhyasika.id %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ abhyasika.name }}
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- ========================================== -->
+                <!-- Search -->
+                <!-- ========================================== -->
+
+                <div class="col-lg-5 col-md-6">
+
+                    <label
+                        class="form-label fw-semibold"
+                        for="studentSearch"
+                    >
+                        Search Student
+                    </label>
+
+                    <input
+                        type="text"
+                        id="studentSearch"
+                        class="form-control"
+                        value="{{ search }}"
+                        placeholder="Search student name..."
+                        autocomplete="off"
+                    >
+
+                </div>
+
+
+                <!-- ========================================== -->
+                <!-- Selected Count -->
+                <!-- ========================================== -->
+
+                <div class="col-lg-3">
+
+                    <div class="border rounded p-2 text-center">
+
+                        <small class="text-muted d-block">
+                            Selected Students
+                        </small>
+
+                        <strong
+                            class="text-primary fs-5"
+                            id="selectedCount"
+                        >
+                            {{ selected_count }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- Selection Form -->
+    <!-- ========================================== -->
+
+    <form
+        method="POST"
+        action="{{ url_for('evaluation_student.save_mulyankan_students') }}"
+        id="mulyankanSelectionForm"
+        data-data-url="{{ url_for('evaluation_student.get_mulyankan_students') }}"
+        data-selected-ids="{{ selected_student_ids | join(',') }}"
+    >
+
+        <!-- Hidden Abhyasika -->
+
+        <input
+            type="hidden"
+            name="abhyasika_id"
+            id="selectedAbhyasika"
+            value="{{ selected_abhyasika_id or '' }}"
+        >
+
+
+        <!-- Complete Selected Student IDs -->
+
+        <input
+            type="hidden"
+            name="selected_ids"
+            id="selectedIdsInput"
+            value=""
+        >
+
+
+        <div class="card shadow-sm border-0">
+
+            <!-- ========================================== -->
+            <!-- Card Header -->
+            <!-- ========================================== -->
+
+            <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+
+                <div>
+
+                    <h5 class="mb-1">
+                        Student List
+                    </h5>
+
+                    <small
+                        class="text-muted"
+                        id="studentScopeText"
+                    >
+
+                        {% if selected_abhyasika %}
+
+                            {{ selected_abhyasika.name }}
+
+                        {% elif is_admin %}
+
+                            All Abhyasikas
+
+                        {% else %}
+
+                            Assigned Abhyasikas
+
+                        {% endif %}
+
+                    </small>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    id="selectAllBtn"
+                    class="btn btn-outline-primary btn-sm"
+                >
+                    <i class="bi bi-check2-square me-1"></i>
+                    Select All on Page
+                </button>
+
+            </div>
+
+
+            <!-- ========================================== -->
+            <!-- Loading -->
+            <!-- ========================================== -->
+
+            <div
+                id="studentLoading"
+                class="text-center py-5 d-none"
+            >
+
+                <div
+                    class="spinner-border text-primary"
+                    role="status"
+                ></div>
+
+                <div class="text-muted mt-2">
+                    Loading students...
+                </div>
+
+            </div>
+
+
+            <!-- ========================================== -->
+            <!-- Student Table -->
+            <!-- ========================================== -->
+
+            <div
+                class="table-responsive"
+                id="studentTableContainer"
+            >
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th
+                                class="text-center"
+                                style="width:8%;"
+                            >
+                                Select
+                            </th>
+
+                            <th style="width:30%;">
+                                Student Name
+                            </th>
+
+                            <th style="width:12%;">
+                                Standard
+                            </th>
+
+                            <th style="width:30%;">
+                                School / College
+                            </th>
+
+                            <th style="width:20%;">
+                                Abhyasika
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="studentTableBody">
+
+                        {% for student in students %}
+
+                        <tr class="student-row">
+
+                            <td class="text-center">
+
+                                <input
+                                    type="checkbox"
+                                    class="form-check-input student-checkbox"
+                                    value="{{ student.id }}"
+                                    {% if student.id in selected_student_ids %}
+                                        checked
+                                    {% endif %}
+                                >
+
+                            </td>
+
+                            <td>
+                                <strong>
+                                    {{ student.student_name }}
+                                </strong>
+                            </td>
+
+                            <td>
+                                {{ student.standard or "-" }}
+                            </td>
+
+                            <td>
+                                {{ student.school_college_name or "-" }}
+                            </td>
+
+                            <td>
+                                {{ student.abhyasika.name
+                                   if student.abhyasika
+                                   else "-" }}
+                            </td>
+
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+
+                            <td
+                                colspan="5"
+                                class="text-center text-muted py-5"
+                            >
+
+                                <i
+                                    class="bi bi-people fs-2 d-block mb-2"
+                                ></i>
+
+                                No students found.
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- ========================================== -->
+            <!-- Pagination -->
+            <!-- ========================================== -->
+
+            <div
+                class="card-body border-top"
+                id="paginationContainer"
+            >
+
+                <nav aria-label="Student pagination">
+
+                    <ul
+                        class="pagination justify-content-center mb-0"
+                        id="paginationList"
+                    ></ul>
+
+                </nav>
+
+
+                <div
+                    class="text-center text-muted small mt-2"
+                    id="paginationInfo"
+                >
+                    Loading...
+                </div>
+
+            </div>
+
+
+            <!-- ========================================== -->
+            <!-- Footer -->
+            <!-- ========================================== -->
+
+            <div class="card-footer bg-transparent">
+
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+
+                    <div class="text-muted small">
+
+                        <i class="bi bi-info-circle me-1"></i>
+
+                        Selected students will remain in
+                        Vidyarthi Mulyankan until removed.
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                        id="saveSelectionBtn"
+                    >
+
+                        <i class="bi bi-check-circle me-1"></i>
+
+                        Save Selection
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}
+
+
+{% block js %}
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    // ==========================================
+    // Elements
+    // ==========================================
+
+    const form =
+        document.getElementById(
+            "mulyankanSelectionForm"
+        );
+
+    const abhyasikaFilter =
+        document.getElementById(
+            "abhyasikaFilter"
+        );
+
+    const searchBox =
+        document.getElementById(
+            "studentSearch"
+        );
+
+    const selectedCountElement =
+        document.getElementById(
+            "selectedCount"
+        );
+
+    const selectedIdsInput =
+        document.getElementById(
+            "selectedIdsInput"
+        );
+
+    const selectedAbhyasikaInput =
+        document.getElementById(
+            "selectedAbhyasika"
+        );
+
+    const studentTableBody =
+        document.getElementById(
+            "studentTableBody"
+        );
+
+    const paginationList =
+        document.getElementById(
+            "paginationList"
+        );
+
+    const paginationInfo =
+        document.getElementById(
+            "paginationInfo"
+        );
+
+    const studentLoading =
+        document.getElementById(
+            "studentLoading"
+        );
+
+    const studentTableContainer =
+        document.getElementById(
+            "studentTableContainer"
+        );
+
+    const selectAllBtn =
+        document.getElementById(
+            "selectAllBtn"
+        );
+
+
+    // ==========================================
+    // Safety Check
+    // ==========================================
+
+    if (!form) {
+
+        console.error(
+            "Mulyankan selection form not found."
+        );
+
+        return;
+
+    }
+
+
+    // ==========================================
+    // Configuration
+    // ==========================================
+
+    const DATA_URL =
+        form.dataset.dataUrl || "";
+
+
+    if (!DATA_URL) {
+
+        console.error(
+            "Student data URL is missing."
+        );
+
+        return;
+
+    }
+
+
+    // ==========================================
+    // Initial Selected Student IDs
+    // ==========================================
+    //
+    // These IDs come from the database through
+    // the form data attribute.
+    //
+    // Example:
+    //
+    // data-selected-ids="1,5,8,12"
+    //
+    // ==========================================
+
+    const initialSelectedIds =
+        form.dataset.selectedIds
+            ? form.dataset.selectedIds
+                .split(",")
+                .map(function (id) {
+
+                    return id.trim();
+
+                })
+                .filter(function (id) {
+
+                    return id !== "";
+
+                })
+                .map(function (id) {
+
+                    return Number(id);
+
+                })
+                .filter(function (id) {
+
+                    return Number.isInteger(id)
+                    && id > 0;
+
+                })
+            : [];
+
+
+    // ==========================================
+    // GLOBAL SELECTION STATE
+    // ==========================================
+    //
+    // This Set is the most important part.
+    //
+    // It contains selections from ALL pages.
+    //
+    // Page 1:
+    // selectedIds = {1, 4}
+    //
+    // Page 2:
+    // selectedIds = {1, 4, 15, 18}
+    //
+    // Page 3:
+    // selectedIds = {1, 4, 15, 18, 25}
+    //
+    // ==========================================
+
+    const selectedIds =
+        new Set(
+            initialSelectedIds
+        );
+
+
+    // ==========================================
+    // Current State
+    // ==========================================
+
+    let currentPage = 1;
+
+    let currentSearch =
+        searchBox
+            ? searchBox.value.trim()
+            : "";
+
+    let currentAbhyasika =
+        abhyasikaFilter
+            ? abhyasikaFilter.value
+            : "";
+
+    let searchTimer = null;
+
+    let requestController = null;
+
+
+    // ==========================================
+    // Update Hidden Input
+    // ==========================================
+
+    function updateHiddenInput() {
+
+        const ids =
+            Array.from(selectedIds)
+                .sort(function (a, b) {
+
+                    return a - b;
+
+                });
+
+
+        selectedIdsInput.value =
+            ids.join(",");
+
+    }
+
+
+    // ==========================================
+    // Update Selected Count
+    // ==========================================
+
+    function updateSelectedCount() {
+
+        selectedCountElement.textContent =
+            selectedIds.size;
+
+    }
+
+
+    // ==========================================
+    // Loading State
+    // ==========================================
+
+    function setLoading(
+        loading
+    ) {
+
+        if (loading) {
+
+            studentLoading.classList.remove(
+                "d-none"
+            );
+
+            studentTableContainer.classList.add(
+                "opacity-50"
+            );
+
+        } else {
+
+            studentLoading.classList.add(
+                "d-none"
+            );
+
+            studentTableContainer.classList.remove(
+                "opacity-50"
+            );
+
+        }
+
+    }
+
+
+    // ==========================================
+    // Escape HTML
+    // ==========================================
+
+    function escapeHtml(
+        value
+    ) {
+
+        if (
+            value === null
+            ||
+            value === undefined
+        ) {
+
+            return "";
+
+        }
+
+
+        return String(value)
+
+            .replace(
+                /&/g,
+                "&amp;"
+            )
+
+            .replace(
+                /</g,
+                "&lt;"
+            )
+
+            .replace(
+                />/g,
+                "&gt;"
+            )
+
+            .replace(
+                /"/g,
+                "&quot;"
+            )
+
+            .replace(
+                /'/g,
+                "&#039;"
+            );
+
+    }
+
+
+    // ==========================================
+    // Render Students
+    // ==========================================
+
+    function renderStudents(
+        students
+    ) {
+
+        if (
+            !Array.isArray(students)
+            ||
+            students.length === 0
+        ) {
+
+            studentTableBody.innerHTML = `
+
+                <tr>
+
+                    <td
+                        colspan="5"
+                        class="text-center text-muted py-5"
+                    >
+
+                        <i
+                            class="bi bi-people fs-2 d-block mb-2"
+                        ></i>
+
+                        No students found.
+
+                    </td>
+
+                </tr>
+
+            `;
+
+            updateSelectAllButton();
+
+            return;
+
+        }
+
+
+        let html = "";
+
+
+        students.forEach(
+            function (student) {
+
+                const studentId =
+                    Number(
+                        student.id
+                    );
+
+
+                const checked =
+                    selectedIds.has(
+                        studentId
+                    );
+
+
+                html += `
+
+                    <tr class="student-row">
+
+                        <td class="text-center">
+
+                            <input
+                                type="checkbox"
+                                class="form-check-input student-checkbox"
+                                value="${escapeHtml(student.id)}"
+                                ${checked ? "checked" : ""}
+                            >
+
+                        </td>
+
+
+                        <td>
+
+                            <strong>
+                                ${escapeHtml(
+                                    student.student_name
+                                )}
+                            </strong>
+
+                        </td>
+
+
+                        <td>
+
+                            ${escapeHtml(
+                                student.standard || "-"
+                            )}
+
+                        </td>
+
+
+                        <td>
+
+                            ${escapeHtml(
+                                student.school_college_name || "-"
+                            )}
+
+                        </td>
+
+
+                        <td>
+
+                            ${escapeHtml(
+                                student.abhyasika_name || "-"
+                            )}
+
+                        </td>
+
+                    </tr>
+
+                `;
+
+            }
+        );
+
+
+        studentTableBody.innerHTML =
+            html;
+
+
+        // ==========================================
+        // Attach Checkbox Events
+        // ==========================================
+
+        document
+            .querySelectorAll(
+                ".student-checkbox"
+            )
+            .forEach(
+                function (checkbox) {
+
+                    checkbox.addEventListener(
+                        "change",
+                        function () {
+
+                            const studentId =
+                                Number(
+                                    this.value
+                                );
+
+
+                            if (
+                                this.checked
+                            ) {
+
+                                selectedIds.add(
+                                    studentId
+                                );
+
+                            } else {
+
+                                selectedIds.delete(
+                                    studentId
+                                );
+
+                            }
+
+
+                            updateHiddenInput();
+
+                            updateSelectedCount();
+
+                            updateSelectAllButton();
+
+                        }
+                    );
+
+                }
+            );
+
+
+        updateSelectAllButton();
+
+    }
+
+
+    // ==========================================
+    // Update Select All Button
+    // ==========================================
+
+    function updateSelectAllButton() {
+
+        const pageCheckboxes =
+            Array.from(
+                document.querySelectorAll(
+                    ".student-checkbox"
+                )
+            );
+
+
+        if (
+            pageCheckboxes.length === 0
+        ) {
+
+            selectAllBtn.disabled =
+                true;
+
+            selectAllBtn.innerHTML = `
+
+                <i
+                    class="bi bi-check2-square me-1"
+                ></i>
+
+                Select All on Page
+
+            `;
+
+            return;
+
+        }
+
+
+        selectAllBtn.disabled =
+            false;
+
+
+        const allSelected =
+            pageCheckboxes.every(
+                function (checkbox) {
+
+                    return checkbox.checked;
+
+                }
+            );
+
+
+        if (allSelected) {
+
+            selectAllBtn.innerHTML = `
+
+                <i
+                    class="bi bi-x-square me-1"
+                ></i>
+
+                Deselect Page
+
+            `;
+
+        } else {
+
+            selectAllBtn.innerHTML = `
+
+                <i
+                    class="bi bi-check2-square me-1"
+                ></i>
+
+                Select All on Page
+
+            `;
+
+        }
+
+    }
+
+
+    // ==========================================
+    // Select / Deselect Current Page
+    // ==========================================
+
+    selectAllBtn.addEventListener(
+        "click",
+        function () {
+
+            const pageCheckboxes =
+                Array.from(
+                    document.querySelectorAll(
+                        ".student-checkbox"
+                    )
+                );
+
+
+            if (
+                pageCheckboxes.length === 0
+            ) {
+
+                return;
+
+            }
+
+
+            const allSelected =
+                pageCheckboxes.every(
+                    function (checkbox) {
+
+                        return checkbox.checked;
+
+                    }
+                );
+
+
+            pageCheckboxes.forEach(
+                function (checkbox) {
+
+                    const studentId =
+                        Number(
+                            checkbox.value
+                        );
+
+
+                    if (allSelected) {
+
+                        checkbox.checked =
+                            false;
+
+                        selectedIds.delete(
+                            studentId
+                        );
+
+                    } else {
+
+                        checkbox.checked =
+                            true;
+
+                        selectedIds.add(
+                            studentId
+                        );
+
+                    }
+
+                }
+            );
+
+
+            updateHiddenInput();
+
+            updateSelectedCount();
+
+            updateSelectAllButton();
+
+        }
+    );
+
+
+    // ==========================================
+    // Generate Page Numbers
+    // ==========================================
+
+    function getPageNumbers(
+        current,
+        total
+    ) {
+
+        const pages = [];
+
+
+        if (total <= 7) {
+
+            for (
+                let i = 1;
+                i <= total;
+                i++
+            ) {
+
+                pages.push(i);
+
+            }
+
+            return pages;
+
+        }
+
+
+        pages.push(1);
+
+
+        if (current > 4) {
+
+            pages.push("...");
+
+        }
+
+
+        const start =
+            Math.max(
+                2,
+                current - 1
+            );
+
+
+        const end =
+            Math.min(
+                total - 1,
+                current + 1
+            );
+
+
+        for (
+            let i = start;
+            i <= end;
+            i++
+        ) {
+
+            pages.push(i);
+
+        }
+
+
+        if (
+            current < total - 3
+        ) {
+
+            pages.push("...");
+
+        }
+
+
+        pages.push(total);
+
+
+        return pages;
+
+    }
+
+
+    // ==========================================
+    // Render Pagination
+    // ==========================================
+
+    function renderPagination(
+        pagination
+    ) {
+
+        paginationList.innerHTML =
+            "";
+
+
+        if (
+            !pagination
+            ||
+            pagination.pages <= 1
+        ) {
+
+            paginationInfo.textContent =
+                pagination
+                    ? (
+                        "Showing "
+                        +
+                        pagination.total
+                        +
+                        " students"
+                    )
+                    : "";
+
+            return;
+
+        }
+
+
+        // ==========================================
+        // Previous Button
+        // ==========================================
+
+        const previousLi =
+            document.createElement(
+                "li"
+            );
+
+        previousLi.className =
+            "page-item"
+            +
+            (
+                pagination.has_prev
+                    ? ""
+                    : " disabled"
+            );
+
+
+        const previousButton =
+            document.createElement(
+                "button"
+            );
+
+        previousButton.type =
+            "button";
+
+        previousButton.className =
+            "page-link";
+
+        previousButton.innerHTML = `
+
+            <i
+                class="bi bi-chevron-left"
+            ></i>
+
+            Previous
+
+        `;
+
+        previousButton.disabled =
+            !pagination.has_prev;
+
+
+        previousButton.addEventListener(
+            "click",
+            function () {
+
+                if (
+                    pagination.has_prev
+                ) {
+
+                    loadStudents(
+                        pagination.prev_num
+                    );
+
+                }
+
+            }
+        );
+
+
+        previousLi.appendChild(
+            previousButton
+        );
+
+        paginationList.appendChild(
+            previousLi
+        );
+
+
+        // ==========================================
+        // Page Numbers
+        // ==========================================
+
+        const pageNumbers =
+            getPageNumbers(
+                pagination.page,
+                pagination.pages
+            );
+
+
+        pageNumbers.forEach(
+            function (pageNumber) {
+
+                // ==========================================
+                // Ellipsis
+                // ==========================================
+
+                if (
+                    pageNumber === "..."
+                ) {
+
+                    const li =
+                        document.createElement(
+                            "li"
+                        );
+
+                    li.className =
+                        "page-item disabled";
+
+                    li.innerHTML = `
+
+                        <span class="page-link">
+                            …
+                        </span>
+
+                    `;
+
+                    paginationList.appendChild(
+                        li
+                    );
+
+                    return;
+
+                }
+
+
+                // ==========================================
+                // Page Number
+                // ==========================================
+
+                const li =
+                    document.createElement(
+                        "li"
+                    );
+
+
+                li.className =
+                    "page-item"
+                    +
+                    (
+                        pageNumber
+                        === pagination.page
+                            ? " active"
+                            : ""
+                    );
+
+
+                const button =
+                    document.createElement(
+                        "button"
+                    );
+
+
+                button.type =
+                    "button";
+
+                button.className =
+                    "page-link";
+
+                button.textContent =
+                    pageNumber;
+
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        loadStudents(
+                            pageNumber
+                        );
+
+                    }
+                );
+
+
+                li.appendChild(
+                    button
+                );
+
+
+                paginationList.appendChild(
+                    li
+                );
+
+            }
+        );
+
+
+        // ==========================================
+        // Next Button
+        // ==========================================
+
+        const nextLi =
+            document.createElement(
+                "li"
+            );
+
+        nextLi.className =
+            "page-item"
+            +
+            (
+                pagination.has_next
+                    ? ""
+                    : " disabled"
+            );
+
+
+        const nextButton =
+            document.createElement(
+                "button"
+            );
+
+        nextButton.type =
+            "button";
+
+        nextButton.className =
+            "page-link";
+
+        nextButton.innerHTML = `
+
+            Next
+
+            <i
+                class="bi bi-chevron-right"
+            ></i>
+
+        `;
+
+        nextButton.disabled =
+            !pagination.has_next;
+
+
+        nextButton.addEventListener(
+            "click",
+            function () {
+
+                if (
+                    pagination.has_next
+                ) {
+
+                    loadStudents(
+                        pagination.next_num
+                    );
+
+                }
+
+            }
+        );
+
+
+        nextLi.appendChild(
+            nextButton
+        );
+
+        paginationList.appendChild(
+            nextLi
+        );
+
+
+        // ==========================================
+        // Pagination Information
+        // ==========================================
+
+        const first =
+            (
+                (
+                    pagination.page
+                    - 1
+                )
+                *
+                pagination.per_page
+            )
+            + 1;
+
+
+        const last =
+            Math.min(
+                pagination.page
+                *
+                pagination.per_page,
+                pagination.total
+            );
+
+
+        paginationInfo.textContent =
+            "Showing "
+            +
+            first
+            +
+            " – "
+            +
+            last
+            +
+            " of "
+            +
+            pagination.total
+            +
+            " students";
+
+    }
+
+
+    // ==========================================
+    // Load Students Using AJAX
+    // ==========================================
+
+    async function loadStudents(
+        page = 1
+    ) {
+
+        currentPage =
+            page;
+
+
+        updateHiddenInput();
+
+        updateSelectedCount();
+
+
+        // ==========================================
+        // Cancel Previous Request
+        // ==========================================
+
+        if (
+            requestController
+        ) {
+
+            requestController.abort();
+
+        }
+
+
+        requestController =
+            new AbortController();
+
+
+        setLoading(true);
+
+
+        const params =
+            new URLSearchParams();
+
+
+        params.set(
+            "page",
+            String(page)
+        );
+
+
+        if (
+            currentAbhyasika
+        ) {
+
+            params.set(
+                "abhyasika_id",
+                currentAbhyasika
+            );
+
+        }
+
+
+        if (
+            currentSearch
+        ) {
+
+            params.set(
+                "search",
+                currentSearch
+            );
+
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    DATA_URL
+                    +
+                    "?"
+                    +
+                    params.toString(),
+                    {
+                        method: "GET",
+
+                        headers: {
+                            "X-Requested-With":
+                                "XMLHttpRequest"
+                        },
+
+                        signal:
+                            requestController.signal
+                    }
+                );
+
+
+            if (
+                !response.ok
+            ) {
+
+                throw new Error(
+                    "Failed to load students."
+                );
+
+            }
+
+
+            const data =
+                await response.json();
+
+
+            if (
+                !data.success
+            ) {
+
+                throw new Error(
+                    "Unable to load students."
+                );
+
+            }
+
+
+            // ==========================================
+            // IMPORTANT
+            // ==========================================
+            //
+            // Do NOT replace selectedIds with
+            // data.selected_ids here.
+            //
+            // selectedIds already contains
+            // selections from previous pages.
+            //
+            // ==========================================
+
+
+            renderStudents(
+                data.students
+            );
+
+
+            renderPagination(
+                data.pagination
+            );
+
+
+            updateHiddenInput();
+
+            updateSelectedCount();
+
+
+        } catch (error) {
+
+            if (
+                error.name === "AbortError"
+            ) {
+
+                return;
+
+            }
+
+
+            console.error(
+                "Student loading error:",
+                error
+            );
+
+
+            studentTableBody.innerHTML = `
+
+                <tr>
+
+                    <td
+                        colspan="5"
+                        class="text-center text-danger py-5"
+                    >
+
+                        <i
+                            class="bi bi-exclamation-triangle fs-2 d-block mb-2"
+                        ></i>
+
+                        Unable to load students.
+
+                        <div
+                            class="small text-muted mt-1"
+                        >
+                            Please try again.
+                        </div>
+
+                    </td>
+
+                </tr>
+
+            `;
+
+
+            paginationList.innerHTML =
+                "";
+
+            paginationInfo.textContent =
+                "";
+
+
+        } finally {
+
+            setLoading(false);
+
+        }
+
+    }
+
+
+    // ==========================================
+    // Search
+    // ==========================================
+
+    if (searchBox) {
+
+        searchBox.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Enter"
+                ) {
+
+                    event.preventDefault();
+
+
+                    currentSearch =
+                        searchBox.value.trim();
+
+
+                    loadStudents(
+                        1
+                    );
+
+                }
+
+            }
+        );
+
+
+        searchBox.addEventListener(
+            "input",
+            function () {
+
+                clearTimeout(
+                    searchTimer
+                );
+
+
+                searchTimer =
+                    setTimeout(
+                        function () {
+
+                            currentSearch =
+                                searchBox
+                                    .value
+                                    .trim();
+
+
+                            /*
+                             * Do NOT clear selectedIds.
+                             *
+                             * Search must preserve
+                             * selections from other
+                             * pages.
+                             */
+
+                            loadStudents(
+                                1
+                            );
+
+                        },
+                        500
+                    );
+
+            }
+        );
+
+    }
+
+
+    // ==========================================
+    // Abhyasika Change
+    // ==========================================
+
+    if (abhyasikaFilter) {
+
+        abhyasikaFilter.addEventListener(
+            "change",
+            function () {
+
+                currentAbhyasika =
+                    this.value;
+
+
+                selectedAbhyasikaInput.value =
+                    currentAbhyasika;
+
+
+                /*
+                 * Abhyasika is a new selection
+                 * scope.
+                 *
+                 * Clear the old scope.
+                 */
+
+                selectedIds.clear();
+
+
+                currentSearch =
+                    "";
+
+
+                if (searchBox) {
+
+                    searchBox.value =
+                        "";
+
+                }
+
+
+                currentPage =
+                    1;
+
+
+                loadStudents(
+                    1
+                );
+
+            }
+        );
+
+    }
+
+
+    // ==========================================
+    // Form Submit
+    // ==========================================
+
+    form.addEventListener(
+        "submit",
+        function () {
+
+            /*
+             * VERY IMPORTANT:
+             *
+             * This contains selections from
+             * every page.
+             */
+
+            updateHiddenInput();
+
+            updateSelectedCount();
+
+        }
+    );
+
+
+    // ==========================================
+    // Initial State
+    // ==========================================
+
+    updateHiddenInput();
+
+    updateSelectedCount();
+
+
+    // ==========================================
+    // Initial Student Load
+    // ==========================================
+
+    loadStudents(
+        1
+    );
+
+});
+
+</script>
+
+{% endblock %}

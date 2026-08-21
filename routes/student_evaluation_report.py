@@ -13,20 +13,36 @@ from flask_login import (
     current_user
 )
 
+from sqlalchemy import or_
+from collections import defaultdict
+
+from models import db
+
 from models.achievement import Achievement
 from models.remark import Remark
+
+from models.student import Student
+from models.student_mulyankan import StudentMulyankan
+
 from models.student_evaluation import StudentEvaluation
+from models.student_evaluation_answer import (
+    StudentEvaluationAnswer
+)
+
+from models.student_evaluation_question import (
+    StudentEvaluationQuestion
+)
+
+from models.student_evaluation_question_group import (
+    StudentEvaluationQuestionGroup
+)
+
 from models.abhyasika import Abhyasika
 from models.teacher_abhyasika import TeacherAbhyasika
-from sqlalchemy import func
-from collections import defaultdict
-from models.student import Student
-from sqlalchemy import or_
+
 from models.attendance import Attendance
 from models.attendance_session import AttendanceSession
-from models.student_evaluation_answer import StudentEvaluationAnswer
-from models.student_evaluation_question import StudentEvaluationQuestion
-from models.student_evaluation_question_group import StudentEvaluationQuestionGroup
+
 
 student_evaluation_report_bp = Blueprint(
     "student_evaluation_report",
@@ -53,7 +69,6 @@ def report_home():
         ""
     ).strip()
 
-
     # ==========================================
     # Selected Abhyasika
     # ==========================================
@@ -62,7 +77,6 @@ def report_home():
         "abhyasika_id",
         type=int
     )
-
 
     # ==========================================
     # Determine Allowed Abhyasikas
@@ -80,34 +94,20 @@ def report_home():
             .all()
         )
 
-        allowed_abhyasika_ids = [
-            abhyasika.id
-            for abhyasika in allowed_abhyasikas
-        ]
-
     elif current_user.role == "teacher":
 
-        # Teacher can only see assigned Abhyasikas
-
-        teacher_assignments = (
-            TeacherAbhyasika.query
-            .filter_by(
-                teacher_id=current_user.id
-            )
-            .all()
-        )
-
-        allowed_abhyasika_ids = [
-            assignment.abhyasika_id
-            for assignment in teacher_assignments
-        ]
+        # Teacher can see only assigned Abhyasikas
 
         allowed_abhyasikas = (
-            Abhyasika.query
+            db.session.query(Abhyasika)
+            .join(
+                TeacherAbhyasika,
+                TeacherAbhyasika.abhyasika_id
+                == Abhyasika.id
+            )
             .filter(
-                Abhyasika.id.in_(
-                    allowed_abhyasika_ids
-                )
+                TeacherAbhyasika.teacher_id
+                == current_user.id
             )
             .order_by(
                 Abhyasika.name
@@ -119,6 +119,14 @@ def report_home():
 
         abort(403)
 
+    # ==========================================
+    # Allowed Abhyasika IDs
+    # ==========================================
+
+    allowed_abhyasika_ids = {
+        abhyasika.id
+        for abhyasika in allowed_abhyasikas
+    }
 
     # ==========================================
     # Validate Selected Abhyasika
@@ -127,21 +135,43 @@ def report_home():
     if (
         abhyasika_id is not None
         and
-        abhyasika_id not in allowed_abhyasika_ids
+        abhyasika_id
+        not in allowed_abhyasika_ids
     ):
 
-        # Do not allow a teacher/admin to
-        # access an Abhyasika outside their scope.
-
-        abhyasika_id = None
-
+        abort(403)
 
     # ==========================================
     # Student Query
     # ==========================================
+    #
+    # IMPORTANT:
+    #
+    # Only students who are ACTIVE in
+    # StudentMulyankan are part of the
+    # Evaluation module.
+    #
+    # StudentMulyankan is now the master
+    # selection for:
+    #
+    # - Vidyarthi Mulyankan
+    # - Mulyankan Ahaval
+    # - Vidyarthi Pragati
+    #
+    # ==========================================
 
-    query = Student.query
-
+    query = (
+        Student.query
+        .join(
+            StudentMulyankan,
+            StudentMulyankan.student_id
+            == Student.id
+        )
+        .filter(
+            StudentMulyankan.status
+            == "Active"
+        )
+    )
 
     # ==========================================
     # Teacher Security Restriction
@@ -155,7 +185,6 @@ def report_home():
             )
         )
 
-
     # ==========================================
     # Admin / Teacher Abhyasika Filter
     # ==========================================
@@ -163,10 +192,12 @@ def report_home():
     if abhyasika_id is not None:
 
         query = query.filter(
-            Student.abhyasika_id ==
-            abhyasika_id
-        )
+            Student.abhyasika_id
+            == abhyasika_id,
 
+            StudentMulyankan.abhyasika_id
+            == abhyasika_id
+        )
 
     # ==========================================
     # Search Filter
@@ -190,7 +221,6 @@ def report_home():
 
         )
 
-
     # ==========================================
     # Load Students
     # ==========================================
@@ -202,7 +232,6 @@ def report_home():
         )
         .all()
     )
-
 
     # ==========================================
     # Prepare Report Students
@@ -220,7 +249,6 @@ def report_home():
             .count()
         )
 
-
         last_evaluation = (
             StudentEvaluation.query
             .filter_by(
@@ -231,7 +259,6 @@ def report_home():
             )
             .first()
         )
-
 
         report_students.append({
 
@@ -254,14 +281,14 @@ def report_home():
 
         })
 
-
     # ==========================================
     # Render
     # ==========================================
 
     return render_template(
 
-        "evaluation/student_report/report_home.html",
+        "evaluation/student_report/"
+        "report_home.html",
 
         report_students=report_students,
 
@@ -269,9 +296,11 @@ def report_home():
 
         abhyasikas=allowed_abhyasikas,
 
-        selected_abhyasika_id=abhyasika_id
+        selected_abhyasika_id=
+            abhyasika_id
 
     )
+
 
 # ==========================================
 # Academic Year Helper
@@ -284,7 +313,10 @@ def get_academic_year(target_date):
 
     year = target_date.year
 
-    if target_date.month >= ACADEMIC_YEAR_START_MONTH:
+    if (
+        target_date.month
+        >= ACADEMIC_YEAR_START_MONTH
+    ):
 
         start_year = year
 
@@ -324,6 +356,69 @@ def teacher_can_access_student(student):
 
     return assignment is not None
 
+
+# ==========================================
+# Mulyankan Student Access Check
+# ==========================================
+
+def mulyankan_can_access_student(student):
+
+    """
+    Check whether the student is currently
+    selected for Vidyarthi Mulyankan.
+
+    Only ACTIVE StudentMulyankan records
+    are allowed in the current Evaluation
+    module.
+    """
+
+    mulyankan_student = (
+        StudentMulyankan.query
+        .filter_by(
+            student_id=student.id,
+            abhyasika_id=student.abhyasika_id,
+            status="Active"
+        )
+        .first()
+    )
+
+    return mulyankan_student is not None
+
+
+# ==========================================
+# Student Evaluation Module Access Check
+# ==========================================
+
+def can_access_evaluation_student(student):
+
+    """
+    Complete access check.
+
+    1. Student must be Active in
+       StudentMulyankan.
+
+    2. Teacher must be assigned to the
+       student's Abhyasika.
+
+    Admin automatically passes the
+    TeacherAbhyasika check.
+    """
+
+    if not mulyankan_can_access_student(
+        student
+    ):
+
+        return False
+
+    if not teacher_can_access_student(
+        student
+    ):
+
+        return False
+
+    return True
+
+
 # ==========================================
 # Student Progress Report
 # ==========================================
@@ -334,9 +429,21 @@ def teacher_can_access_student(student):
 @login_required
 def student_progress_report(student_id):
 
-    student = Student.query.get_or_404(student_id)
+    # ==========================================
+    # Load Student
+    # ==========================================
 
-    if not teacher_can_access_student(student):
+    student = Student.query.get_or_404(
+        student_id
+    )
+
+    # ==========================================
+    # Evaluation Student Access
+    # ==========================================
+
+    if not can_access_evaluation_student(
+        student
+    ):
 
         abort(403)
 
@@ -349,15 +456,15 @@ def student_progress_report(student_id):
         Attendance.query
         .join(
             AttendanceSession,
-            Attendance.attendance_session_id ==
-            AttendanceSession.id
+            Attendance.attendance_session_id
+            == AttendanceSession.id
         )
         .filter(
-            Attendance.student_id == student.id
+            Attendance.student_id
+            == student.id
         )
         .all()
     )
-
 
     attendance_year_data = defaultdict(
         lambda: {
@@ -374,23 +481,22 @@ def student_progress_report(student_id):
         }
     )
 
-
     for attendance in attendance_records:
 
         attendance_date = (
-            attendance.attendance_session.attendance_date
+            attendance
+            .attendance_session
+            .attendance_date
         )
 
         academic_year = get_academic_year(
             attendance_date
         )
 
-        month_key = attendance_date.strftime(
-            "%Y-%m"
-        )
-
-        month_name = attendance_date.strftime(
-            "%B"
+        month_key = (
+            attendance_date.strftime(
+                "%Y-%m"
+            )
         )
 
         # ==========================================
@@ -407,7 +513,9 @@ def student_progress_report(student_id):
 
         attendance_year_data[
             academic_year
-        ]["months"][month_key]["total"] += 1
+        ]["months"][month_key][
+            "total"
+        ] += 1
 
         if attendance.status == "Present":
 
@@ -417,7 +525,9 @@ def student_progress_report(student_id):
 
             attendance_year_data[
                 academic_year
-            ]["months"][month_key]["present"] += 1
+            ]["months"][month_key][
+                "present"
+            ] += 1
 
         elif attendance.status == "Absent":
 
@@ -427,7 +537,9 @@ def student_progress_report(student_id):
 
             attendance_year_data[
                 academic_year
-            ]["months"][month_key]["absent"] += 1
+            ]["months"][month_key][
+                "absent"
+            ] += 1
 
     # ==========================================
     # Prepare Attendance Year Summary
@@ -439,9 +551,11 @@ def student_progress_report(student_id):
         attendance_year_data.keys()
     ):
 
-        year_data = attendance_year_data[
-            academic_year
-        ]
+        year_data = (
+            attendance_year_data[
+                academic_year
+            ]
+        )
 
         total = year_data["total"]
 
@@ -449,8 +563,8 @@ def student_progress_report(student_id):
 
             percentage = round(
                 (
-                    year_data["present"] /
-                    total
+                    year_data["present"]
+                    / total
                 ) * 100,
                 2
             )
@@ -465,18 +579,22 @@ def student_progress_report(student_id):
             year_data["months"].keys()
         ):
 
-            month_data = year_data[
-                "months"
-            ][month_key]
+            month_data = (
+                year_data["months"][
+                    month_key
+                ]
+            )
 
-            month_total = month_data["total"]
+            month_total = (
+                month_data["total"]
+            )
 
             if month_total > 0:
 
                 month_percentage = round(
                     (
-                        month_data["present"] /
-                        month_total
+                        month_data["present"]
+                        / month_total
                     ) * 100,
                     2
                 )
@@ -490,7 +608,6 @@ def student_progress_report(student_id):
                 "%Y-%m"
             )
 
-
             # ==========================================
             # Month-wise Change
             # ==========================================
@@ -502,61 +619,63 @@ def student_progress_report(student_id):
             else:
 
                 previous_month_percentage = (
-                    year_months[-1]["percentage"]
+                    year_months[-1][
+                        "percentage"
+                    ]
                 )
 
                 month_change = round(
-                    month_percentage -
-                    previous_month_percentage,
+                    month_percentage
+                    - previous_month_percentage,
                     2
                 )
 
-
-            # ==========================================
-            # Store Month Summary
-            # ==========================================
-
             year_months.append({
 
-                "month_key": month_key,
+                "month_key":
+                    month_key,
 
-                "month": month_date.strftime(
-                    "%B"
-                ),
+                "month":
+                    month_date.strftime(
+                        "%B"
+                    ),
 
-                "present": month_data[
-                    "present"
-                ],
+                "present":
+                    month_data["present"],
 
-                "absent": month_data[
-                    "absent"
-                ],
+                "absent":
+                    month_data["absent"],
 
-                "total": month_total,
+                "total":
+                    month_total,
 
-                "percentage": month_percentage,
+                "percentage":
+                    month_percentage,
 
-                "change": month_change
+                "change":
+                    month_change
 
             })
 
         attendance_year_summary.append({
 
-            "academic_year": academic_year,
+            "academic_year":
+                academic_year,
 
-            "present": year_data[
-                "present"
-            ],
+            "present":
+                year_data["present"],
 
-            "absent": year_data[
-                "absent"
-            ],
+            "absent":
+                year_data["absent"],
 
-            "total": total,
+            "total":
+                total,
 
-            "percentage": percentage,
+            "percentage":
+                percentage,
 
-            "months": year_months
+            "months":
+                year_months
 
         })
 
@@ -576,23 +695,23 @@ def student_progress_report(student_id):
     )
 
     overall_attendance_days = (
-        overall_present_days +
-        overall_absent_days
+        overall_present_days
+        + overall_absent_days
     )
 
     if overall_attendance_days > 0:
 
         overall_attendance_percentage = round(
             (
-                overall_present_days /
-                overall_attendance_days
+                overall_present_days
+                / overall_attendance_days
             ) * 100,
             2
         )
 
     else:
 
-        overall_attendance_percentage = 0.00    
+        overall_attendance_percentage = 0.00
 
     # ==========================================
     # Student Achievements
@@ -633,15 +752,20 @@ def student_progress_report(student_id):
 
     for remark in teacher_remarks:
 
-        if remark.teacher_id not in grouped_teacher_remarks:
+        if (
+            remark.teacher_id
+            not in grouped_teacher_remarks
+        ):
 
             grouped_teacher_remarks[
                 remark.teacher_id
             ] = {
 
-                "teacher": remark.teacher,
+                "teacher":
+                    remark.teacher,
 
-                "remarks": []
+                "remarks":
+                    []
 
             }
 
@@ -651,21 +775,28 @@ def student_progress_report(student_id):
             remark
         )
 
-    evaluations = StudentEvaluation.query.filter_by(
+    # ==========================================
+    # Student Evaluations
+    # ==========================================
 
-        student_id=student.id
-
-    ).order_by(
-
-        StudentEvaluation.evaluation_date.asc()
-
-    ).all()
+    evaluations = (
+        StudentEvaluation.query
+        .filter_by(
+            student_id=student.id
+        )
+        .order_by(
+            StudentEvaluation.evaluation_date.asc()
+        )
+        .all()
+    )
 
     # ==========================================
     # Progress Summary
     # ==========================================
 
-    total_evaluations = len(evaluations)
+    total_evaluations = len(
+        evaluations
+    )
 
     average_percentage = 0.00
     best_percentage = 0.00
@@ -678,35 +809,33 @@ def student_progress_report(student_id):
         if evaluation.result:
 
             percentages.append(
-
                 float(
                     evaluation.result.percentage
                 )
-
             )
 
     if percentages:
 
         average_percentage = round(
-
-            sum(percentages) / len(percentages),
-
+            sum(percentages)
+            / len(percentages),
             2
-
         )
 
-        best_percentage = max(percentages)
+        best_percentage = max(
+            percentages
+        )
 
     if evaluations:
 
-        latest_result = evaluations[-1].result
+        latest_result = (
+            evaluations[-1].result
+        )
 
         if latest_result:
 
             latest_percentage = float(
-
                 latest_result.percentage
-
             )
 
     first_evaluation = None
@@ -714,10 +843,13 @@ def student_progress_report(student_id):
 
     if evaluations:
 
-        first_evaluation = evaluations[0]
+        first_evaluation = (
+            evaluations[0]
+        )
 
-        last_evaluation = evaluations[-1]
-
+        last_evaluation = (
+            evaluations[-1]
+        )
 
     # ==========================================
     # Evaluation Year → Month Structure
@@ -739,7 +871,6 @@ def student_progress_report(student_id):
         }
     )
 
-
     for evaluation in evaluations:
 
         if not evaluation.result:
@@ -754,8 +885,10 @@ def student_progress_report(student_id):
             evaluation_date
         )
 
-        month_key = evaluation_date.strftime(
-            "%Y-%m"
+        month_key = (
+            evaluation_date.strftime(
+                "%Y-%m"
+            )
         )
 
         # ==========================================
@@ -822,24 +955,25 @@ def student_progress_report(student_id):
         evaluation_year_data.keys()
     ):
 
-        year_data = evaluation_year_data[
-            academic_year
-        ]
+        year_data = (
+            evaluation_year_data[
+                academic_year
+            ]
+        )
 
-        obtained = year_data[
-            "obtained_marks"
-        ]
+        obtained = (
+            year_data["obtained_marks"]
+        )
 
-        total = year_data[
-            "total_marks"
-        ]
+        total = (
+            year_data["total_marks"]
+        )
 
         if total > 0:
 
             percentage = round(
                 (
-                    obtained /
-                    total
+                    obtained / total
                 ) * 100,
                 2
             )
@@ -854,24 +988,30 @@ def student_progress_report(student_id):
             year_data["months"].keys()
         ):
 
-            month_data = year_data[
-                "months"
-            ][month_key]
+            month_data = (
+                year_data["months"][
+                    month_key
+                ]
+            )
 
-            month_obtained = month_data[
-                "obtained_marks"
-            ]
+            month_obtained = (
+                month_data[
+                    "obtained_marks"
+                ]
+            )
 
-            month_total = month_data[
-                "total_marks"
-            ]
+            month_total = (
+                month_data[
+                    "total_marks"
+                ]
+            )
 
             if month_total > 0:
 
                 month_percentage = round(
                     (
-                        month_obtained /
-                        month_total
+                        month_obtained
+                        / month_total
                     ) * 100,
                     2
                 )
@@ -896,22 +1036,26 @@ def student_progress_report(student_id):
             else:
 
                 previous_month_percentage = (
-                    year_months[-1]["percentage"]
+                    year_months[-1][
+                        "percentage"
+                    ]
                 )
 
                 month_change = round(
-                    month_percentage -
-                    previous_month_percentage,
+                    month_percentage
+                    - previous_month_percentage,
                     2
                 )
 
             year_months.append({
 
-                "month_key": month_key,
+                "month_key":
+                    month_key,
 
-                "month": month_date.strftime(
-                    "%B"
-                ),
+                "month":
+                    month_date.strftime(
+                        "%B"
+                    ),
 
                 "evaluation_count":
                     month_data[
@@ -927,7 +1071,8 @@ def student_progress_report(student_id):
                 "percentage":
                     month_percentage,
 
-                "change": month_change,
+                "change":
+                    month_change,
 
                 "evaluations":
                     month_data[
@@ -938,7 +1083,8 @@ def student_progress_report(student_id):
 
         evaluation_year_summary.append({
 
-            "academic_year": academic_year,
+            "academic_year":
+                academic_year,
 
             "evaluation_count":
                 year_data[
@@ -974,15 +1120,15 @@ def student_progress_report(student_id):
         else:
 
             year_data["change"] = round(
-                year_data["percentage"] -
-                previous_percentage,
+                year_data["percentage"]
+                - previous_percentage,
                 2
             )
 
         previous_percentage = (
             year_data["percentage"]
         )
-   
+
     # ==========================================
     # Adaptive Chart Data
     # ==========================================
@@ -1003,35 +1149,26 @@ def student_progress_report(student_id):
             if evaluation.result:
 
                 chart_labels.append(
-
-                    evaluation.evaluation_date.strftime(
-
-                        "%d-%m-%Y"
-
-                    )
-
+                    evaluation
+                    .evaluation_date
+                    .strftime("%d-%m-%Y")
                 )
 
                 chart_percentages.append(
-
                     float(
-
-                        evaluation.result.percentage
-
+                        evaluation.result
+                        .percentage
                     )
-
                 )
 
                 chart_obtained_marks.append(
-
-                    evaluation.result.obtained_marks
-
+                    evaluation.result
+                    .obtained_marks
                 )
 
                 chart_total_questions.append(
-
-                    evaluation.result.total_questions
-
+                    evaluation.result
+                    .total_questions
                 )
 
     # ------------------------------------------
@@ -1041,54 +1178,58 @@ def student_progress_report(student_id):
     else:
 
         monthly_data = defaultdict(list)
-
         monthly_marks = defaultdict(list)
-
         monthly_totals = defaultdict(list)
 
         for evaluation in evaluations:
 
             if evaluation.result:
 
-                month = evaluation.evaluation_date.strftime(
-
-                    "%b %Y"
-
+                month = (
+                    evaluation
+                    .evaluation_date
+                    .strftime("%b %Y")
                 )
 
-                monthly_data[month].append(
-
+                monthly_data[
+                    month
+                ].append(
                     float(
-
-                        evaluation.result.percentage
-
+                        evaluation.result
+                        .percentage
                     )
-
                 )
 
-                monthly_marks[month].append(
-
-                    evaluation.result.obtained_marks
-
+                monthly_marks[
+                    month
+                ].append(
+                    evaluation.result
+                    .obtained_marks
                 )
 
-                monthly_totals[month].append(
-
-                    evaluation.result.total_questions
-
+                monthly_totals[
+                    month
+                ].append(
+                    evaluation.result
+                    .total_questions
                 )
 
         for month in monthly_data:
 
-            chart_labels.append(month)
+            chart_labels.append(
+                month
+            )
 
             chart_percentages.append(
 
                 round(
 
-                    sum(monthly_data[month]) /
-
-                    len(monthly_data[month]),
+                    sum(
+                        monthly_data[month]
+                    )
+                    / len(
+                        monthly_data[month]
+                    ),
 
                     2
 
@@ -1100,9 +1241,12 @@ def student_progress_report(student_id):
 
                 round(
 
-                    sum(monthly_marks[month]) /
-
-                    len(monthly_marks[month]),
+                    sum(
+                        monthly_marks[month]
+                    )
+                    / len(
+                        monthly_marks[month]
+                    ),
 
                     1
 
@@ -1114,9 +1258,12 @@ def student_progress_report(student_id):
 
                 round(
 
-                    sum(monthly_totals[month]) /
-
-                    len(monthly_totals[month]),
+                    sum(
+                        monthly_totals[month]
+                    )
+                    / len(
+                        monthly_totals[month]
+                    ),
 
                     1
 
@@ -1129,27 +1276,29 @@ def student_progress_report(student_id):
     # ==========================================
 
     highest_percentage = 0
-
     lowest_percentage = 0
-
     overall_improvement = 0
 
-    performance_status = "माहिती उपलब्ध नाही"
+    performance_status = (
+        "माहिती उपलब्ध नाही"
+    )
 
     if percentages:
 
-        highest_percentage = max(percentages)
+        highest_percentage = max(
+            percentages
+        )
 
-        lowest_percentage = min(percentages)
+        lowest_percentage = min(
+            percentages
+        )
 
         if len(percentages) >= 2:
 
             overall_improvement = round(
-
-                percentages[-1] - percentages[0],
-
+                percentages[-1]
+                - percentages[0],
                 2
-
             )
 
         if average_percentage >= 90:
@@ -1158,84 +1307,93 @@ def student_progress_report(student_id):
 
         elif average_percentage >= 75:
 
-            performance_status = "खूप चांगली प्रगती"
+            performance_status = (
+                "खूप चांगली प्रगती"
+            )
 
         elif average_percentage >= 60:
 
-            performance_status = "सुधारणा होत आहे"
+            performance_status = (
+                "सुधारणा होत आहे"
+            )
 
         elif average_percentage >= 40:
 
-            performance_status = "लक्ष आवश्यक"
+            performance_status = (
+                "लक्ष आवश्यक"
+            )
 
         else:
 
-            performance_status = "तात्काळ लक्ष आवश्यक"
+            performance_status = (
+                "तात्काळ लक्ष आवश्यक"
+            )
 
     # ==========================================
     # Automatic Observation
     # ==========================================
 
     observation_title = ""
-
     observation_message = ""
 
     if total_evaluations == 0:
 
-        observation_title = "माहिती उपलब्ध नाही"
+        observation_title = (
+            "माहिती उपलब्ध नाही"
+        )
 
         observation_message = (
-
-            "विद्यार्थ्याचे अद्याप कोणतेही मूल्यांकन झालेले नाही."
-
+            "विद्यार्थ्याचे अद्याप कोणतेही "
+            "मूल्यांकन झालेले नाही."
         )
 
     elif overall_improvement >= 20:
 
-        observation_title = "उत्कृष्ट प्रगती"
+        observation_title = (
+            "उत्कृष्ट प्रगती"
+        )
 
         observation_message = (
-
-            "विद्यार्थ्याच्या कामगिरीमध्ये सातत्याने मोठी सुधारणा दिसून येत आहे. "
-
-            "ही प्रगती कायम ठेवण्यासाठी नियमित मार्गदर्शन सुरू ठेवावे."
-
+            "विद्यार्थ्याच्या कामगिरीमध्ये "
+            "सातत्याने मोठी सुधारणा दिसून "
+            "येत आहे. ही प्रगती कायम ठेवण्यासाठी "
+            "नियमित मार्गदर्शन सुरू ठेवावे."
         )
 
     elif overall_improvement >= 10:
 
-        observation_title = "चांगली प्रगती"
+        observation_title = (
+            "चांगली प्रगती"
+        )
 
         observation_message = (
-
-            "विद्यार्थ्याची कामगिरी हळूहळू सुधारत आहे. "
-
-            "नियमित सराव व प्रोत्साहन सुरू ठेवावे."
-
+            "विद्यार्थ्याची कामगिरी हळूहळू "
+            "सुधारत आहे. नियमित सराव व "
+            "प्रोत्साहन सुरू ठेवावे."
         )
 
     elif overall_improvement >= 0:
 
-        observation_title = "स्थिर प्रगती"
+        observation_title = (
+            "स्थिर प्रगती"
+        )
 
         observation_message = (
-
             "विद्यार्थ्याची कामगिरी स्थिर आहे. "
-
-            "अधिक प्रगतीसाठी काही बाबींवर विशेष लक्ष देण्याची आवश्यकता आहे."
-
+            "अधिक प्रगतीसाठी काही बाबींवर "
+            "विशेष लक्ष देण्याची आवश्यकता आहे."
         )
 
     else:
 
-        observation_title = "सुधारणा आवश्यक"
+        observation_title = (
+            "सुधारणा आवश्यक"
+        )
 
         observation_message = (
-
-            "विद्यार्थ्याच्या कामगिरीमध्ये घट दिसून येत आहे. "
-
-            "शिक्षकांनी व पालकांनी नियमित मार्गदर्शन करणे आवश्यक आहे."
-
+            "विद्यार्थ्याच्या कामगिरीमध्ये घट "
+            "दिसून येत आहे. शिक्षकांनी व पालकांनी "
+            "नियमित मार्गदर्शन करणे आवश्यक आहे."
         )
 
     # ==========================================
@@ -1243,109 +1401,100 @@ def student_progress_report(student_id):
     # ==========================================
 
     trend_status = "No Data"
-
     trend_color = "secondary"
 
     latest_change = 0.0
-
     average_change = 0.0
-
     consistency = 0
+
+    trend_title = "माहिती उपलब्ध नाही"
+    trend_message = (
+        "प्रगतीचा कल पाहण्यासाठी "
+        "किमान दोन मूल्यांकन आवश्यक आहेत."
+    )
 
     changes = []
 
     if len(chart_percentages) >= 2:
 
         for i in range(
-
             1,
-
             len(chart_percentages)
-
         ):
 
             change = (
-
-                chart_percentages[i] -
-
-                chart_percentages[i - 1]
-
+                chart_percentages[i]
+                - chart_percentages[i - 1]
             )
 
-            changes.append(change)
+            changes.append(
+                change
+            )
 
         latest_change = round(
-
             changes[-1],
-
             2
-
         )
 
         average_change = round(
-
-            sum(changes) /
-
-            len(changes),
-
+            sum(changes)
+            / len(changes),
             2
-
         )
 
         # --------------------------------------
         # Overall Trend
         # --------------------------------------
 
-        trend_title = ""
-
-        trend_message = ""
-
         if average_change >= 5:
 
             trend_status = "success"
 
-            trend_title = "उत्कृष्ट प्रगती"
+            trend_title = (
+                "उत्कृष्ट प्रगती"
+            )
 
             trend_message = (
-
-                "विद्यार्थ्याच्या कामगिरीमध्ये सातत्याने उत्कृष्ट सुधारणा होत आहे."
-
+                "विद्यार्थ्याच्या कामगिरीमध्ये "
+                "सातत्याने उत्कृष्ट सुधारणा होत आहे."
             )
 
         elif average_change >= 1:
 
             trend_status = "primary"
 
-            trend_title = "सातत्यपूर्ण प्रगती"
+            trend_title = (
+                "सातत्यपूर्ण प्रगती"
+            )
 
             trend_message = (
-
-                "विद्यार्थ्याची प्रगती योग्य दिशेने सुरू आहे."
-
+                "विद्यार्थ्याची प्रगती योग्य "
+                "दिशेने सुरू आहे."
             )
 
         elif average_change > -1:
 
             trend_status = "warning"
 
-            trend_title = "स्थिर प्रगती"
+            trend_title = (
+                "स्थिर प्रगती"
+            )
 
             trend_message = (
-
                 "विद्यार्थ्याची कामगिरी स्थिर आहे."
-
             )
 
         else:
 
             trend_status = "danger"
 
-            trend_title = "विशेष लक्ष आवश्यक"
+            trend_title = (
+                "विशेष लक्ष आवश्यक"
+            )
 
             trend_message = (
-
-                "विद्यार्थ्याच्या कामगिरीमध्ये घट दिसून येत आहे."
-
+                "विद्यार्थ्याच्या कामगिरीमध्ये "
+                "घट दिसून येत आहे."
             )
 
         trend_color = trend_status
@@ -1355,40 +1504,23 @@ def student_progress_report(student_id):
         # --------------------------------------
 
         positive = len(
-
             [
-
                 x
-
                 for x in changes
-
                 if x >= 0
-
             ]
-
         )
 
         consistency = round(
-
             (
-
-                positive /
-
-                len(changes)
-
+                positive
+                / len(changes)
             ) * 100
-
         )
 
     # ==========================================
     # Core Question Analysis
     # ==========================================
-
-    from models.student_evaluation_question import StudentEvaluationQuestion
-
-    from models.student_evaluation_answer import StudentEvaluationAnswer
-
-    from models.student_evaluation_question_group import StudentEvaluationQuestionGroup
 
     core_question_summary = []
 
@@ -1396,19 +1528,26 @@ def student_progress_report(student_id):
 
         StudentEvaluationQuestion.query
 
-        .join(StudentEvaluationQuestionGroup)
+        .join(
+            StudentEvaluationQuestionGroup
+        )
 
         .filter(
 
-            StudentEvaluationQuestionGroup.group_type == "Core",
+            StudentEvaluationQuestionGroup
+            .group_type
+            == "Core",
 
-            StudentEvaluationQuestion.is_active == True
+            StudentEvaluationQuestion
+            .is_active
+            == True
 
         )
 
         .order_by(
 
-            StudentEvaluationQuestion.display_order
+            StudentEvaluationQuestion
+            .display_order
 
         )
 
@@ -1422,13 +1561,19 @@ def student_progress_report(student_id):
 
             StudentEvaluationAnswer.query
 
-            .join(StudentEvaluation)
+            .join(
+                StudentEvaluation
+            )
 
             .filter(
 
-                StudentEvaluation.student_id == student.id,
+                StudentEvaluation
+                .student_id
+                == student.id,
 
-                StudentEvaluationAnswer.question_id == question.id
+                StudentEvaluationAnswer
+                .question_id
+                == question.id
 
             )
 
@@ -1446,15 +1591,23 @@ def student_progress_report(student_id):
 
         )
 
-        no_count = len(answers) - yes_count
+        no_count = (
+            len(answers)
+            - yes_count
+        )
 
-        total_answers = len(answers)
+        total_answers = len(
+            answers
+        )
 
         if total_answers > 0:
 
             percentage = round(
 
-                (yes_count / total_answers) * 100,
+                (
+                    yes_count
+                    / total_answers
+                ) * 100,
 
                 2
 
@@ -1471,59 +1624,57 @@ def student_progress_report(student_id):
         if percentage >= 90:
 
             status = "उत्कृष्ट"
-
             status_color = "success"
 
         elif percentage >= 75:
 
             status = "खूप चांगली प्रगती"
-
             status_color = "primary"
 
         elif percentage >= 60:
 
             status = "सुधारणा होत आहे"
-
             status_color = "warning"
 
         elif percentage >= 40:
 
             status = "लक्ष आवश्यक"
-
             status_color = "secondary"
 
         else:
 
             status = "तात्काळ लक्ष आवश्यक"
-
             status_color = "danger"
 
         # ==========================================
         # Save Summary
         # ==========================================
 
-        core_question_summary.append(
+        core_question_summary.append({
 
-            {
+            "question":
+                question,
 
-                "question": question,
+            "yes_count":
+                yes_count,
 
-                "yes_count": yes_count,
+            "no_count":
+                no_count,
 
-                "no_count": no_count,
+            "total_answers":
+                total_answers,
 
-                "total_answers": total_answers,
+            "percentage":
+                percentage,
 
-                "percentage": percentage,
+            "status":
+                status,
 
-                "status": status,
+            "status_color":
+                status_color
 
-                "status_color": status_color
+        })
 
-            }
-
-        )
-    
     # ==========================================
     # Student Strengths & Needs Improvement
     # ==========================================
@@ -1536,24 +1687,23 @@ def student_progress_report(student_id):
 
         if item["percentage"] >= 80:
 
-            student_strengths.append(item)
+            student_strengths.append(
+                item
+            )
 
         elif item["percentage"] < 60:
 
-            needs_improvement.append(item)
+            needs_improvement.append(
+                item
+            )
 
     student_strengths.sort(
-
         key=lambda x: x["percentage"],
-
         reverse=True
-
     )
 
     needs_improvement.sort(
-
         key=lambda x: x["percentage"]
-
     )
 
     # ==========================================
@@ -1564,81 +1714,110 @@ def student_progress_report(student_id):
 
     if len(evaluations) >= 2:
 
-        previous_evaluation = evaluations[-2]
+        previous_evaluation = (
+            evaluations[-2]
+        )
 
-        latest_evaluation = evaluations[-1]
+        latest_evaluation = (
+            evaluations[-1]
+        )
 
         previous_answers = {
 
-            answer.question_id: answer.answer
+            answer.question_id:
+                answer.answer
 
-            for answer in previous_evaluation.evaluation_answers
+            for answer
+            in previous_evaluation
+                .evaluation_answers
 
         }
 
         latest_answers = {
 
-            answer.question_id: answer.answer
+            answer.question_id:
+                answer.answer
 
-            for answer in latest_evaluation.evaluation_answers
+            for answer
+            in latest_evaluation
+                .evaluation_answers
 
         }
 
         for question in core_questions:
 
-            previous = previous_answers.get(question.id)
+            previous = (
+                previous_answers
+                .get(question.id)
+            )
 
-            current = latest_answers.get(question.id)
+            current = (
+                latest_answers
+                .get(question.id)
+            )
 
-            if previous is None or current is None:
+            if (
+                previous is None
+                or current is None
+            ):
 
                 continue
 
-            if previous == False and current == True:
+            if (
+                previous is False
+                and current is True
+            ):
 
                 trend = "improved"
-
                 trend_text = "सुधारणा"
-
-                trend_icon = "bi-arrow-up-circle-fill"
-
+                trend_icon = (
+                    "bi-arrow-up-circle-fill"
+                )
                 trend_color = "success"
 
-            elif previous == True and current == False:
+            elif (
+                previous is True
+                and current is False
+            ):
 
                 trend = "declined"
-
                 trend_text = "घट"
-
-                trend_icon = "bi-arrow-down-circle-fill"
-
+                trend_icon = (
+                    "bi-arrow-down-circle-fill"
+                )
                 trend_color = "danger"
 
             else:
 
                 trend = "same"
-
                 trend_text = "बदल नाही"
-
-                trend_icon = "bi-dash-circle-fill"
-
+                trend_icon = (
+                    "bi-dash-circle-fill"
+                )
                 trend_color = "secondary"
 
             latest_changes.append({
 
-                "question": question.question_text,
+                "question":
+                    question.question_text,
 
-                "previous": previous,
+                "previous":
+                    previous,
 
-                "current": current,
+                "current":
+                    current,
 
-                "trend": trend,
+                "trend":
+                    trend,
 
-                "trend_text": trend_text,
+                "trend_text":
+                    trend_text,
 
-                "trend_icon": trend_icon,
+                "trend_icon":
+                    trend_icon,
 
-                "trend_color": trend_color
+                "trend_color":
+                    trend_color
 
             })
 
@@ -1652,7 +1831,8 @@ def student_progress_report(student_id):
 
         for item in latest_changes
 
-        if item["trend"] == "improved"
+        if item["trend"]
+        == "improved"
 
     )
 
@@ -1662,7 +1842,8 @@ def student_progress_report(student_id):
 
         for item in latest_changes
 
-        if item["trend"] == "same"
+        if item["trend"]
+        == "same"
 
     )
 
@@ -1672,7 +1853,8 @@ def student_progress_report(student_id):
 
         for item in latest_changes
 
-        if item["trend"] == "declined"
+        if item["trend"]
+        == "declined"
 
     )
 
@@ -1682,7 +1864,9 @@ def student_progress_report(student_id):
 
     evaluation_history = []
 
-    for evaluation in reversed(evaluations):
+    for evaluation in reversed(
+        evaluations
+    ):
 
         result = evaluation.result
 
@@ -1691,21 +1875,21 @@ def student_progress_report(student_id):
         # --------------------------------------
 
         obtained_marks = 0
-
         total_questions = 0
-
         percentage = 0.00
 
         if result:
 
-            obtained_marks = result.obtained_marks
+            obtained_marks = (
+                result.obtained_marks
+            )
 
-            total_questions = result.total_questions
+            total_questions = (
+                result.total_questions
+            )
 
             percentage = float(
-
                 result.percentage
-
             )
 
         # --------------------------------------
@@ -1715,142 +1899,197 @@ def student_progress_report(student_id):
         if percentage >= 90:
 
             status = "उत्कृष्ट"
-
             status_color = "success"
 
         elif percentage >= 75:
 
             status = "खूप चांगले"
-
             status_color = "primary"
 
         elif percentage >= 60:
 
             status = "चांगली प्रगती"
-
             status_color = "warning"
 
         else:
 
             status = "सुधारणा आवश्यक"
-
             status_color = "danger"
+
+        # --------------------------------------
+        # Teacher Name
+        # --------------------------------------
+
+        teacher_name = "-"
+
+        if evaluation.teacher:
+
+            teacher_name = (
+                evaluation.teacher.name
+            )
 
         # --------------------------------------
         # Save
         # --------------------------------------
 
-        evaluation_history.append(
+        evaluation_history.append({
 
-            {
+            "id":
+                evaluation.id,
 
-                "id": evaluation.id,
+            "date":
+                evaluation.evaluation_date,
 
-                "date": evaluation.evaluation_date,
+            "teacher":
+                teacher_name,
 
-                "teacher": evaluation.teacher.name,
+            "obtained_marks":
+                obtained_marks,
 
-                "obtained_marks": obtained_marks,
+            "total_questions":
+                total_questions,
 
-                "total_questions": total_questions,
+            "percentage":
+                percentage,
 
-                "percentage": percentage,
+            "status":
+                status,
 
-                "status": status,
+            "status_color":
+                status_color
 
-                "status_color": status_color
+        })
 
-            }
-
-        )
+    # ==========================================
+    # Render
+    # ==========================================
 
     return render_template(
 
-        "evaluation/student_report/student_progress_report.html",
+        "evaluation/student_report/"
+        "student_progress_report.html",
 
         student=student,
 
         evaluations=evaluations,
 
-        first_evaluation=first_evaluation,
+        first_evaluation=
+            first_evaluation,
 
-        last_evaluation=last_evaluation,
+        last_evaluation=
+            last_evaluation,
 
-        total_evaluations=total_evaluations,
+        total_evaluations=
+            total_evaluations,
 
-        average_percentage=average_percentage,
+        average_percentage=
+            average_percentage,
 
-        best_percentage=best_percentage,
+        best_percentage=
+            best_percentage,
 
-        latest_percentage=latest_percentage,
+        latest_percentage=
+            latest_percentage,
 
-        chart_labels=chart_labels,
+        chart_labels=
+            chart_labels,
 
-        chart_percentages=chart_percentages,
+        chart_percentages=
+            chart_percentages,
 
-        chart_obtained_marks=chart_obtained_marks,
+        chart_obtained_marks=
+            chart_obtained_marks,
 
-        chart_total_questions=chart_total_questions,
+        chart_total_questions=
+            chart_total_questions,
 
-        core_question_summary=core_question_summary,
+        core_question_summary=
+            core_question_summary,
 
-        highest_percentage=highest_percentage,
+        highest_percentage=
+            highest_percentage,
 
-        lowest_percentage=lowest_percentage,
+        lowest_percentage=
+            lowest_percentage,
 
-        overall_improvement=overall_improvement,
+        overall_improvement=
+            overall_improvement,
 
-        performance_status=performance_status,
+        performance_status=
+            performance_status,
 
-        observation_title=observation_title,
+        observation_title=
+            observation_title,
 
-        observation_message=observation_message,
+        observation_message=
+            observation_message,
 
-        student_strengths=student_strengths,
+        student_strengths=
+            student_strengths,
 
-        needs_improvement=needs_improvement,
+        needs_improvement=
+            needs_improvement,
 
-        latest_changes=latest_changes,
+        latest_changes=
+            latest_changes,
 
-        improved_count=improved_count,
+        improved_count=
+            improved_count,
 
-        same_count=same_count,
+        same_count=
+            same_count,
 
-        declined_count=declined_count,
+        declined_count=
+            declined_count,
 
-        evaluation_history=evaluation_history,
+        evaluation_history=
+            evaluation_history,
 
-        trend_status=trend_status,
+        trend_status=
+            trend_status,
 
-        trend_color=trend_color,
+        trend_color=
+            trend_color,
 
-        latest_change=latest_change,
+        latest_change=
+            latest_change,
 
-        average_change=average_change,
+        average_change=
+            average_change,
 
-        consistency=consistency,
+        consistency=
+            consistency,
 
-        trend_title=trend_title,
+        trend_title=
+            trend_title,
 
-        trend_message=trend_message,
+        trend_message=
+            trend_message,
 
-        achievements=achievements,
+        achievements=
+            achievements,
 
-        grouped_teacher_remarks=grouped_teacher_remarks,
+        grouped_teacher_remarks=
+            grouped_teacher_remarks,
 
-        teacher_remarks=teacher_remarks,
+        teacher_remarks=
+            teacher_remarks,
 
         # ==========================================
         # Scalable Attendance
         # ==========================================
 
-        attendance_year_summary=attendance_year_summary,
+        attendance_year_summary=
+            attendance_year_summary,
 
-        overall_present_days=overall_present_days,
+        overall_present_days=
+            overall_present_days,
 
-        overall_absent_days=overall_absent_days,
+        overall_absent_days=
+            overall_absent_days,
 
-        overall_attendance_days=overall_attendance_days,
+        overall_attendance_days=
+            overall_attendance_days,
 
         overall_attendance_percentage=
             overall_attendance_percentage,
@@ -1870,21 +2109,32 @@ def student_progress_report(student_id):
 # ==========================================
 
 @student_evaluation_report_bp.route(
-    "/student-evaluation-report/<int:student_id>/question-details"
+    "/student-evaluation-report/"
+    "<int:student_id>/question-details"
 )
 @login_required
 def student_question_details(student_id):
+
+    # ==========================================
+    # Load Student
+    # ==========================================
 
     student = Student.query.get_or_404(
         student_id
     )
 
-    if not teacher_can_access_student(student):
+    # ==========================================
+    # Evaluation Student Access
+    # ==========================================
+
+    if not can_access_evaluation_student(
+        student
+    ):
 
         abort(403)
 
     # ==========================================
-    # Get all evaluations
+    # Get All Evaluations
     # ==========================================
 
     evaluations = (
@@ -1918,11 +2168,14 @@ def student_question_details(student_id):
         core_questions = (
             StudentEvaluationQuestion.query
             .filter_by(
-                question_group_id=core_group.id,
+                question_group_id=
+                    core_group.id,
+
                 is_active=True
             )
             .order_by(
-                StudentEvaluationQuestion.display_order
+                StudentEvaluationQuestion
+                .display_order
             )
             .all()
         )
@@ -1936,7 +2189,6 @@ def student_question_details(student_id):
     for question in core_questions:
 
         yes_count = 0
-
         no_count = 0
 
         for evaluation in evaluations:
@@ -1944,8 +2196,11 @@ def student_question_details(student_id):
             answer = (
                 StudentEvaluationAnswer.query
                 .filter_by(
-                    evaluation_id=evaluation.id,
-                    question_id=question.id
+                    evaluation_id=
+                        evaluation.id,
+
+                    question_id=
+                        question.id
                 )
                 .first()
             )
@@ -1965,7 +2220,8 @@ def student_question_details(student_id):
         # ==========================================
 
         total_answers = (
-            yes_count + no_count
+            yes_count
+            + no_count
         )
 
         # ==========================================
@@ -1987,8 +2243,8 @@ def student_question_details(student_id):
 
             percentage = round(
                 (
-                    obtained_marks /
-                    total_marks
+                    obtained_marks
+                    / total_marks
                 ) * 100,
                 2
             )
@@ -2005,11 +2261,14 @@ def student_question_details(student_id):
             question.id
         ] = {
 
-            "yes": yes_count,
+            "yes":
+                yes_count,
 
-            "no": no_count,
+            "no":
+                no_count,
 
-            "total": total_answers,
+            "total":
+                total_answers,
 
             "obtained_marks":
                 obtained_marks,
@@ -2033,22 +2292,27 @@ def student_question_details(student_id):
         answers = (
             StudentEvaluationAnswer.query
             .filter_by(
-                evaluation_id=evaluation.id
+                evaluation_id=
+                    evaluation.id
             )
             .all()
         )
 
         answer_dict = {
-            answer.question_id: answer.answer
+            answer.question_id:
+                answer.answer
             for answer in answers
         }
 
         current_month = month_name[
-            evaluation.evaluation_date.month
+            evaluation
+            .evaluation_date
+            .month
         ]
 
         month_group = (
-            StudentEvaluationQuestionGroup.query
+            StudentEvaluationQuestionGroup
+            .query
             .filter_by(
                 group_name=current_month,
                 is_active=True
@@ -2063,24 +2327,31 @@ def student_question_details(student_id):
             month_questions = (
                 StudentEvaluationQuestion.query
                 .filter_by(
-                    question_group_id=month_group.id,
+                    question_group_id=
+                        month_group.id,
+
                     is_active=True
                 )
                 .order_by(
-                    StudentEvaluationQuestion.display_order
+                    StudentEvaluationQuestion
+                    .display_order
                 )
                 .all()
             )
 
         evaluation_details.append({
 
-            "evaluation": evaluation,
+            "evaluation":
+                evaluation,
 
-            "answer_dict": answer_dict,
+            "answer_dict":
+                answer_dict,
 
-            "current_month": current_month,
+            "current_month":
+                current_month,
 
-            "month_questions": month_questions
+            "month_questions":
+                month_questions
 
         })
 
@@ -2092,15 +2363,19 @@ def student_question_details(student_id):
 
     for item in evaluation_details:
 
-        evaluation = item["evaluation"]
+        evaluation = item[
+            "evaluation"
+        ]
 
-        evaluation_date = evaluation.evaluation_date
+        evaluation_date = (
+            evaluation.evaluation_date
+        )
 
         year = evaluation_date.year
-
         month = evaluation_date.month
 
         # Academic year starts in June
+
         if month >= 6:
 
             academic_year = (
@@ -2113,13 +2388,22 @@ def student_question_details(student_id):
                 f"{year - 1}-{str(year)[-2:]}"
             )
 
-        if academic_year not in evaluation_years:
+        if (
+            academic_year
+            not in evaluation_years
+        ):
 
-            evaluation_years[academic_year] = []
+            evaluation_years[
+                academic_year
+            ] = []
 
         evaluation_years[
             academic_year
         ].append(item)
+
+    # ==========================================
+    # Render
+    # ==========================================
 
     return render_template(
 
@@ -2128,7 +2412,8 @@ def student_question_details(student_id):
 
         student=student,
 
-        core_questions=core_questions,
+        core_questions=
+            core_questions,
 
         core_question_counts=
             core_question_counts,

@@ -25,7 +25,7 @@ from models.student_evaluation_question import StudentEvaluationQuestion
 from models.student_evaluation_question_group import StudentEvaluationQuestionGroup
 from datetime import date, datetime
 from models.student_evaluation_result import StudentEvaluationResult
-
+from models.student_mulyankan import StudentMulyankan
 from models.teacher_abhyasika import TeacherAbhyasika
 
 evaluation_student_bp = Blueprint(
@@ -33,26 +33,63 @@ evaluation_student_bp = Blueprint(
     __name__
 )
 
-
 # ==========================================
 # Student Evaluation Home
 # ==========================================
 
-@evaluation_student_bp.route("/evaluation/student")
+@evaluation_student_bp.route(
+    "/evaluation/student"
+)
 @login_required
 def student_evaluation_home():
 
-    # ------------------------------------------
+    # ==========================================
     # Load Abhyasikas
-    # ------------------------------------------
+    # ==========================================
 
-    abhyasikas = Abhyasika.query.order_by(
-        Abhyasika.name
-    ).all()
+    if current_user.role == "admin":
 
-    # ------------------------------------------
+        abhyasikas = (
+            Abhyasika.query
+            .order_by(
+                Abhyasika.name
+            )
+            .all()
+        )
+
+    else:
+
+        # Teacher → ONLY assigned Abhyasikas
+
+        teacher_assignments = (
+            TeacherAbhyasika.query
+            .filter_by(
+                teacher_id=current_user.id
+            )
+            .all()
+        )
+
+        assigned_abhyasika_ids = [
+            assignment.abhyasika_id
+            for assignment in teacher_assignments
+        ]
+
+        abhyasikas = (
+            Abhyasika.query
+            .filter(
+                Abhyasika.id.in_(
+                    assigned_abhyasika_ids
+                )
+            )
+            .order_by(
+                Abhyasika.name
+            )
+            .all()
+        )
+
+    # ==========================================
     # Selected Abhyasika
-    # ------------------------------------------
+    # ==========================================
 
     if current_user.role == "admin":
 
@@ -63,51 +100,108 @@ def student_evaluation_home():
 
     else:
 
-        abhyasika_id = session.get("abhyasika_id")
+        abhyasika_id = session.get(
+            "abhyasika_id"
+        )
 
-    # ------------------------------------------
-    # Selected Evaluation Date
-    # ------------------------------------------
+    # ==========================================
+    # Teacher Security
+    # ==========================================
 
-    evaluation_date = request.args.get("evaluation_date")
+    if current_user.role == "teacher":
+
+        allowed_abhyasika_ids = {
+            abhyasika.id
+            for abhyasika in abhyasikas
+        }
+
+        if (
+            abhyasika_id
+            and
+            abhyasika_id
+            not in allowed_abhyasika_ids
+        ):
+
+            abort(403)
+
+    # ==========================================
+    # Evaluation Date
+    # ==========================================
+
+    evaluation_date = request.args.get(
+        "evaluation_date"
+    )
 
     if evaluation_date:
 
-        evaluation_date = datetime.strptime(
-            evaluation_date,
-            "%Y-%m-%d"
-        ).date()
+        try:
+
+            evaluation_date = datetime.strptime(
+                evaluation_date,
+                "%Y-%m-%d"
+            ).date()
+
+        except ValueError:
+
+            evaluation_date = date.today()
 
     else:
 
         evaluation_date = date.today()
 
+    # ==========================================
+    # Students
+    # ==========================================
+
     students = []
-
-    today = evaluation_date
-
-    # ------------------------------------------
-    # Load Students
-    # ------------------------------------------
 
     if abhyasika_id:
 
-        students = Student.query.filter_by(
-            abhyasika_id=abhyasika_id
-        ).order_by(
-            Student.student_name
-        ).all()
+        # --------------------------------------
+        # ONLY PERMANENTLY SELECTED STUDENTS
+        # --------------------------------------
+
+        students = (
+            Student.query
+            .join(
+                StudentMulyankan,
+                StudentMulyankan.student_id
+                == Student.id
+            )
+            .filter(
+                Student.abhyasika_id
+                == abhyasika_id,
+
+                StudentMulyankan.abhyasika_id
+                == abhyasika_id,
+
+                StudentMulyankan.status
+                == "Active"
+            )
+            .order_by(
+                Student.student_name
+            )
+            .all()
+        )
+
+        # --------------------------------------
+        # Evaluation Information
+        # --------------------------------------
 
         for student in students:
 
-            # Today's Evaluation
+            # Today's / selected-date evaluation
 
-            student.today_evaluation = StudentEvaluation.query.filter_by(
-                student_id=student.id,
-                evaluation_date=today
-            ).first()
+            student.today_evaluation = (
+                StudentEvaluation.query
+                .filter_by(
+                    student_id=student.id,
+                    evaluation_date=evaluation_date
+                )
+                .first()
+            )
 
-            # Last Evaluation
+            # Last evaluation
 
             student.last_evaluation = (
                 StudentEvaluation.query
@@ -120,11 +214,13 @@ def student_evaluation_home():
                 .first()
             )
 
-    # ------------------------------------------
+    # ==========================================
     # Evaluation Progress
-    # ------------------------------------------
+    # ==========================================
 
-    total_students = len(students)
+    total_students = len(
+        students
+    )
 
     completed_students = sum(
         1
@@ -132,21 +228,27 @@ def student_evaluation_home():
         if student.today_evaluation
     )
 
-    pending_students = total_students - completed_students
+    pending_students = (
+        total_students
+        - completed_students
+    )
 
     if total_students > 0:
 
         progress_percentage = round(
-            (completed_students / total_students) * 100
+            (
+                completed_students
+                / total_students
+            ) * 100
         )
 
     else:
 
         progress_percentage = 0
 
-    # ------------------------------------------
-    # Render Template
-    # ------------------------------------------
+    # ==========================================
+    # Render
+    # ==========================================
 
     return render_template(
 
@@ -158,7 +260,9 @@ def student_evaluation_home():
 
         selected_abhyasika=abhyasika_id,
 
-        is_admin=(current_user.role == "admin"),
+        is_admin=(
+            current_user.role == "admin"
+        ),
 
         evaluation_date=evaluation_date,
 
@@ -173,6 +277,812 @@ def student_evaluation_home():
     )
 
 # ==========================================
+# Vidyarthi Mulyankan - Student Selection
+# ==========================================
+
+@evaluation_student_bp.route(
+    "/evaluation/student/select",
+    methods=["GET"]
+)
+@login_required
+def select_mulyankan_students():
+
+    # ==========================================
+    # Permission
+    # ==========================================
+
+    if current_user.role not in ["admin", "teacher"]:
+        abort(403)
+
+    PER_PAGE = 10
+
+    # ==========================================
+    # Load Allowed Abhyasikas
+    # ==========================================
+
+    if current_user.role == "admin":
+
+        allowed_abhyasikas = (
+            Abhyasika.query
+            .order_by(
+                Abhyasika.name
+            )
+            .all()
+        )
+
+    else:
+
+        teacher_assignments = (
+            TeacherAbhyasika.query
+            .filter_by(
+                teacher_id=current_user.id
+            )
+            .all()
+        )
+
+        allowed_abhyasika_ids = {
+            assignment.abhyasika_id
+            for assignment in teacher_assignments
+        }
+
+        allowed_abhyasikas = (
+            Abhyasika.query
+            .filter(
+                Abhyasika.id.in_(
+                    allowed_abhyasika_ids
+                )
+            )
+            .order_by(
+                Abhyasika.name
+            )
+            .all()
+        )
+
+    # ==========================================
+    # Selected Abhyasika
+    # ==========================================
+
+    abhyasika_id = request.args.get(
+        "abhyasika_id",
+        type=int
+    )
+
+    # ==========================================
+    # Teacher Security
+    # ==========================================
+
+    allowed_abhyasika_ids = {
+        abhyasika.id
+        for abhyasika in allowed_abhyasikas
+    }
+
+    if current_user.role == "teacher":
+
+        # Teacher must use one of assigned
+        # Abhyasikas.
+
+        if abhyasika_id is None:
+
+            if len(allowed_abhyasika_ids) == 1:
+
+                abhyasika_id = next(
+                    iter(
+                        allowed_abhyasika_ids
+                    )
+                )
+
+        elif (
+            abhyasika_id
+            not in allowed_abhyasika_ids
+        ):
+
+            abort(403)
+
+    # ==========================================
+    # Page
+    # ==========================================
+
+    page = request.args.get(
+        "page",
+        1,
+        type=int
+    )
+
+    if page < 1:
+        page = 1
+
+    # ==========================================
+    # Search
+    # ==========================================
+
+    search = request.args.get(
+        "search",
+        "",
+        type=str
+    ).strip()
+
+    # ==========================================
+    # Student Query
+    # ==========================================
+
+    student_query = Student.query
+
+    # ==========================================
+    # Abhyasika Filter
+    # ==========================================
+
+    if abhyasika_id is not None:
+
+        student_query = student_query.filter(
+            Student.abhyasika_id
+            == abhyasika_id
+        )
+
+    elif current_user.role == "teacher":
+
+        student_query = student_query.filter(
+            Student.abhyasika_id.in_(
+                allowed_abhyasika_ids
+            )
+        )
+
+    # ==========================================
+    # Search
+    # ==========================================
+
+    if search:
+
+        student_query = student_query.filter(
+            Student.student_name.ilike(
+                f"%{search}%"
+            )
+        )
+
+    # ==========================================
+    # Pagination
+    # ==========================================
+
+    pagination = (
+        student_query
+        .order_by(
+            Student.student_name
+        )
+        .paginate(
+            page=page,
+            per_page=PER_PAGE,
+            error_out=False
+        )
+    )
+
+    students = pagination.items
+
+    # ==========================================
+    # Existing Selected Students
+    # ==========================================
+
+    selected_query = (
+        StudentMulyankan.query
+        .filter(
+            StudentMulyankan.status
+            == "Active"
+        )
+    )
+
+    # ------------------------------------------
+    # Abhyasika Scope
+    # ------------------------------------------
+
+    if abhyasika_id is not None:
+
+        selected_query = selected_query.filter(
+            StudentMulyankan.abhyasika_id
+            == abhyasika_id
+        )
+
+    elif current_user.role == "teacher":
+
+        selected_query = selected_query.filter(
+            StudentMulyankan.abhyasika_id.in_(
+                allowed_abhyasika_ids
+            )
+        )
+
+    # ==========================================
+    # Selected IDs
+    # ==========================================
+
+    selected_student_ids = {
+        record.student_id
+        for record in selected_query.all()
+    }
+
+    # ==========================================
+    # Selected Count
+    # ==========================================
+
+    selected_count = len(
+        selected_student_ids
+    )
+
+    # ==========================================
+    # Render
+    # ==========================================
+
+    return render_template(
+
+        "evaluation/student/"
+        "select_mulyankan_students.html",
+
+        abhyasikas=allowed_abhyasikas,
+
+        selected_abhyasika=(
+            Abhyasika.query.get(
+                abhyasika_id
+            )
+            if abhyasika_id
+            else None
+        ),
+
+        selected_abhyasika_id=
+            abhyasika_id,
+
+        students=students,
+
+        selected_student_ids=
+            selected_student_ids,
+
+        selected_count=
+            selected_count,
+
+        is_admin=(
+            current_user.role
+            == "admin"
+        ),
+
+        search=search,
+
+        pagination=pagination,
+
+        per_page=PER_PAGE
+
+    )
+
+
+# ==========================================
+# AJAX - Get Mulyankan Students
+# ==========================================
+
+@evaluation_student_bp.route(
+    "/evaluation/student/select/data",
+    methods=["GET"]
+)
+@login_required
+def get_mulyankan_students():
+
+    # ==========================================
+    # Permission
+    # ==========================================
+
+    if current_user.role not in ["admin", "teacher"]:
+        abort(403)
+
+    PER_PAGE = 10
+
+    # ==========================================
+    # Parameters
+    # ==========================================
+
+    page = request.args.get(
+        "page",
+        1,
+        type=int
+    )
+
+    if page < 1:
+        page = 1
+
+    search = request.args.get(
+        "search",
+        "",
+        type=str
+    ).strip()
+
+    abhyasika_id = request.args.get(
+        "abhyasika_id",
+        type=int
+    )
+
+    # ==========================================
+    # Allowed Abhyasikas
+    # ==========================================
+
+    if current_user.role == "admin":
+
+        allowed_abhyasika_ids = {
+            abhyasika.id
+            for abhyasika in
+            Abhyasika.query.all()
+        }
+
+    else:
+
+        teacher_assignments = (
+            TeacherAbhyasika.query
+            .filter_by(
+                teacher_id=current_user.id
+            )
+            .all()
+        )
+
+        allowed_abhyasika_ids = {
+            assignment.abhyasika_id
+            for assignment in teacher_assignments
+        }
+
+    # ==========================================
+    # Teacher Security
+    # ==========================================
+
+    if current_user.role == "teacher":
+
+        if abhyasika_id is not None:
+
+            if (
+                abhyasika_id
+                not in allowed_abhyasika_ids
+            ):
+
+                abort(403)
+
+        else:
+
+            # Teacher without filter:
+            # only assigned Abhyasikas.
+
+            pass
+
+    # ==========================================
+    # Student Query
+    # ==========================================
+
+    student_query = Student.query
+
+    # ==========================================
+    # Abhyasika Filter
+    # ==========================================
+
+    if abhyasika_id is not None:
+
+        student_query = student_query.filter(
+            Student.abhyasika_id
+            == abhyasika_id
+        )
+
+    elif current_user.role == "teacher":
+
+        student_query = student_query.filter(
+            Student.abhyasika_id.in_(
+                allowed_abhyasika_ids
+            )
+        )
+
+    # ==========================================
+    # Search
+    # ==========================================
+
+    if search:
+
+        student_query = student_query.filter(
+            Student.student_name.ilike(
+                f"%{search}%"
+            )
+        )
+
+    # ==========================================
+    # Pagination
+    # ==========================================
+
+    pagination = (
+        student_query
+        .order_by(
+            Student.student_name
+        )
+        .paginate(
+            page=page,
+            per_page=PER_PAGE,
+            error_out=False
+        )
+    )
+
+    # ==========================================
+    # Existing Selected Students
+    # ==========================================
+
+    selected_query = (
+        StudentMulyankan.query
+        .filter(
+            StudentMulyankan.status
+            == "Active"
+        )
+    )
+
+    if abhyasika_id is not None:
+
+        selected_query = selected_query.filter(
+            StudentMulyankan.abhyasika_id
+            == abhyasika_id
+        )
+
+    elif current_user.role == "teacher":
+
+        selected_query = selected_query.filter(
+            StudentMulyankan.abhyasika_id.in_(
+                allowed_abhyasika_ids
+            )
+        )
+
+    selected_ids = [
+        record.student_id
+        for record in selected_query.all()
+    ]
+
+    # ==========================================
+    # Student JSON
+    # ==========================================
+
+    student_data = []
+
+    for student in pagination.items:
+
+        student_data.append({
+
+            "id": student.id,
+
+            "student_name":
+                student.student_name,
+
+            "standard":
+                student.standard
+                or "",
+
+            "school_college_name":
+                student.school_college_name
+                or "",
+
+            "abhyasika_id":
+                student.abhyasika_id,
+
+            "abhyasika_name":
+                (
+                    student.abhyasika.name
+                    if student.abhyasika
+                    else ""
+                ),
+
+            "selected":
+                student.id
+                in selected_ids
+
+        })
+
+    # ==========================================
+    # Response
+    # ==========================================
+
+    return {
+
+        "success": True,
+
+        "students":
+            student_data,
+
+        "selected_ids":
+            selected_ids,
+
+        "pagination": {
+
+            "page":
+                pagination.page,
+
+            "per_page":
+                pagination.per_page,
+
+            "total":
+                pagination.total,
+
+            "pages":
+                pagination.pages,
+
+            "has_prev":
+                pagination.has_prev,
+
+            "has_next":
+                pagination.has_next,
+
+            "prev_num":
+                pagination.prev_num,
+
+            "next_num":
+                pagination.next_num
+
+        },
+
+        "selected_count":
+            len(selected_ids)
+
+    }
+
+# ==========================================
+# Save Vidyarthi Mulyankan Students
+# ==========================================
+
+@evaluation_student_bp.route(
+    "/evaluation/student/select/save",
+    methods=["POST"]
+)
+@login_required
+def save_mulyankan_students():
+
+    # ==========================================
+    # Permission
+    # ==========================================
+
+    if current_user.role not in ["admin", "teacher"]:
+        abort(403)
+
+    # ==========================================
+    # Selected Abhyasika
+    # ==========================================
+
+    abhyasika_id = request.form.get(
+        "abhyasika_id",
+        type=int
+    )
+
+    # ==========================================
+    # Allowed Abhyasikas
+    # ==========================================
+
+    if current_user.role == "admin":
+
+        allowed_abhyasika_ids = {
+            abhyasika.id
+            for abhyasika in
+            Abhyasika.query.all()
+        }
+
+    else:
+
+        teacher_assignments = (
+            TeacherAbhyasika.query
+            .filter_by(
+                teacher_id=current_user.id
+            )
+            .all()
+        )
+
+        allowed_abhyasika_ids = {
+            assignment.abhyasika_id
+            for assignment in teacher_assignments
+        }
+
+        # Teacher must select one assigned Abhyasika
+
+        if abhyasika_id is None:
+
+            flash(
+                "Please select an Abhyasika.",
+                "warning"
+            )
+
+            return redirect(
+                url_for(
+                    "evaluation_student.select_mulyankan_students"
+                )
+            )
+
+    # ==========================================
+    # Validate Abhyasika
+    # ==========================================
+
+    if (
+        abhyasika_id is not None
+        and
+        abhyasika_id not in allowed_abhyasika_ids
+    ):
+
+        abort(403)
+
+    # ==========================================
+    # Get Selected Students
+    # ==========================================
+
+    selected_student_ids_raw = request.form.get(
+        "selected_ids",
+        ""
+    )
+
+    selected_student_ids = {
+        int(student_id.strip())
+        for student_id
+        in selected_student_ids_raw.split(",")
+        if student_id.strip().isdigit()
+    }
+
+    # ==========================================
+    # Determine Valid Students
+    # ==========================================
+
+    if abhyasika_id is not None:
+
+        # Specific Abhyasika
+
+        valid_students = (
+            Student.query
+            .filter(
+                Student.id.in_(
+                    selected_student_ids
+                ),
+                Student.abhyasika_id ==
+                abhyasika_id
+            )
+            .all()
+        )
+
+    else:
+
+        # Admin + All Abhyasikas
+
+        valid_students = (
+            Student.query
+            .filter(
+                Student.id.in_(
+                    selected_student_ids
+                )
+            )
+            .all()
+        )
+
+    # ==========================================
+    # Teacher Extra Security
+    # ==========================================
+
+    if current_user.role == "teacher":
+
+        valid_students = [
+            student
+            for student in valid_students
+            if student.abhyasika_id
+            in allowed_abhyasika_ids
+        ]
+
+    valid_student_ids = {
+        student.id
+        for student in valid_students
+    }
+
+    # ==========================================
+    # Existing Records
+    # ==========================================
+
+    if abhyasika_id is not None:
+
+        # --------------------------------------
+        # Specific Abhyasika
+        # --------------------------------------
+
+        # Only manage Mulyankan records belonging
+        # to this selected Abhyasika.
+
+        existing_records = (
+            StudentMulyankan.query
+            .filter_by(
+                abhyasika_id=abhyasika_id
+            )
+            .all()
+        )
+
+    else:
+
+        # --------------------------------------
+        # Admin + All Abhyasikas
+        # --------------------------------------
+
+        # Admin intentionally selected
+        # "All Abhyasikas".
+        #
+        # In this case all Mulyankan records
+        # are part of the current management scope.
+
+        existing_records = (
+            StudentMulyankan.query
+            .all()
+        )
+
+    existing_map = {
+        record.student_id: record
+        for record in existing_records
+    }
+
+    # ==========================================
+    # Activate / Create Selected Students
+    # ==========================================
+
+    for student in valid_students:
+
+        record = existing_map.get(
+            student.id
+        )
+
+        if record:
+
+            record.status = "Active"
+
+            record.added_by = current_user.id
+
+        else:
+
+            record = StudentMulyankan(
+
+                student_id=student.id,
+
+                abhyasika_id=student.abhyasika_id,
+
+                added_by=current_user.id,
+
+                status="Active"
+
+            )
+
+            db.session.add(record)
+
+    # ==========================================
+    # Deactivate Removed Students
+    # ==========================================
+
+    for record in existing_records:
+
+        # Only deactivate records belonging
+        # to the currently managed scope.
+
+        if (
+            record.student_id
+            not in valid_student_ids
+        ):
+
+            record.status = "Inactive"
+
+    # ==========================================
+    # Save
+    # ==========================================
+
+    db.session.commit()
+
+    flash(
+        "Vidyarthi Mulyankan students updated successfully.",
+        "success"
+    )
+
+    # ==========================================
+    # Return to Selection Page
+    # ==========================================
+
+    if abhyasika_id is not None:
+
+        return redirect(
+            url_for(
+                "evaluation_student.select_mulyankan_students",
+                abhyasika_id=abhyasika_id
+            )
+        )
+
+    return redirect(
+        url_for(
+            "evaluation_student.select_mulyankan_students"
+        )
+    )
+
+# ==========================================
 # Evaluate Student
 # ==========================================
 
@@ -184,6 +1094,52 @@ def student_evaluation_home():
 def evaluate_student(student_id):
 
     student = Student.query.get_or_404(student_id)
+
+    # ==========================================
+    # Mulyankan Selection Validation
+    # ==========================================
+
+    mulyankan_student = (
+        StudentMulyankan.query
+        .filter_by(
+            student_id=student.id,
+            abhyasika_id=student.abhyasika_id,
+            status="Active"
+        )
+        .first()
+    )
+
+    if not mulyankan_student:
+
+        flash(
+            "This student is not selected for Vidyarthi Mulyankan.",
+            "warning"
+        )
+
+        return redirect(
+            url_for(
+                "evaluation_student.student_evaluation_home"
+            )
+        )
+
+    # ==========================================
+    # Teacher Abhyasika Security
+    # ==========================================
+
+    if current_user.role == "teacher":
+
+        assignment = (
+            TeacherAbhyasika.query
+            .filter_by(
+                teacher_id=current_user.id,
+                abhyasika_id=student.abhyasika_id
+            )
+            .first()
+        )
+
+        if not assignment:
+
+            abort(403)
 
     # ------------------------------------------
     # Selected Evaluation Date
@@ -258,15 +1214,32 @@ def evaluate_student(student_id):
             .all()
         )
 
-    # ------------------------------------------
+    # ==========================================
     # Student Navigation
-    # ------------------------------------------
+    # ==========================================
 
-    students = Student.query.filter_by(
-        abhyasika_id=student.abhyasika_id
-    ).order_by(
-        Student.student_name
-    ).all()
+    students = (
+        Student.query
+        .join(
+            StudentMulyankan,
+            StudentMulyankan.student_id
+            == Student.id
+        )
+        .filter(
+            Student.abhyasika_id
+            == student.abhyasika_id,
+
+            StudentMulyankan.abhyasika_id
+            == student.abhyasika_id,
+
+            StudentMulyankan.status
+            == "Active"
+        )
+        .order_by(
+            Student.student_name
+        )
+        .all()
+    )
 
     total_students = len(students)
 
@@ -302,17 +1275,40 @@ def evaluate_student(student_id):
     # Evaluation Progress
     # ------------------------------------------
 
-    completed_students = StudentEvaluation.query.filter(
-        StudentEvaluation.abhyasika_id == student.abhyasika_id,
-        StudentEvaluation.evaluation_date == evaluation_date
-    ).count()
+    # Get IDs of only the students selected
+    # for Vidyarthi Mulyankan
+    mulyankan_student_ids = [
+        s.id
+        for s in students
+    ]
 
-    pending_students = total_students - completed_students
+    # Count evaluations only for the selected
+    # Mulyankan students on the current date
+    completed_students = (
+        StudentEvaluation.query
+        .filter(
+            StudentEvaluation.student_id.in_(
+                mulyankan_student_ids
+            ),
+            StudentEvaluation.abhyasika_id == student.abhyasika_id,
+            StudentEvaluation.evaluation_date == evaluation_date
+        )
+        .count()
+    )
 
+    # Pending students
+    pending_students = (
+        total_students - completed_students
+    )
+
+    # Progress percentage
     if total_students > 0:
 
         progress_percentage = round(
-            (completed_students / total_students) * 100
+            (
+                completed_students
+                / total_students
+            ) * 100
         )
 
     else:
@@ -351,41 +1347,116 @@ def evaluate_student(student_id):
 
     )
 
-@evaluation_student_bp.route("/evaluation/student/<int:student_id>/open")
+# ==========================================
+# Open Student Evaluation
+# ==========================================
+
+@evaluation_student_bp.route(
+    "/evaluation/student/<int:student_id>/open"
+)
 @login_required
 def open_student_evaluation(student_id):
 
-    student = Student.query.get_or_404(student_id)
+    # ------------------------------------------
+    # Load Student
+    # ------------------------------------------
+
+    student = Student.query.get_or_404(
+        student_id
+    )
+
+    # ------------------------------------------
+    # Mulyankan Selection Validation
+    # ------------------------------------------
+
+    mulyankan_student = (
+        StudentMulyankan.query
+        .filter_by(
+            student_id=student.id,
+            abhyasika_id=student.abhyasika_id,
+            status="Active"
+        )
+        .first()
+    )
+
+    if not mulyankan_student:
+
+        flash(
+            "This student is not selected for Vidyarthi Mulyankan.",
+            "warning"
+        )
+
+        return redirect(
+            url_for(
+                "evaluation_student.student_evaluation_home"
+            )
+        )
+
+    # ------------------------------------------
+    # Teacher Abhyasika Security
+    # ------------------------------------------
+
+    if current_user.role == "teacher":
+
+        assignment = (
+            TeacherAbhyasika.query
+            .filter_by(
+                teacher_id=current_user.id,
+                abhyasika_id=student.abhyasika_id
+            )
+            .first()
+        )
+
+        if not assignment:
+
+            abort(403)
+
+    # ------------------------------------------
+    # Today's Evaluation
+    # ------------------------------------------
 
     today = date.today()
 
-    abhyasika_id = request.args.get(
-        "abhyasika_id",
-        type=int
+    # ------------------------------------------
+    # Existing Evaluation
+    # ------------------------------------------
+
+    existing_evaluation = (
+        StudentEvaluation.query
+        .filter_by(
+            student_id=student.id,
+            evaluation_date=today
+        )
+        .first()
     )
 
-    existing_evaluation = StudentEvaluation.query.filter_by(
-        student_id=student.id,
-        evaluation_date=today
-    ).first()
+    # ------------------------------------------
+    # Already Evaluated
+    # ------------------------------------------
 
     if existing_evaluation:
 
         return redirect(
             url_for(
                 "evaluation_student.view_evaluation",
-                evaluation_id=existing_evaluation.id,
-                abhyasika_id=abhyasika_id
+                evaluation_id=existing_evaluation.id
             )
         )
+
+    # ------------------------------------------
+    # Open Evaluation Form
+    # ------------------------------------------
 
     return redirect(
         url_for(
             "evaluation_student.evaluate_student",
             student_id=student.id,
-            abhyasika_id=abhyasika_id
+            evaluation_date=today.strftime(
+                "%Y-%m-%d"
+            )
         )
     )
+
 
 # ==========================================
 # Save Student Evaluation
@@ -403,6 +1474,52 @@ def save_student_evaluation(student_id):
     # ------------------------------------------
 
     student = Student.query.get_or_404(student_id)
+
+    # ------------------------------------------
+    # Mulyankan Selection Validation
+    # ------------------------------------------
+
+    mulyankan_student = (
+        StudentMulyankan.query
+        .filter_by(
+            student_id=student.id,
+            abhyasika_id=student.abhyasika_id,
+            status="Active"
+        )
+        .first()
+    )
+
+    if not mulyankan_student:
+
+        flash(
+            "This student is not selected for Vidyarthi Mulyankan.",
+            "warning"
+        )
+
+        return redirect(
+            url_for(
+                "evaluation_student.student_evaluation_home"
+            )
+        )
+
+    # ------------------------------------------
+    # Teacher Abhyasika Security
+    # ------------------------------------------
+
+    if current_user.role == "teacher":
+
+        assignment = (
+            TeacherAbhyasika.query
+            .filter_by(
+                teacher_id=current_user.id,
+                abhyasika_id=student.abhyasika_id
+            )
+            .first()
+        )
+
+        if not assignment:
+
+            abort(403)
 
     # ------------------------------------------
     # Get Evaluation Date
@@ -666,11 +1783,32 @@ def save_student_evaluation(student_id):
 
         if action == "save_next":
 
-            students = Student.query.filter_by(
-                abhyasika_id=student.abhyasika_id
-            ).order_by(
-                Student.student_name
-            ).all()
+            # ==========================================
+            # Only Mulyankan Selected Students
+            # ==========================================
+
+            students = (
+                Student.query
+                .join(
+                    StudentMulyankan,
+                    StudentMulyankan.student_id
+                    == Student.id
+                )
+                .filter(
+                    Student.abhyasika_id
+                    == student.abhyasika_id,
+
+                    StudentMulyankan.abhyasika_id
+                    == student.abhyasika_id,
+
+                    StudentMulyankan.status
+                    == "Active"
+                )
+                .order_by(
+                    Student.student_name
+                )
+                .all()
+            )
 
             current_index = None
 
@@ -679,37 +1817,59 @@ def save_student_evaluation(student_id):
                 if s.id == student.id:
 
                     current_index = index
+
                     break
 
             if current_index is not None:
 
-                for next_student in students[current_index + 1:]:
+                for next_student in students[
+                    current_index + 1:
+                ]:
 
-                    existing = StudentEvaluation.query.filter_by(
-                        student_id=next_student.id,
-                        evaluation_date=evaluation_date
-                    ).first()
+                    existing = (
+                        StudentEvaluation.query
+                        .filter_by(
+                            student_id=next_student.id,
+                            evaluation_date=evaluation_date
+                        )
+                        .first()
+                    )
 
                     if not existing:
 
                         return redirect(
                             url_for(
                                 "evaluation_student.evaluate_student",
+
                                 student_id=next_student.id,
-                                evaluation_date=evaluation_date.strftime("%Y-%m-%d"),
+
+                                evaluation_date=(
+                                    evaluation_date
+                                    .strftime("%Y-%m-%d")
+                                ),
+
                                 previous_evaluation_id=evaluation.id
+
                             )
                         )
 
             flash(
-                "🎉 All remaining students have been evaluated.",
+                "🎉 All selected Mulyankan students have been evaluated.",
                 "success"
             )
 
             return redirect(
                 url_for(
                     "evaluation_student.student_evaluation_home",
-                    evaluation_date=evaluation_date.strftime("%Y-%m-%d")
+
+                    evaluation_date=(
+                        evaluation_date
+                        .strftime("%Y-%m-%d")
+                    ),
+
+                    abhyasika_id=student.abhyasika_id
+                    if current_user.role == "admin"
+                    else None
                 )
             )
 
@@ -771,6 +1931,24 @@ def save_student_evaluation(student_id):
 def view_student_evaluations(student_id):
 
     student = Student.query.get_or_404(student_id)
+    # ------------------------------------------
+    # Teacher Abhyasika Security
+    # ------------------------------------------
+
+    if current_user.role == "teacher":
+
+        assignment = (
+            TeacherAbhyasika.query
+            .filter_by(
+                teacher_id=current_user.id,
+                abhyasika_id=student.abhyasika_id
+            )
+            .first()
+        )
+
+        if not assignment:
+
+            abort(403)
 
     # ------------------------------------------
     # Pagination
@@ -865,6 +2043,23 @@ def view_evaluation(evaluation_id):
     evaluation = StudentEvaluation.query.get_or_404(
         evaluation_id
     )
+
+    student = evaluation.student
+
+    if current_user.role == "teacher":
+
+        assignment = (
+            TeacherAbhyasika.query
+            .filter_by(
+                teacher_id=current_user.id,
+                abhyasika_id=student.abhyasika_id
+            )
+            .first()
+        )
+
+        if not assignment:
+            abort(403)
+
 
     # ==========================================
     # Source Page
@@ -962,6 +2157,39 @@ def edit_student_evaluation(evaluation_id):
 
     student = evaluation.student
 
+    # ------------------------------------------
+    # Teacher Abhyasika Security
+    # ------------------------------------------
+
+    if current_user.role == "teacher":
+
+        assignment = (
+            TeacherAbhyasika.query
+            .filter_by(
+                teacher_id=current_user.id,
+                abhyasika_id=student.abhyasika_id
+            )
+            .first()
+        )
+
+        if not assignment:
+
+            abort(403)
+
+    if current_user.role == "teacher":
+
+        assignment = (
+            TeacherAbhyasika.query
+            .filter_by(
+                teacher_id=current_user.id,
+                abhyasika_id=student.abhyasika_id
+            )
+            .first()
+        )
+
+        if not assignment:
+            abort(403)
+
     answers = StudentEvaluationAnswer.query.filter_by(
         evaluation_id=evaluation.id
     ).all()
@@ -1042,6 +2270,22 @@ def update_student_evaluation(evaluation_id):
     evaluation = StudentEvaluation.query.get_or_404(
         evaluation_id
     )
+
+    student = evaluation.student
+
+    if current_user.role == "teacher":
+
+        assignment = (
+            TeacherAbhyasika.query
+            .filter_by(
+                teacher_id=current_user.id,
+                abhyasika_id=student.abhyasika_id
+            )
+            .first()
+        )
+
+        if not assignment:
+            abort(403)
 
     try:
 
