@@ -6314,3 +6314,115 @@ REMARK CARD
     border-radius: 50%;
     display: block;
 }
+
+
+/* ==========================================================
+   DESKTOP SIDEBAR LOCK
+   ==========================================================
+   Applies ONLY to desktop screens (992px and above).
+
+   Mobile sidebar / Offcanvas remains unchanged.
+   ========================================================== */
+
+@media (min-width: 992px) {
+
+    /* ------------------------------------------------------
+       Main application wrapper
+       ------------------------------------------------------ */
+
+    .app-wrapper {
+        min-height: 100vh;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+
+    /* ------------------------------------------------------
+       Desktop Sidebar
+       ------------------------------------------------------ */
+
+    .app-wrapper > .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+
+        width: var(--sidebar-width);
+        height: 100vh;
+
+        z-index: 1050;
+
+        display: flex;
+        flex-direction: column;
+
+        flex-shrink: 0;
+
+        overflow: hidden;
+    }
+
+
+    /* ------------------------------------------------------
+       Sidebar Menu
+       ------------------------------------------------------
+       If the sidebar menu becomes longer than the screen,
+       only the menu itself will scroll.
+       ------------------------------------------------------ */
+
+    .app-wrapper > .sidebar .sidebar-menu {
+        flex: 1;
+        min-height: 0;
+
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        /* Hide scrollbar - keep scrolling enabled */
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+
+    /* Chrome, Edge, Safari */
+    .app-wrapper > .sidebar .sidebar-menu::-webkit-scrollbar {
+        width: 0;
+        height: 0;
+    }
+
+
+    /* ------------------------------------------------------
+       Main Content Area
+       ------------------------------------------------------ */
+
+    .app-wrapper > .main-content {
+        margin-left: var(--sidebar-width);
+
+        width: calc(100% - var(--sidebar-width));
+
+        height: 100vh;
+        min-height: 100vh;
+
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        display: flex;
+        flex-direction: column;
+    }
+
+
+    /* ------------------------------------------------------
+       Page Content
+       ------------------------------------------------------ */
+
+    .app-wrapper > .main-content .page-content {
+        flex: 1;
+        min-height: 0;
+    }
+
+
+    /* ------------------------------------------------------
+       Footer
+       ------------------------------------------------------ */
+
+    .app-wrapper > .main-content footer {
+        flex-shrink: 0;
+    }
+
+}
