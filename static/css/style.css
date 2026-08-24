@@ -1415,6 +1415,8 @@ small{
 
     width:270px;
 
+    max-width:85vw;
+
     background:var(--sidebar-bg);
 
     color:var(--sidebar-text);
@@ -1423,29 +1425,189 @@ small{
 
 }
 
-.offcanvas-header{
+
+/*==============================================================
+  MOBILE SIDEBAR HEADER
+==============================================================*/
+
+.mobile-sidebar-header{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:10px;
+
+    padding:16px 14px;
+
+    min-height:86px;
 
     border-bottom:1px solid rgba(255,255,255,.08);
 
-    padding:24px;
+}
+
+
+/*==============================================================
+  MOBILE SIDEBAR BRAND
+==============================================================*/
+
+.mobile-sidebar-brand{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:11px;
+
+    min-width:0;
+
+    flex:1;
 
 }
 
-.offcanvas-header h5{
 
-    color:#fff;
+/*==============================================================
+  MOBILE SIDEBAR LOGO
+==============================================================*/
+
+.mobile-sidebar-logo{
+
+    width:40px;
+
+    height:40px;
+
+    flex:0 0 40px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:13px;
+
+    background:rgba(255,255,255,.08);
+
+    border:1px solid rgba(255,255,255,.10);
+
+    box-shadow:0 5px 16px rgba(0,0,0,.12);
 
 }
 
-.offcanvas-header small{
 
-    color:#94A3B8;
+/* Logo image */
+
+.mobile-sidebar-logo img{
+
+    width:34px;
+
+    height:34px;
+
+    object-fit:contain;
+
+    display:block;
 
 }
 
-.offcanvas-header .btn-close{
+
+/*==============================================================
+  MOBILE BRAND TEXT
+==============================================================*/
+
+.mobile-sidebar-brand-text{
+
+    min-width:0;
+
+    overflow:hidden;
+
+}
+
+
+.mobile-sidebar-brand-text h5{
+
+    margin:0;
+
+    color:#FFFFFF;
+
+    font-size:17px;
+
+    line-height:1.2;
+
+    font-weight:700;
+
+    white-space:nowrap;
+
+}
+
+
+.mobile-sidebar-brand-text p{
+
+    margin:3px 0 0;
+
+    color:rgba(255,255,255,.78);
+
+    font-size:10.5px;
+
+    line-height:1.3;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+}
+
+
+.mobile-sidebar-brand-text small{
+
+    display:block;
+
+    margin-top:2px;
+
+    color:rgba(255,255,255,.52);
+
+    font-size:9.5px;
+
+    line-height:1.3;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+}
+
+
+/*==============================================================
+  MOBILE CLOSE BUTTON
+==============================================================*/
+
+.mobile-sidebar-close{
+
+    flex:0 0 auto;
+
+    width:30px;
+
+    height:30px;
+
+    padding:6px;
+
+    margin:0;
 
     filter:invert(1);
+
+    opacity:.75;
+
+}
+
+
+.mobile-sidebar-close:hover{
+
+    opacity:1;
 
 }
 

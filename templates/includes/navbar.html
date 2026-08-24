@@ -37,7 +37,9 @@
 
     <div class="navbar-right">
 
-        <!-- Current Date -->
+        <!-- ==========================================
+            Current Date
+        ========================================== -->
 
         <div class="navbar-date d-none d-md-flex">
 
@@ -46,6 +48,36 @@
             <span id="currentDate"></span>
 
         </div>
+
+
+        <script>
+            (function () {
+
+                const dateElement =
+                    document.getElementById("currentDate");
+
+                if (!dateElement) {
+                    return;
+                }
+
+                const today = new Date();
+
+                const formattedDate =
+                    new Intl.DateTimeFormat(
+                        "en-IN",
+                        {
+                            weekday: "long",
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric"
+                        }
+                    ).format(today);
+
+                dateElement.textContent =
+                    formattedDate;
+
+            })();
+        </script>
 
         <!-- User -->
 

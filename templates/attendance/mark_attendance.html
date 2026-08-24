@@ -538,6 +538,45 @@ Mark Attendance
 
                     </div>
 
+                    <!-- ========================================== -->
+                    <!-- Student Pagination -->
+                    <!-- ========================================== -->
+
+                    <div
+                        id="studentPagination"
+                        class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3 mt-3"
+                    >
+
+                        <!-- Page Information -->
+
+                        <div class="text-muted small">
+
+                            Showing
+                            <strong id="paginationStart">0</strong>
+                            -
+                            <strong id="paginationEnd">0</strong>
+                            of
+                            <strong id="paginationTotal">0</strong>
+                            students
+
+                        </div>
+
+
+                        <!-- Pagination Controls -->
+
+                        <nav
+                            aria-label="Student attendance pagination"
+                        >
+
+                            <ul
+                                class="pagination pagination-sm mb-0"
+                                id="paginationControls"
+                            ></ul>
+
+                        </nav>
+
+                    </div>
+
                 </div>
 
             </div>
@@ -934,49 +973,123 @@ if (absentButton) {
 }
 
 // ==========================================
-// Student Search
+// Student Pagination + Search
 // ==========================================
 
 const studentSearch = document.getElementById(
-
     "studentSearch"
-
 );
 
-if (studentSearch) {
+const attendanceTable = document.getElementById(
+    "attendanceTable"
+);
 
-    studentSearch.addEventListener(
+const paginationControls = document.getElementById(
+    "paginationControls"
+);
 
-        "keyup",
+const paginationStart = document.getElementById(
+    "paginationStart"
+);
 
-        function () {
+const paginationEnd = document.getElementById(
+    "paginationEnd"
+);
 
-            const keyword = this.value.toLowerCase();
+const paginationTotal = document.getElementById(
+    "paginationTotal"
+);
 
-            document.querySelectorAll(
 
-                "#attendanceTable tbody tr"
+// ==========================================
+// Pagination Configuration
+// ==========================================
 
-            ).forEach(
+const STUDENTS_PER_PAGE = 10;
 
-                row => {
+let currentStudentPage = 1;
 
-                    const name = row.querySelector(
 
-                        ".student-name"
+// ==========================================
+// Get All Student Rows
+//
+// IMPORTANT:
+// We NEVER remove rows from the DOM.
+// We only hide/show them.
+//
+// Therefore every student's attendance
+// input remains inside the form.
+// ==========================================
 
-                    ).textContent.toLowerCase();
+function getStudentRows() {
 
-                    row.style.display =
+    if (!attendanceTable) {
 
-                        name.includes(keyword)
+        return [];
 
-                        ? ""
+    }
 
-                        : "none";
+    return Array.from(
 
-                }
+        attendanceTable.querySelectorAll(
+            "tbody tr"
+        )
 
+    );
+
+}
+
+
+// ==========================================
+// Get Filtered Student Rows
+// ==========================================
+
+function getFilteredStudentRows() {
+
+    const rows = getStudentRows();
+
+    const keyword = studentSearch
+
+        ? studentSearch.value
+            .trim()
+            .toLowerCase()
+
+        : "";
+
+
+    if (!keyword) {
+
+        return rows;
+
+    }
+
+
+    return rows.filter(
+
+        row => {
+
+            const studentNameElement =
+                row.querySelector(
+                    ".student-name"
+                );
+
+
+            if (!studentNameElement) {
+
+                return false;
+
+            }
+
+
+            const studentName =
+                studentNameElement
+                    .textContent
+                    .trim()
+                    .toLowerCase();
+
+
+            return studentName.includes(
+                keyword
             );
 
         }
@@ -984,6 +1097,411 @@ if (studentSearch) {
     );
 
 }
+
+
+// ==========================================
+// Render Pagination
+// ==========================================
+
+function renderStudentPagination() {
+
+    if (
+        !paginationControls ||
+        !paginationStart ||
+        !paginationEnd ||
+        !paginationTotal
+    ) {
+
+        return;
+
+    }
+
+
+    const filteredRows =
+        getFilteredStudentRows();
+
+
+    const totalStudents =
+        filteredRows.length;
+
+
+    const totalPages = Math.max(
+
+        1,
+
+        Math.ceil(
+            totalStudents /
+            STUDENTS_PER_PAGE
+        )
+
+    );
+
+
+    // --------------------------------------
+    // Prevent Invalid Page
+    // --------------------------------------
+
+    if (
+        currentStudentPage >
+        totalPages
+    ) {
+
+        currentStudentPage =
+            totalPages;
+
+    }
+
+
+    if (
+        currentStudentPage < 1
+    ) {
+
+        currentStudentPage = 1;
+
+    }
+
+
+    // --------------------------------------
+    // Calculate Visible Range
+    // --------------------------------------
+
+    const startIndex = (
+
+        (
+            currentStudentPage -
+            1
+        ) *
+        STUDENTS_PER_PAGE
+
+    );
+
+
+    const endIndex = Math.min(
+
+        startIndex +
+        STUDENTS_PER_PAGE,
+
+        totalStudents
+
+    );
+
+
+    // --------------------------------------
+    // Hide ALL rows first
+    // --------------------------------------
+
+    const allRows =
+        getStudentRows();
+
+
+    allRows.forEach(
+
+        row => {
+
+            row.style.display = "none";
+
+        }
+
+    );
+
+
+    // --------------------------------------
+    // Show Current Page Rows
+    // --------------------------------------
+
+    filteredRows
+        .slice(
+            startIndex,
+            endIndex
+        )
+        .forEach(
+
+            row => {
+
+                row.style.display = "";
+
+            }
+
+        );
+
+
+    // --------------------------------------
+    // Update Information
+    // --------------------------------------
+
+    if (totalStudents === 0) {
+
+        paginationStart.textContent = "0";
+
+        paginationEnd.textContent = "0";
+
+        paginationTotal.textContent = "0";
+
+    } else {
+
+        paginationStart.textContent =
+            startIndex + 1;
+
+        paginationEnd.textContent =
+            endIndex;
+
+        paginationTotal.textContent =
+            totalStudents;
+
+    }
+
+
+    // --------------------------------------
+    // Build Pagination Buttons
+    // --------------------------------------
+
+    paginationControls.innerHTML = "";
+
+
+    // --------------------------------------
+    // No Results
+    // --------------------------------------
+
+    if (totalStudents === 0) {
+
+        return;
+
+    }
+
+
+    // --------------------------------------
+    // Previous Button
+    // --------------------------------------
+
+    const previousItem =
+        document.createElement("li");
+
+    previousItem.className =
+        "page-item";
+
+
+    if (
+        currentStudentPage === 1
+    ) {
+
+        previousItem.classList.add(
+            "disabled"
+        );
+
+    }
+
+
+    const previousLink =
+        document.createElement("button");
+
+    previousLink.type = "button";
+
+    previousLink.className =
+        "page-link";
+
+    previousLink.innerHTML =
+        '<i class="bi bi-chevron-left"></i>';
+
+
+    previousLink.setAttribute(
+        "aria-label",
+        "Previous page"
+    );
+
+
+    previousLink.addEventListener(
+        "click",
+        function () {
+
+            if (
+                currentStudentPage > 1
+            ) {
+
+                currentStudentPage--;
+
+                renderStudentPagination();
+
+            }
+
+        }
+    );
+
+
+    previousItem.appendChild(
+        previousLink
+    );
+
+
+    paginationControls.appendChild(
+        previousItem
+    );
+
+
+    // --------------------------------------
+    // Page Numbers
+    // --------------------------------------
+
+    for (
+        let page = 1;
+        page <= totalPages;
+        page++
+    ) {
+
+        const pageItem =
+            document.createElement("li");
+
+
+        pageItem.className =
+            "page-item";
+
+
+        if (
+            page === currentStudentPage
+        ) {
+
+            pageItem.classList.add(
+                "active"
+            );
+
+        }
+
+
+        const pageButton =
+            document.createElement("button");
+
+
+        pageButton.type = "button";
+
+        pageButton.className =
+            "page-link";
+
+        pageButton.textContent =
+            page;
+
+
+        pageButton.addEventListener(
+            "click",
+            function () {
+
+                currentStudentPage =
+                    page;
+
+                renderStudentPagination();
+
+            }
+        );
+
+
+        pageItem.appendChild(
+            pageButton
+        );
+
+
+        paginationControls.appendChild(
+            pageItem
+        );
+
+    }
+
+
+    // --------------------------------------
+    // Next Button
+    // --------------------------------------
+
+    const nextItem =
+        document.createElement("li");
+
+
+    nextItem.className =
+        "page-item";
+
+
+    if (
+        currentStudentPage === totalPages
+    ) {
+
+        nextItem.classList.add(
+            "disabled"
+        );
+
+    }
+
+
+    const nextLink =
+        document.createElement("button");
+
+
+    nextLink.type = "button";
+
+    nextLink.className =
+        "page-link";
+
+    nextLink.innerHTML =
+        '<i class="bi bi-chevron-right"></i>';
+
+
+    nextLink.setAttribute(
+        "aria-label",
+        "Next page"
+    );
+
+
+    nextLink.addEventListener(
+        "click",
+        function () {
+
+            if (
+                currentStudentPage <
+                totalPages
+            ) {
+
+                currentStudentPage++;
+
+                renderStudentPagination();
+
+            }
+
+        }
+    );
+
+
+    nextItem.appendChild(
+        nextLink
+    );
+
+
+    paginationControls.appendChild(
+        nextItem
+    );
+
+}
+
+
+// ==========================================
+// Search Event
+// ==========================================
+
+if (studentSearch) {
+
+    studentSearch.addEventListener(
+        "input",
+        function () {
+
+            currentStudentPage = 1;
+
+            renderStudentPagination();
+
+        }
+    );
+
+}
+
+
+// ==========================================
+// Initial Pagination
+// ==========================================
+
+renderStudentPagination();
 
 </script>
 

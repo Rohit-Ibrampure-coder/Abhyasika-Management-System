@@ -255,37 +255,58 @@
     tabindex="-1"
 >
 
-    <!-- Header -->
+    <!-- ==========================================
+        Mobile Sidebar Header
+    ========================================== -->
 
-    <div class="offcanvas-header border-bottom">
+    <div class="offcanvas-header mobile-sidebar-header">
 
-        <div>
+        <!-- Logo + Brand -->
 
-            <h5 class="fw-bold mb-0">
+        <div class="mobile-sidebar-brand">
 
-                {{ APP_SHORT_NAME }}
+            <div class="mobile-sidebar-logo">
 
-            </h5>
+                <img
+                    src="{{ url_for('static', filename='images/logo-icon.png') }}"
+                    alt="Shri Laxmikeshav Pratisthan Logo"
+                >
 
-            <small class="text-muted">
+            </div>
 
-                Shri Laxmikeshav Pratisthan
 
-            </small>
+            <div class="mobile-sidebar-brand-text">
 
-            <br>
+                <h5>
 
-            <small class="text-muted">
+                    {{ APP_SHORT_NAME }}
 
-                Abhyasika Management System
+                </h5>
 
-            </small>
+                <p>
+
+                    Shri Laxmikeshav Pratisthan
+
+                </p>
+
+                <small>
+
+                    Abhyasika Management System
+
+                </small>
+
+            </div>
 
         </div>
 
+
+        <!-- Close Button -->
+
         <button
             type="button"
-            class="btn-close"
+            class="btn-close mobile-sidebar-close"
+            data-bs-dismiss="offcanvas"
+            aria-label="Close"
         ></button>
 
     </div>
@@ -450,27 +471,6 @@
                         <span class="menu-text">
 
                             Reports
-
-                        </span>
-
-                    </a>
-
-                </li>
-
-                <!-- Settings -->
-
-                <li class="nav-item">
-
-                    <a
-                        href="#"
-                        class="nav-link"
-                    >
-
-                        <i class="bi bi-gear-fill"></i>
-
-                        <span class="menu-text">
-
-                            Settings
 
                         </span>
 
