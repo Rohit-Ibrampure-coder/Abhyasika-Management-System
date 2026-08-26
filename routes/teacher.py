@@ -4,7 +4,8 @@ from flask import (
     request,
     redirect,
     url_for,
-    session
+    session,
+    abort
 )
 from models.abhyasika import Abhyasika
 from flask import flash
@@ -45,9 +46,23 @@ def select_abhyasika():
             "abhyasika_id"
         )
 
-        session["abhyasika_id"] = int(
-            selected_id
-        )
+        if not selected_id:
+            abort(400)
+
+        try:
+            selected_id = int(selected_id)
+        except (TypeError, ValueError):
+            abort(400)
+
+        assigned_ids = {
+            assignment.abhyasika_id
+            for assignment in assignments
+        }
+
+        if selected_id not in assigned_ids:
+            abort(403)
+
+        session["abhyasika_id"] = selected_id
 
         return redirect(
             url_for(
