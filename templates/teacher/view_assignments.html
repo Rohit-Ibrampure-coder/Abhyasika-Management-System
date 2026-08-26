@@ -25,9 +25,30 @@
     Abhyasika:
     {{ assignment.abhyasika.name }}
 
-    <a href="/admin/teacher/assignment/delete/{{ assignment.id }}">
-        Remove
-    </a>
+    <form
+        method="POST"
+        action="{{ url_for(
+            'teacher_assignment.delete_assignment',
+            id=assignment.id
+        ) }}"
+        class="d-inline"
+        onsubmit="return confirm('Are you sure you want to remove this teacher-Abhyasika assignment?');"
+    >
+
+        <input
+            type="hidden"
+            name="csrf_token"
+            value="{{ csrf_token() }}"
+        >
+
+        <button
+            type="submit"
+            class="btn btn-link p-0"
+        >
+            Remove
+        </button>
+
+    </form>
 
 </p>
 

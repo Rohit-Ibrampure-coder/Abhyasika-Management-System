@@ -92,7 +92,8 @@ def view_assignments():
     )
 
 @teacher_assignment_bp.route(
-    "/admin/teacher/assignment/delete/<int:id>"
+    "/admin/teacher/assignment/delete/<int:id>",
+    methods=["POST"]
 )
 @login_required
 def delete_assignment(id):
@@ -103,6 +104,7 @@ def delete_assignment(id):
     assignment = TeacherAbhyasika.query.get_or_404(id)
 
     db.session.delete(assignment)
+
     db.session.commit()
 
     return redirect(
