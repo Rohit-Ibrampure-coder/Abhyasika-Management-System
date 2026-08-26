@@ -640,6 +640,16 @@ def edit_student(student_id):
 
     student = Student.query.get_or_404(student_id)
 
+    if current_user.role == "teacher":
+
+        assignment = TeacherAbhyasika.query.filter_by(
+            teacher_id=current_user.id,
+            abhyasika_id=student.abhyasika_id
+        ).first()
+
+        if not assignment:
+            abort(403)
+
     if current_user.role == "admin":
 
         abhyasikas = Abhyasika.query.all()
