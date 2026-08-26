@@ -314,6 +314,12 @@ Evaluation Question Master
                                             method="POST"
                                             class="d-inline delete-form">
 
+                                            <input
+                                                type="hidden"
+                                                name="csrf_token"
+                                                value="{{ csrf_token() }}"
+                                            >
+
                                             <button
                                                 type="submit"
                                                 class="btn btn-danger btn-sm"

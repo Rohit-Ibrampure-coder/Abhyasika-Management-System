@@ -80,6 +80,12 @@ Add Student
     enctype="multipart/form-data"
 >
 
+<input
+    type="hidden"
+    name="csrf_token"
+    value="{{ csrf_token() }}"
+>
+
 <!-- ==========================================================
      STUDENT PHOTO
 ========================================================== -->

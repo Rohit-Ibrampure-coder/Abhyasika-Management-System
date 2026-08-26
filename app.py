@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_wtf.csrf import CSRFProtect
 from config import Config
 from models import db
 from routes.auth import auth_bp
@@ -36,6 +37,19 @@ from branding import (
 
 app = Flask(__name__)
 app.config.from_object(Config)
+
+# ==========================================
+# CSRF Protection
+# ==========================================
+
+csrf = CSRFProtect()
+
+csrf.init_app(app)
+
+
+# ==========================================
+# Database
+# ==========================================
 
 db.init_app(app)
 

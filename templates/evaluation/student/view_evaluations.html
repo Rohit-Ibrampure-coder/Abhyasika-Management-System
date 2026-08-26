@@ -458,6 +458,12 @@ Student Evaluations
                                         class="delete-evaluation-form m-0"
                                     >
 
+                                        <input
+                                            type="hidden"
+                                            name="csrf_token"
+                                            value="{{ csrf_token() }}"
+                                        >
+
                                         <button
                                             type="submit"
                                             class="btn btn-danger btn-sm d-flex align-items-center justify-content-center"

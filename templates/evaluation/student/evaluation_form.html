@@ -27,6 +27,12 @@ Student Evaluation
                 action="{{ url_for('evaluation_student.save_student_evaluation', student_id=student.id) }}"
             >
 
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}"
+                >
+
                 <div class="row g-3">
 
                     <div class="col-md-6">

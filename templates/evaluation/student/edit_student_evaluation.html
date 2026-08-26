@@ -27,6 +27,12 @@ Edit Student Evaluation
                 action="{{ url_for('evaluation_student.update_student_evaluation', evaluation_id=evaluation.id) }}"
             >
 
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}"
+                >
+
                 <div class="row g-3">
 
                     <!-- Student Name -->

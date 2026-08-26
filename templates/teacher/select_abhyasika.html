@@ -77,6 +77,12 @@
 
         <form method="POST">
 
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="{{ csrf_token() }}"
+            >
+
             {% for assignment in assignments %}
 
             <label class="abhyasika-option">

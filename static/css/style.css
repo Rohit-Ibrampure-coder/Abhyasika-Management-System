@@ -6588,3 +6588,98 @@ REMARK CARD
     }
 
 }
+
+/* ==========================================================
+   FINAL APP LAYOUT FIX
+   Prevent footer from appearing inside overflowing content
+========================================================== */
+
+.app-wrapper {
+    min-height: 100vh;
+}
+
+.main-content {
+    min-width: 0;
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.page-content {
+    flex: 1 0 auto;
+    min-height: 0;
+
+    padding: 32px;
+}
+
+.footer {
+    flex: 0 0 auto;
+    width: 100%;
+    margin-top: 18px;
+    text-align: center;
+}
+
+
+/* ==========================================================
+   DESKTOP
+========================================================== */
+
+@media (min-width: 992px) {
+
+    .app-wrapper {
+        height: 100vh;
+        min-height: 100vh;
+        overflow: hidden;
+    }
+
+    .app-wrapper > .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+
+        width: var(--sidebar-width);
+        height: 100vh;
+
+        z-index: 1050;
+
+        display: flex;
+        flex-direction: column;
+
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+
+    .app-wrapper > .main-content {
+        margin-left: var(--sidebar-width);
+
+        width: calc(100% - var(--sidebar-width));
+
+        min-height: 100vh;
+        height: 100vh;
+
+        display: flex;
+        flex-direction: column;
+
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    /*
+       IMPORTANT:
+       Do NOT use min-height:0 here.
+       The page content must be allowed to grow
+       according to the actual Dashboard content.
+    */
+
+    .app-wrapper > .main-content .page-content {
+        flex: 1 0 auto;
+        min-height: 0;
+    }
+
+    .app-wrapper > .main-content footer {
+        flex: 0 0 auto;
+        width: 100%;
+    }
+
+}

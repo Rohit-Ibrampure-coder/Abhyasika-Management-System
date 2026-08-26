@@ -44,6 +44,12 @@ Assign Abhyasika
 
 <form method="POST">
 
+    <input
+        type="hidden"
+        name="csrf_token"
+        value="{{ csrf_token() }}"
+    >
+
     <div class="card border-0 shadow-sm rounded-4">
 
         <div class="card-body">

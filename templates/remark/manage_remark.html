@@ -162,6 +162,12 @@ Teacher Remarks
 
             <form method="POST">
 
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}"
+                >
+
                 <div class="mb-4">
 
                     <label
@@ -322,6 +328,12 @@ Teacher Remarks
                                         ) }}"
                                         class="d-inline delete-remark-form"
                                     >
+
+                                        <input
+                                            type="hidden"
+                                            name="csrf_token"
+                                            value="{{ csrf_token() }}"
+                                        >
 
                                         <button
                                             type="submit"

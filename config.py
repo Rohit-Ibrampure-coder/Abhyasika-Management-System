@@ -14,6 +14,12 @@ class Config:
     SECRET_KEY = os.getenv("SECRET_KEY")
 
     # ==========================================
+    # CSRF Protection
+    # ==========================================
+
+    WTF_CSRF_ENABLED = True
+
+    # ==========================================
     # Database Configuration
     # ==========================================
 

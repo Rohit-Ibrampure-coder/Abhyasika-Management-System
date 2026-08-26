@@ -43,6 +43,12 @@
 
 <form method="POST" class="daily-report-form">
 
+    <input
+        type="hidden"
+        name="csrf_token"
+        value="{{ csrf_token() }}"
+    >
+
     <!-- Information Card -->
 
     <div class="report-card mb-4">
