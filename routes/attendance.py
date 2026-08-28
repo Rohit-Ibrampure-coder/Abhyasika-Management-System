@@ -8,6 +8,7 @@ from flask import (
     flash
 )
 from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
 
 from utils.file_upload import (
     allowed_attendance_file,
@@ -414,7 +415,58 @@ def save_attendance():
         attendance_session
     )
 
-    db.session.flush()
+    try:
+
+        db.session.flush()
+
+    except IntegrityError:
+
+        # Another request may have created the
+        # attendance session at the same time.
+        db.session.rollback()
+
+        # Remove the photo that was saved by this
+        # failed request because its database record
+        # was not created.
+        delete_attendance_photo(
+            filename
+        )
+
+        existing_session = AttendanceSession.query.filter_by(
+
+            abhyasika_id=abhyasika.id,
+
+            attendance_date=attendance_date
+
+        ).first()
+
+        if existing_session:
+
+            flash(
+
+                "Attendance has already been marked for this date.",
+
+                "warning"
+
+            )
+
+            return redirect(
+
+                url_for(
+
+                    "attendance.view_attendance",
+
+                    attendance_session_id=existing_session.id
+
+                )
+
+            )
+
+        # If the IntegrityError was caused by
+        # something other than the attendance-session
+        # race condition, do not hide it.
+
+        raise
 
     # -----------------------------------------
     # Load Students

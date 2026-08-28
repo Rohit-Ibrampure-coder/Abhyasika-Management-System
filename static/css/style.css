@@ -6693,3 +6693,27 @@ REMARK CARD
     opacity: 1 !important;
     visibility: visible !important;
 }
+
+/* ==========================================
+   Edit Attendance
+   Student Attendance Header
+========================================== */
+
+.student-attendance-header {
+    background-color: #212529 !important;
+}
+
+.student-attendance-title {
+    color: #ffffff !important;
+    margin: 0;
+    font-weight: 600;
+}
+
+.student-attendance-title i {
+    color: #ffffff !important;
+}
+
+.student-count-badge {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
