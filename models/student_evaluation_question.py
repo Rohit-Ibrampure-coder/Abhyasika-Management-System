@@ -31,11 +31,6 @@ class StudentEvaluationQuestion(db.Model):
         nullable=False
     )
 
-    question_group = db.relationship(
-        "StudentEvaluationQuestionGroup",
-        back_populates="questions"
-    )
-
     display_order = db.Column(
         db.Integer,
         nullable=False,

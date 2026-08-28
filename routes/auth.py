@@ -1,22 +1,50 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from datetime import datetime
+
+from flask import (
+    Blueprint,
+    render_template,
+    request,
+    redirect,
+    url_for,
+    flash,
+    session
+)
+
 from werkzeug.security import check_password_hash
-from flask_login import logout_user, login_user
-from flask import session
+
+from flask_login import (
+    logout_user,
+    login_user
+)
+
+from models import db
 from models.user import User
 from models.teacher_abhyasika import TeacherAbhyasika
+
 
 auth_bp = Blueprint(
     "auth",
     __name__
 )
 
-@auth_bp.route("/login", methods=["GET", "POST"])
+
+@auth_bp.route(
+    "/login",
+    methods=["GET", "POST"]
+)
 def login():
 
     if request.method == "POST":
 
-        username = request.form.get("username")
-        password = request.form.get("password")
+        username = request.form.get(
+            "username",
+            ""
+        ).strip()
+
+        password = request.form.get(
+            "password",
+            ""
+        )
 
         user = User.query.filter_by(
             username=username
@@ -34,7 +62,8 @@ def login():
             if not user.is_active_account:
 
                 flash(
-                    "Your account has been deactivated. Please contact the administrator.",
+                    "Your account has been deactivated. "
+                    "Please contact the administrator.",
                     "danger"
                 )
 
@@ -42,26 +71,52 @@ def login():
                     url_for("auth.login")
                 )
 
+            # ==========================================
+            # Update Last Login
+            # ==========================================
+
+            user.last_login = datetime.utcnow()
+
+            db.session.commit()
+
+            # ==========================================
+            # Create Login Session
+            # ==========================================
+
             login_user(user)
 
+            # ==========================================
             # Admin Login
+            # ==========================================
+
             if user.role == "admin":
 
                 return redirect(
-                    url_for("admin.admin_dashboard")
+                    url_for(
+                        "admin.admin_dashboard"
+                    )
                 )
 
+            # ==========================================
             # Teacher Login
+            # ==========================================
+
             elif user.role == "teacher":
 
-                assignments = TeacherAbhyasika.query.filter_by(
-                    teacher_id=user.id
-                ).all()
+                assignments = (
+                    TeacherAbhyasika.query
+                    .filter_by(
+                        teacher_id=user.id
+                    )
+                    .all()
+                )
 
                 if len(assignments) == 1:
 
                     return redirect(
-                        url_for("teacher.teacher_dashboard")
+                        url_for(
+                            "teacher.teacher_dashboard"
+                        )
                     )
 
                 elif len(assignments) > 1:
@@ -72,7 +127,19 @@ def login():
                         )
                     )
 
-                return "No Abhyasika Assigned"
+                flash(
+                    "No Abhyasika has been assigned "
+                    "to your account.",
+                    "warning"
+                )
+
+                return redirect(
+                    url_for("auth.login")
+                )
+
+        # ==========================================
+        # Invalid Login
+        # ==========================================
 
         flash(
             "Invalid username or password",
@@ -88,6 +155,7 @@ def login():
 def logout():
 
     logout_user()
+
     session.clear()
 
     return redirect(

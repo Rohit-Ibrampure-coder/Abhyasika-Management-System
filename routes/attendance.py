@@ -1,3 +1,5 @@
+from datetime import date, datetime
+
 from flask import (
     Blueprint,
     render_template,
@@ -5,8 +7,15 @@ from flask import (
     session,
     redirect,
     url_for,
-    flash
+    flash,
+    abort
 )
+
+from flask_login import (
+    login_required,
+    current_user
+)
+
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
@@ -16,22 +25,13 @@ from utils.file_upload import (
     delete_attendance_photo
 )
 
-from flask import abort
+from models import db
 from models.student import Student
 from models.abhyasika import Abhyasika
-from models import db
 from models.attendance import Attendance
-from datetime import date
-from datetime import datetime
-from models.achievement import Achievement
 from models.attendance_session import AttendanceSession
 from models.teacher_abhyasika import TeacherAbhyasika
 from models.user import User
-
-from flask_login import (
-    login_required,
-    current_user
-)
 
 attendance_bp = Blueprint(
     "attendance",
@@ -88,12 +88,6 @@ def mark_attendance():
     # ==========================================
 
     if request.method == "POST":
-
-        print("=" * 50)
-        print("POST REQUEST RECEIVED")
-        print("Abhyasika:", request.form.get("abhyasika_id"))
-        print("Date:", request.form.get("attendance_date"))
-        print("=" * 50)
 
         attendance_date = request.form.get(
             "attendance_date"
@@ -211,8 +205,6 @@ def mark_attendance():
 
             )
 
-        print("Students Loaded :", students_loaded)
-        print("Students Count :", len(students))
 
     # ==========================================
     # Render Template
@@ -556,10 +548,6 @@ def attendance_history():
         type=int
     )
 
-    # ==========================================
-    # Student Attendance Filters
-    # ==========================================
-
     student_search = request.args.get(
         "student_search",
         ""
@@ -583,18 +571,16 @@ def attendance_history():
 
     else:
 
-        # Teacher can only access the
-        # currently selected Abhyasika.
         selected_abhyasika = session.get(
             "abhyasika_id"
         )
 
-        # Teacher must have an Abhyasika selected.
         if not selected_abhyasika:
             abort(403)
 
-        # Prevent teacher from manually changing
-        # the student Abhyasika filter.
+        # Teacher cannot manually change the
+        # student Abhyasika filter.
+
         student_abhyasika_id = selected_abhyasika
 
     # ==========================================
@@ -617,48 +603,48 @@ def attendance_history():
 
     query = AttendanceSession.query
 
-    # ==========================================
-    # Abhyasika Filter
-    # ==========================================
+    # ------------------------------------------
+    # Abhyasika
+    # ------------------------------------------
 
     if selected_abhyasika:
 
         query = query.filter(
-            AttendanceSession.abhyasika_id ==
-            selected_abhyasika
+            AttendanceSession.abhyasika_id
+            == selected_abhyasika
         )
 
-    # ==========================================
-    # Teacher Filter
-    # ==========================================
+    # ------------------------------------------
+    # Teacher
+    # ------------------------------------------
 
     if selected_teacher:
 
         query = query.filter(
-            AttendanceSession.teacher_id ==
-            selected_teacher
+            AttendanceSession.teacher_id
+            == selected_teacher
         )
 
-    # ==========================================
+    # ------------------------------------------
     # From Date
-    # ==========================================
+    # ------------------------------------------
 
     if from_date:
 
         query = query.filter(
-            AttendanceSession.attendance_date >=
-            from_date
+            AttendanceSession.attendance_date
+            >= from_date
         )
 
-    # ==========================================
+    # ------------------------------------------
     # To Date
-    # ==========================================
+    # ------------------------------------------
 
     if to_date:
 
         query = query.filter(
-            AttendanceSession.attendance_date <=
-            to_date
+            AttendanceSession.attendance_date
+            <= to_date
         )
 
     # ==========================================
@@ -677,23 +663,105 @@ def attendance_history():
     attendance_sessions = (
 
         query
-
         .order_by(
             AttendanceSession.attendance_date.desc(),
             AttendanceSession.created_at.desc()
         )
-
         .paginate(
-
             page=session_page,
-
             per_page=10,
-
             error_out=False
-
         )
 
     )
+
+    # ==========================================
+    # Session Attendance Statistics
+    #
+    # ONE grouped query instead of:
+    # 2 queries × every session
+    # ==========================================
+
+    session_ids = [
+        attendance_session.id
+        for attendance_session
+        in attendance_sessions.items
+    ]
+
+    session_stats = {}
+
+    if session_ids:
+
+        grouped_session_stats = (
+
+            db.session.query(
+
+                Attendance.attendance_session_id,
+
+                func.count(
+                    Attendance.id
+                ).label(
+                    "total"
+                ),
+
+                func.sum(
+                    db.case(
+                        (
+                            Attendance.status
+                            == "Present",
+                            1
+                        ),
+                        else_=0
+                    )
+                ).label(
+                    "present"
+                ),
+
+                func.sum(
+                    db.case(
+                        (
+                            Attendance.status
+                            == "Absent",
+                            1
+                        ),
+                        else_=0
+                    )
+                ).label(
+                    "absent"
+                )
+
+            )
+
+            .filter(
+                Attendance.attendance_session_id.in_(
+                    session_ids
+                )
+            )
+
+            .group_by(
+                Attendance.attendance_session_id
+            )
+
+            .all()
+
+        )
+
+        for row in grouped_session_stats:
+
+            session_stats[
+                row.attendance_session_id
+            ] = {
+
+                "total":
+                    int(row.total or 0),
+
+                "present":
+                    int(row.present or 0),
+
+                "absent":
+                    int(row.absent or 0)
+
+            }
 
     # ==========================================
     # Attendance History List
@@ -703,29 +771,16 @@ def attendance_history():
 
     for attendance_session in attendance_sessions.items:
 
-        present_count = (
-            Attendance.query
-            .filter_by(
-                attendance_session_id=
-                    attendance_session.id,
-                status="Present"
-            )
-            .count()
-        )
+        stats = session_stats.get(
 
-        absent_count = (
-            Attendance.query
-            .filter_by(
-                attendance_session_id=
-                    attendance_session.id,
-                status="Absent"
-            )
-            .count()
-        )
+            attendance_session.id,
 
-        total_students = (
-            present_count +
-            absent_count
+            {
+                "total": 0,
+                "present": 0,
+                "absent": 0
+            }
+
         )
 
         history.append({
@@ -734,13 +789,13 @@ def attendance_history():
                 attendance_session,
 
             "present":
-                present_count,
+                stats["present"],
 
             "absent":
-                absent_count,
+                stats["absent"],
 
             "total":
-                total_students
+                stats["total"]
 
         })
 
@@ -766,8 +821,8 @@ def attendance_history():
 
         student_query = student_query.filter(
 
-            Student.abhyasika_id ==
-            student_abhyasika_id
+            Student.abhyasika_id
+            == student_abhyasika_id
 
         )
 
@@ -786,10 +841,256 @@ def attendance_history():
         )
 
     # ==========================================
-    # Load Filtered Students
+    # Student Count
     # ==========================================
 
-    students = (
+    student_total = student_query.count()
+
+    # ==========================================
+    # Student Attendance Summary
+    #
+    # Instead of loading attendance separately
+    # for every student, aggregate everything
+    # in ONE database query.
+    # ==========================================
+
+    student_summary_query = (
+
+        db.session.query(
+
+            Student.id.label(
+                "student_id"
+            ),
+
+            func.count(
+                Attendance.id
+            ).label(
+                "total_days"
+            ),
+
+            func.sum(
+                db.case(
+                    (
+                        Attendance.status
+                        == "Present",
+                        1
+                    ),
+                    else_=0
+                )
+            ).label(
+                "present_days"
+            ),
+
+            func.sum(
+                db.case(
+                    (
+                        Attendance.status
+                        == "Absent",
+                        1
+                    ),
+                    else_=0
+                )
+            ).label(
+                "absent_days"
+            )
+
+        )
+
+        .outerjoin(
+
+            Attendance,
+
+            Attendance.student_id
+            == Student.id
+
+        )
+
+        .outerjoin(
+
+            AttendanceSession,
+
+            Attendance.attendance_session_id
+            == AttendanceSession.id
+
+        )
+
+        .filter(
+
+            Student.status == "Active"
+
+        )
+
+    )
+
+    # ==========================================
+    # Student Abhyasika Filter
+    # ==========================================
+
+    if student_abhyasika_id:
+
+        student_summary_query = (
+            student_summary_query.filter(
+                Student.abhyasika_id
+                == student_abhyasika_id
+            )
+        )
+
+    # ==========================================
+    # Student Search
+    # ==========================================
+
+    if student_search:
+
+        student_summary_query = (
+            student_summary_query.filter(
+                Student.student_name.ilike(
+                    f"%{student_search}%"
+                )
+            )
+        )
+
+    # ==========================================
+    # Attendance Abhyasika Filter
+    # ==========================================
+
+    if selected_abhyasika:
+
+        student_summary_query = (
+            student_summary_query.filter(
+                AttendanceSession.abhyasika_id
+                == selected_abhyasika
+            )
+        )
+
+    # ==========================================
+    # Attendance Teacher Filter
+    # ==========================================
+
+    if selected_teacher:
+
+        student_summary_query = (
+            student_summary_query.filter(
+                AttendanceSession.teacher_id
+                == selected_teacher
+            )
+        )
+
+    # ==========================================
+    # Attendance From Date
+    # ==========================================
+
+    if from_date:
+
+        student_summary_query = (
+            student_summary_query.filter(
+                AttendanceSession.attendance_date
+                >= from_date
+            )
+        )
+
+    # ==========================================
+    # Attendance To Date
+    # ==========================================
+
+    if to_date:
+
+        student_summary_query = (
+            student_summary_query.filter(
+                AttendanceSession.attendance_date
+                <= to_date
+            )
+        )
+
+    # ==========================================
+    # Group Student Statistics
+    # ==========================================
+
+    student_summary_rows = (
+
+        student_summary_query
+
+        .group_by(
+            Student.id
+        )
+
+        .all()
+
+    )
+
+    student_summary_map = {
+
+        row.student_id: {
+
+            "total_days":
+                int(row.total_days or 0),
+
+            "present_days":
+                int(row.present_days or 0),
+
+            "absent_days":
+                int(row.absent_days or 0)
+
+        }
+
+        for row in student_summary_rows
+
+    }
+
+    # ==========================================
+    # Student Pagination
+    # ==========================================
+
+    student_per_page = 10
+
+    student_page = request.args.get(
+        "student_page",
+        1,
+        type=int
+    )
+
+    if student_page < 1:
+        student_page = 1
+
+    student_total_pages = (
+
+        (
+            student_total
+            + student_per_page
+            - 1
+        )
+        //
+        student_per_page
+
+    )
+
+    if (
+
+        student_total_pages > 0
+
+        and
+
+        student_page >
+        student_total_pages
+
+    ):
+
+        student_page = student_total_pages
+
+    student_start = (
+
+        (
+            student_page - 1
+        )
+        *
+        student_per_page
+
+    )
+
+    # ==========================================
+    # Load ONLY Current Student Page
+    # ==========================================
+
+    paginated_students = (
 
         student_query
 
@@ -797,151 +1098,43 @@ def attendance_history():
             Student.student_name.asc()
         )
 
+        .offset(
+            student_start
+        )
+
+        .limit(
+            student_per_page
+        )
+
         .all()
 
     )
 
     # ==========================================
-    # Total Filtered Students
-    # ==========================================
-
-    student_total = len(students)
-
-    # ==========================================
     # Build Student Attendance Summary
-    #
-    # IMPORTANT:
-    # Build the COMPLETE summary first.
-    # Pagination happens only after this.
     # ==========================================
 
-    student_attendance_summary = []
+    paginated_student_attendance_summary = []
 
-    for student in students:
+    for student in paginated_students:
 
-        # ======================================
-        # Attendance Query
-        # ======================================
+        stats = student_summary_map.get(
 
-        attendance_query = (
+            student.id,
 
-            db.session.query(
-                Attendance
-            )
-
-            .join(
-                AttendanceSession,
-                Attendance.attendance_session_id ==
-                AttendanceSession.id
-            )
-
-            .filter(
-                Attendance.student_id ==
-                student.id
-            )
+            {
+                "total_days": 0,
+                "present_days": 0,
+                "absent_days": 0
+            }
 
         )
 
-        # ======================================
-        # Abhyasika Filter
-        # ======================================
+        total_days = stats["total_days"]
 
-        if selected_abhyasika:
+        present_days = stats["present_days"]
 
-            attendance_query = attendance_query.filter(
-
-                AttendanceSession.abhyasika_id ==
-                selected_abhyasika
-
-            )
-
-        elif student_abhyasika_id:
-
-            attendance_query = attendance_query.filter(
-
-                AttendanceSession.abhyasika_id ==
-                student_abhyasika_id
-
-            )
-
-        # ======================================
-        # Teacher Filter
-        # ======================================
-
-        if selected_teacher:
-
-            attendance_query = attendance_query.filter(
-
-                AttendanceSession.teacher_id ==
-                selected_teacher
-
-            )
-
-        # ======================================
-        # From Date
-        # ======================================
-
-        if from_date:
-
-            attendance_query = attendance_query.filter(
-
-                AttendanceSession.attendance_date >=
-                from_date
-
-            )
-
-        # ======================================
-        # To Date
-        # ======================================
-
-        if to_date:
-
-            attendance_query = attendance_query.filter(
-
-                AttendanceSession.attendance_date <=
-                to_date
-
-            )
-
-        # ======================================
-        # Attendance Records
-        # ======================================
-
-        attendance_records = (
-            attendance_query.all()
-        )
-
-        # ======================================
-        # Statistics
-        # ======================================
-
-        total_days = len(
-            attendance_records
-        )
-
-        present_days = sum(
-
-            1
-
-            for record in attendance_records
-
-            if record.status == "Present"
-
-        )
-
-        absent_days = sum(
-
-            1
-
-            for record in attendance_records
-
-            if record.status == "Absent"
-
-        )
-
-        # ======================================
-        # Attendance Percentage
-        # ======================================
+        absent_days = stats["absent_days"]
 
         attendance_percentage = 0.00
 
@@ -958,11 +1151,7 @@ def attendance_history():
 
             )
 
-        # ======================================
-        # Add Student Summary
-        # ======================================
-
-        student_attendance_summary.append({
+        paginated_student_attendance_summary.append({
 
             "student":
                 student,
@@ -982,20 +1171,14 @@ def attendance_history():
         })
 
     # ==========================================
-    # COMPLETE STUDENT ATTENDANCE STATISTICS
-    #
-    # IMPORTANT:
-    # These are calculated BEFORE pagination.
-    #
-    # Therefore page 1 and page 2 will show
-    # exactly the same summary cards.
+    # Complete Student Statistics
     # ==========================================
 
     student_total_present = sum(
 
         item["present_days"]
 
-        for item in student_attendance_summary
+        for item in student_summary_map.values()
 
     )
 
@@ -1003,7 +1186,7 @@ def attendance_history():
 
         item["absent_days"]
 
-        for item in student_attendance_summary
+        for item in student_summary_map.values()
 
     )
 
@@ -1011,87 +1194,12 @@ def attendance_history():
 
         item["total_days"]
 
-        for item in student_attendance_summary
-
-    )
-
-    # ==========================================
-    # Student Pagination
-    # ==========================================
-
-    student_per_page = 10
-
-    student_page = request.args.get(
-        "student_page",
-        1,
-        type=int
-    )
-
-    if student_page < 1:
-        student_page = 1
-
-    # ==========================================
-    # Calculate Total Student Pages
-    # ==========================================
-
-    student_total_pages = (
-
-        (
-            student_total +
-            student_per_page -
-            1
-        )
-        //
-        student_per_page
-
-    )
-
-    # ==========================================
-    # Prevent Invalid Page
-    # ==========================================
-
-    if (
-        student_total_pages > 0
-        and student_page > student_total_pages
-    ):
-
-        student_page = student_total_pages
-
-    # ==========================================
-    # Student Page Slice
-    # ==========================================
-
-    student_start = (
-
-        (
-            student_page -
-            1
-        )
-        *
-        student_per_page
-
-    )
-
-    student_end = (
-
-        student_start +
-        student_per_page
-
-    )
-
-    paginated_student_attendance_summary = (
-
-        student_attendance_summary[
-            student_start:student_end
-        ]
+        for item in student_summary_map.values()
 
     )
 
     # ==========================================
     # Dashboard Statistics
-    #
-    # These statistics respect the current
-    # Abhyasika / Teacher / Date filters.
     # ==========================================
 
     total_sessions = query.count()
@@ -1108,8 +1216,8 @@ def attendance_history():
 
         today_query = today_query.filter(
 
-            AttendanceSession.abhyasika_id ==
-            selected_abhyasika
+            AttendanceSession.abhyasika_id
+            == selected_abhyasika
 
         )
 
@@ -1117,19 +1225,25 @@ def attendance_history():
 
         today_query = today_query.filter(
 
-            AttendanceSession.teacher_id ==
-            selected_teacher
+            AttendanceSession.teacher_id
+            == selected_teacher
 
         )
 
-    today_query = today_query.filter(
+    today_sessions = (
 
-        AttendanceSession.attendance_date ==
-        today
+        today_query
+
+        .filter(
+
+            AttendanceSession.attendance_date
+            == today
+
+        )
+
+        .count()
 
     )
-
-    today_sessions = today_query.count()
 
     # ==========================================
     # Filtered Attendance Totals
@@ -1138,96 +1252,91 @@ def attendance_history():
     attendance_stats_query = (
 
         db.session.query(
-            Attendance.status
+
+            Attendance.status,
+
+            func.count(
+                Attendance.id
+            )
+
         )
 
         .join(
+
             AttendanceSession,
-            Attendance.attendance_session_id ==
-            AttendanceSession.id
+
+            Attendance.attendance_session_id
+            == AttendanceSession.id
+
         )
 
     )
-
-    # ==========================================
-    # Abhyasika Filter
-    # ==========================================
 
     if selected_abhyasika:
 
         attendance_stats_query = (
             attendance_stats_query.filter(
-                AttendanceSession.abhyasika_id ==
-                selected_abhyasika
+                AttendanceSession.abhyasika_id
+                == selected_abhyasika
             )
         )
-
-    # ==========================================
-    # Teacher Filter
-    # ==========================================
 
     if selected_teacher:
 
         attendance_stats_query = (
             attendance_stats_query.filter(
-                AttendanceSession.teacher_id ==
-                selected_teacher
+                AttendanceSession.teacher_id
+                == selected_teacher
             )
         )
-
-    # ==========================================
-    # From Date
-    # ==========================================
 
     if from_date:
 
         attendance_stats_query = (
             attendance_stats_query.filter(
-                AttendanceSession.attendance_date >=
-                from_date
+                AttendanceSession.attendance_date
+                >= from_date
             )
         )
-
-    # ==========================================
-    # To Date
-    # ==========================================
 
     if to_date:
 
         attendance_stats_query = (
             attendance_stats_query.filter(
-                AttendanceSession.attendance_date <=
-                to_date
+                AttendanceSession.attendance_date
+                <= to_date
             )
         )
 
-    # ==========================================
-    # Execute Attendance Statistics
-    # ==========================================
-
     attendance_status_records = (
-        attendance_stats_query.all()
-    )
 
-    total_present = sum(
+        attendance_stats_query
 
-        1
+        .group_by(
+            Attendance.status
+        )
 
-        for status, in attendance_status_records
-
-        if status == "Present"
+        .all()
 
     )
 
-    total_absent = sum(
+    total_present = 0
 
-        1
+    total_absent = 0
 
-        for status, in attendance_status_records
+    for status_value, count_value in attendance_status_records:
 
-        if status == "Absent"
+        if status_value == "Present":
 
-    )
+            total_present = int(
+                count_value or 0
+            )
+
+        elif status_value == "Absent":
+
+            total_absent = int(
+                count_value or 0
+            )
 
     # ==========================================
     # Abhyasika Dropdown
@@ -1249,14 +1358,16 @@ def attendance_history():
 
         )
 
-        # Selected Abhyasika object
-
         if selected_abhyasika:
 
             abhyasika = (
-                Abhyasika.query.get(
+
+                Abhyasika.query
+
+                .get(
                     selected_abhyasika
                 )
+
             )
 
     else:
@@ -1266,9 +1377,13 @@ def attendance_history():
         if selected_abhyasika:
 
             abhyasika = (
-                Abhyasika.query.get(
+
+                Abhyasika.query
+
+                .get(
                     selected_abhyasika
                 )
+
             )
 
     # ==========================================
@@ -1299,67 +1414,34 @@ def attendance_history():
 
         "attendance/attendance_history.html",
 
-        # ======================================
-        # Attendance Sessions
-        # ======================================
-
         history=history,
 
         pagination=attendance_sessions,
 
-        # ======================================
-        # Dashboard Statistics
-        # ======================================
+        total_sessions=total_sessions,
 
-        total_sessions=
-            total_sessions,
+        today_sessions=today_sessions,
 
-        today_sessions=
-            today_sessions,
+        total_present=total_present,
 
-        total_present=
-            total_present,
+        total_absent=total_absent,
 
-        total_absent=
-            total_absent,
+        abhyasikas=abhyasikas,
 
-        # ======================================
-        # Main Filters
-        # ======================================
+        teachers=teachers,
 
-        abhyasikas=
-            abhyasikas,
+        selected_abhyasika=selected_abhyasika,
 
-        teachers=
-            teachers,
+        selected_teacher=selected_teacher,
 
-        selected_abhyasika=
-            selected_abhyasika,
+        from_date=from_date,
 
-        selected_teacher=
-            selected_teacher,
+        to_date=to_date,
 
-        from_date=
-            from_date,
-
-        to_date=
-            to_date,
-
-        abhyasika=
-            abhyasika,
-
-        # ======================================
-        # Student Attendance
-        # ======================================
+        abhyasika=abhyasika,
 
         student_attendance_summary=
             paginated_student_attendance_summary,
-
-        # ======================================
-        # Complete Student Statistics
-        #
-        # These DO NOT change with pagination.
-        # ======================================
 
         student_total=
             student_total,
@@ -1373,10 +1455,6 @@ def attendance_history():
         student_total_records=
             student_total_records,
 
-        # ======================================
-        # Student Pagination
-        # ======================================
-
         student_page=
             student_page,
 
@@ -1385,10 +1463,6 @@ def attendance_history():
 
         student_total_pages=
             student_total_pages,
-
-        # ======================================
-        # Student Filters
-        # ======================================
 
         student_search=
             student_search,
@@ -1959,7 +2033,6 @@ def student_attendance_history(student_id):
         ""
     ).strip()
 
-
     # ==========================================
     # Load Student
     # ==========================================
@@ -1968,13 +2041,13 @@ def student_attendance_history(student_id):
         student_id
     )
 
-
     # ==========================================
     # Determine Student's Abhyasika
     # ==========================================
 
-    student_abhyasika_id = student.abhyasika_id
-
+    student_abhyasika_id = (
+        student.abhyasika_id
+    )
 
     # ==========================================
     # Teacher Access Control
@@ -1986,16 +2059,8 @@ def student_attendance_history(student_id):
             "abhyasika_id"
         )
 
-        # Teacher must have an active
-        # Abhyasika selected.
-
         if not selected_abhyasika:
-
             abort(403)
-
-
-        # Teacher can only view students
-        # from their selected Abhyasika.
 
         if (
             student_abhyasika_id
@@ -2004,9 +2069,8 @@ def student_attendance_history(student_id):
 
             abort(403)
 
-
     # ==========================================
-    # Attendance Records Query
+    # Base Attendance Query
     # ==========================================
 
     attendance_query = (
@@ -2019,17 +2083,15 @@ def student_attendance_history(student_id):
         .join(
             AttendanceSession,
             Attendance.attendance_session_id
-            ==
-            AttendanceSession.id
+            == AttendanceSession.id
         )
 
         .filter(
-            Attendance.student_id ==
-            student.id
+            Attendance.student_id
+            == student.id
         )
 
     )
-
 
     # ==========================================
     # Status Filter
@@ -2040,13 +2102,12 @@ def student_attendance_history(student_id):
         "Absent"
     ):
 
-        attendance_query = attendance_query.filter(
-
-            Attendance.status ==
-            selected_status
-
+        attendance_query = (
+            attendance_query.filter(
+                Attendance.status
+                == selected_status
+            )
         )
-
 
     # ==========================================
     # Month Filter
@@ -2054,17 +2115,21 @@ def student_attendance_history(student_id):
 
     if selected_month:
 
-        attendance_query = attendance_query.filter(
+        if selected_month < 1 or selected_month > 12:
 
-            db.extract(
-                "month",
-                AttendanceSession.attendance_date
+            selected_month = None
+
+        else:
+
+            attendance_query = (
+                attendance_query.filter(
+                    db.extract(
+                        "month",
+                        AttendanceSession.attendance_date
+                    )
+                    == selected_month
+                )
             )
-            ==
-            selected_month
-
-        )
-
 
     # ==========================================
     # Academic Year Filter
@@ -2086,14 +2151,13 @@ def student_attendance_history(student_id):
                     "20" + year_parts[1]
                 )
 
-                from sqlalchemy import or_
-
                 attendance_query = (
                     attendance_query.filter(
 
-                        or_(
+                        db.or_(
 
                             # June to December
+
                             db.and_(
 
                                 db.extract(
@@ -2101,8 +2165,7 @@ def student_attendance_history(student_id):
                                     AttendanceSession
                                     .attendance_date
                                 )
-                                ==
-                                start_year,
+                                == start_year,
 
                                 db.extract(
                                     "month",
@@ -2114,6 +2177,7 @@ def student_attendance_history(student_id):
                             ),
 
                             # January to May
+
                             db.and_(
 
                                 db.extract(
@@ -2121,8 +2185,7 @@ def student_attendance_history(student_id):
                                     AttendanceSession
                                     .attendance_date
                                 )
-                                ==
-                                end_year,
+                                == end_year,
 
                                 db.extract(
                                     "month",
@@ -2140,45 +2203,200 @@ def student_attendance_history(student_id):
 
             except ValueError:
 
-                # Invalid academic year
-                # is simply ignored.
-
                 pass
 
-
     # ==========================================
-    # Order Attendance Records
+    # Attendance Statistics
+    #
+    # Calculated directly by the database.
+    # No complete attendance record list needed.
     # ==========================================
 
-    attendance_query = (
+    statistics_query = (
 
-        attendance_query
+        db.session.query(
 
-        .order_by(
+            func.count(
+                Attendance.id
+            ).label(
+                "total_days"
+            ),
 
-            AttendanceSession.attendance_date.desc(),
+            func.sum(
+                db.case(
+                    (
+                        Attendance.status
+                        == "Present",
+                        1
+                    ),
+                    else_=0
+                )
+            ).label(
+                "present_days"
+            ),
 
-            AttendanceSession.created_at.desc()
+            func.sum(
+                db.case(
+                    (
+                        Attendance.status
+                        == "Absent",
+                        1
+                    ),
+                    else_=0
+                )
+            ).label(
+                "absent_days"
+            )
+
+        )
+
+        .join(
+
+            AttendanceSession,
+
+            Attendance.attendance_session_id
+            == AttendanceSession.id
+
+        )
+
+        .filter(
+
+            Attendance.student_id
+            == student.id
 
         )
 
     )
 
-
     # ==========================================
-    # Complete Filtered Records
-    #
-    # Used only for summary statistics.
+    # Apply Same Filters to Statistics
     # ==========================================
 
-    filtered_attendance_records = (
+    if selected_status in (
+        "Present",
+        "Absent"
+    ):
 
-        attendance_query
+        statistics_query = (
+            statistics_query.filter(
+                Attendance.status
+                == selected_status
+            )
+        )
 
-        .all()
+    if selected_month:
 
+        statistics_query = (
+            statistics_query.filter(
+                db.extract(
+                    "month",
+                    AttendanceSession.attendance_date
+                )
+                == selected_month
+            )
+        )
+
+    if selected_year:
+
+        year_parts = selected_year.split("-")
+
+        if len(year_parts) == 2:
+
+            try:
+
+                start_year = int(
+                    year_parts[0]
+                )
+
+                end_year = int(
+                    "20" + year_parts[1]
+                )
+
+                statistics_query = (
+                    statistics_query.filter(
+
+                        db.or_(
+
+                            db.and_(
+
+                                db.extract(
+                                    "year",
+                                    AttendanceSession
+                                    .attendance_date
+                                )
+                                == start_year,
+
+                                db.extract(
+                                    "month",
+                                    AttendanceSession
+                                    .attendance_date
+                                )
+                                >= 6
+
+                            ),
+
+                            db.and_(
+
+                                db.extract(
+                                    "year",
+                                    AttendanceSession
+                                    .attendance_date
+                                )
+                                == end_year,
+
+                                db.extract(
+                                    "month",
+                                    AttendanceSession
+                                    .attendance_date
+                                )
+                                < 6
+
+                            )
+
+                        )
+
+                    )
+                )
+
+            except ValueError:
+
+                pass
+
+    statistics = (
+        statistics_query
+        .first()
     )
 
+    total_days = int(
+        statistics.total_days or 0
+    )
+
+    present_days = int(
+        statistics.present_days or 0
+    )
+
+    absent_days = int(
+        statistics.absent_days or 0
+    )
+
+    # ==========================================
+    # Attendance Percentage
+    # ==========================================
+
+    attendance_percentage = 0.00
+
+    if total_days > 0:
+
+        attendance_percentage = round(
+
+            (
+                present_days /
+                total_days
+            ) * 100,
+
+            2
+
+        )
 
     # ==========================================
     # Pagination
@@ -2190,12 +2408,22 @@ def student_attendance_history(student_id):
         type=int
     )
 
-    per_page = 10
+    if page < 1:
+        page = 1
 
+    per_page = 10
 
     attendance_pagination = (
 
         attendance_query
+
+        .order_by(
+
+            AttendanceSession.attendance_date.desc(),
+
+            AttendanceSession.created_at.desc()
+
+        )
 
         .paginate(
 
@@ -2209,24 +2437,15 @@ def student_attendance_history(student_id):
 
     )
 
-
-    # ==========================================
-    # Current Page Records
-    # ==========================================
-
     attendance_records = (
-
         attendance_pagination.items
-
     )
-
 
     # ==========================================
     # Available Academic Years
     #
-    # These are generated from ALL attendance
-    # records of this student, not the filtered
-    # result.
+    # Only dates are loaded here.
+    # No Attendance objects are loaded.
     # ==========================================
 
     all_student_records = (
@@ -2238,13 +2457,12 @@ def student_attendance_history(student_id):
         .join(
             Attendance,
             Attendance.attendance_session_id
-            ==
-            AttendanceSession.id
+            == AttendanceSession.id
         )
 
         .filter(
-            Attendance.student_id ==
-            student.id
+            Attendance.student_id
+            == student.id
         )
 
         .order_by(
@@ -2255,61 +2473,41 @@ def student_attendance_history(student_id):
 
     )
 
-
     academic_years = set()
-
 
     for record in all_student_records:
 
         attendance_date = record[0]
 
-
         if not attendance_date:
-
             continue
-
-
-        # June to December belongs
-        # to the current academic year.
 
         if attendance_date.month >= 6:
 
             academic_year = (
 
                 f"{attendance_date.year}-"
-
-                f"{str(
-                    attendance_date.year + 1
-                )[-2:]}"
+                f"{str(attendance_date.year + 1)[-2:]}"
 
             )
-
-        # January to May belongs
-        # to the previous academic year.
 
         else:
 
             academic_year = (
 
                 f"{attendance_date.year - 1}-"
-
-                f"{str(
-                    attendance_date.year
-                )[-2:]}"
+                f"{str(attendance_date.year)[-2:]}"
 
             )
-
 
         academic_years.add(
             academic_year
         )
 
-
     academic_years = sorted(
         academic_years,
         reverse=True
     )
-
 
     # ==========================================
     # Month Options
@@ -2379,77 +2577,13 @@ def student_attendance_history(student_id):
 
     ]
 
-
     # ==========================================
-    # Attendance Statistics
-    #
-    # These use ALL filtered records,
-    # not only the current page.
+    # Compatibility History
     # ==========================================
 
-    total_days = len(
-        filtered_attendance_records
-    )
+    history = [
 
-
-    present_days = sum(
-
-        1
-
-        for attendance, attendance_session
-        in filtered_attendance_records
-
-        if attendance.status == "Present"
-
-    )
-
-
-    absent_days = sum(
-
-        1
-
-        for attendance, attendance_session
-        in filtered_attendance_records
-
-        if attendance.status == "Absent"
-
-    )
-
-
-    # ==========================================
-    # Attendance Percentage
-    # ==========================================
-
-    attendance_percentage = 0.00
-
-
-    if total_days > 0:
-
-        attendance_percentage = round(
-
-            (
-                present_days /
-                total_days
-            ) * 100,
-
-            2
-
-        )
-
-
-    # ==========================================
-    # Prepare Attendance History
-    #
-    # Kept for compatibility with any existing
-    # template code that uses "history".
-    # ==========================================
-
-    history = []
-
-
-    for attendance, attendance_session in attendance_records:
-
-        history.append({
+        {
 
             "attendance":
                 attendance,
@@ -2457,8 +2591,12 @@ def student_attendance_history(student_id):
             "session":
                 attendance_session
 
-        })
+        }
 
+        for attendance, attendance_session
+        in attendance_records
+
+    ]
 
     # ==========================================
     # Render
@@ -2468,32 +2606,13 @@ def student_attendance_history(student_id):
 
         "attendance/student_attendance_history.html",
 
-        # --------------------------------------
-        # Student
-        # --------------------------------------
-
         student=student,
-
-
-        # --------------------------------------
-        # Current Page Attendance Records
-        # --------------------------------------
 
         attendance_records=
             attendance_records,
 
-
-        # --------------------------------------
-        # Compatibility History
-        # --------------------------------------
-
         history=
             history,
-
-
-        # --------------------------------------
-        # Summary Statistics
-        # --------------------------------------
 
         total_days=
             total_days,
@@ -2507,11 +2626,6 @@ def student_attendance_history(student_id):
         attendance_percentage=
             attendance_percentage,
 
-
-        # --------------------------------------
-        # Selected Filters
-        # --------------------------------------
-
         selected_year=
             selected_year,
 
@@ -2521,21 +2635,11 @@ def student_attendance_history(student_id):
         selected_status=
             selected_status,
 
-
-        # --------------------------------------
-        # Filter Options
-        # --------------------------------------
-
         academic_years=
             academic_years,
 
         months=
             months,
-
-
-        # --------------------------------------
-        # Pagination
-        # --------------------------------------
 
         attendance_pagination=
             attendance_pagination

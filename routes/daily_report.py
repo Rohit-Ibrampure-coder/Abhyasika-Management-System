@@ -15,7 +15,6 @@ from flask_login import (
 )
 
 from models import db
-from models.daily_report import DailyReport
 from models.attendance_session import AttendanceSession
 from models.daily_report import DailyReport
 from models.user import User
@@ -484,8 +483,6 @@ def daily_report_history():
 
         "daily_report/daily_report_history.html",
 
-        reports=reports,
-
         teachers=teachers,
 
         abhyasikas=abhyasikas,
@@ -948,7 +945,9 @@ def delete_daily_report(report_id):
 # Pending Daily Reports
 # ==========================================================
 
-@daily_report_bp.route("/daily-report/pending")
+@daily_report_bp.route(
+    "/daily-report/pending"
+)
 @login_required
 def pending_daily_reports():
 
@@ -964,22 +963,21 @@ def pending_daily_reports():
     # Selected Abhyasika
     # ==========================================
 
-    abhyasika_id = session.get("abhyasika_id")
+    abhyasika_id = session.get(
+        "abhyasika_id"
+    )
 
     if not abhyasika_id:
 
         flash(
-
             "Please select an Abhyasika.",
-
             "warning"
-
         )
 
         return redirect(
-
-            url_for("teacher.select_abhyasika")
-
+            url_for(
+                "teacher.select_abhyasika"
+            )
         )
 
     today = date.today()
@@ -988,71 +986,98 @@ def pending_daily_reports():
     # Filters
     # ==========================================
 
-    from_date = request.args.get("from_date")
+    from_date = request.args.get(
+        "from_date",
+        ""
+    ).strip()
 
-    to_date = request.args.get("to_date")
+    to_date = request.args.get(
+        "to_date",
+        ""
+    ).strip()
 
     # ==========================================
-    # Attendance Sessions
+    # Pending Daily Reports
+    #
+    # Database performs the missing-report
+    # detection directly.
+    #
+    # No:
+    #   - loading all attendance sessions
+    #   - loading all DailyReport IDs
+    #   - Python set creation
+    #   - Python filtering loop
     # ==========================================
 
-    query = AttendanceSession.query.filter(
+    query = (
 
-        AttendanceSession.abhyasika_id == abhyasika_id,
+        AttendanceSession.query
 
-        AttendanceSession.attendance_date < today
+        .outerjoin(
+            DailyReport,
+            DailyReport.attendance_session_id
+            == AttendanceSession.id
+        )
+
+        .filter(
+
+            AttendanceSession.abhyasika_id
+            == abhyasika_id,
+
+            AttendanceSession.attendance_date
+            < today,
+
+            DailyReport.id.is_(None)
+
+        )
 
     )
+
+    # ==========================================
+    # From Date
+    # ==========================================
 
     if from_date:
 
         query = query.filter(
 
-            AttendanceSession.attendance_date >= from_date
+            AttendanceSession.attendance_date
+            >= from_date
 
         )
+
+    # ==========================================
+    # To Date
+    # ==========================================
 
     if to_date:
 
         query = query.filter(
 
-            AttendanceSession.attendance_date <= to_date
+            AttendanceSession.attendance_date
+            <= to_date
 
         )
 
-    attendance_sessions = query.order_by(
-
-        AttendanceSession.attendance_date.asc()
-
-    ).all()
-
     # ==========================================
-    # Existing Daily Reports
+    # Order
     # ==========================================
 
-    report_session_ids = {
+    pending_reports = (
 
-        report.attendance_session_id
+        query
 
-        for report in DailyReport.query.with_entities(
+        .order_by(
 
-            DailyReport.attendance_session_id
+            AttendanceSession.attendance_date.asc(),
 
-        ).all()
+            AttendanceSession.created_at.asc()
 
-    }
+        )
 
-    # ==========================================
-    # Pending Reports
-    # ==========================================
+        .all()
 
-    pending_reports = []
-
-    for attendance_session in attendance_sessions:
-
-        if attendance_session.id not in report_session_ids:
-
-            pending_reports.append(attendance_session)
+    )
 
     # ==========================================
     # Render
