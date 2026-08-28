@@ -4,6 +4,14 @@ from models import db
 class TeacherAbhyasika(db.Model):
     __tablename__ = "teacher_abhyasika"
 
+    __table_args__ = (
+        db.UniqueConstraint(
+            "teacher_id",
+            "abhyasika_id",
+            name="uq_teacher_abhyasika"
+        ),
+    )
+
     id = db.Column(
         db.Integer,
         primary_key=True
