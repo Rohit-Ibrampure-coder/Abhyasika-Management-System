@@ -27,6 +27,21 @@ def login():
             password
         ):
 
+            # ==========================================
+            # Account Status Check
+            # ==========================================
+
+            if not user.is_active_account:
+
+                flash(
+                    "Your account has been deactivated. Please contact the administrator.",
+                    "danger"
+                )
+
+                return redirect(
+                    url_for("auth.login")
+                )
+
             login_user(user)
 
             # Admin Login

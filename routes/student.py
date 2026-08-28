@@ -587,7 +587,7 @@ def student_profile(student_id):
     ).limit(3).all()
 
     # ==========================================
-    # Teacher Permission
+    # Teacher Authorization
     # ==========================================
 
     can_manage_student = False
@@ -599,9 +599,10 @@ def student_profile(student_id):
             abhyasika_id=student.abhyasika_id
         ).first()
 
-        if assignment:
+        if not assignment:
+            abort(403)
 
-            can_manage_student = True
+        can_manage_student = True
 
 
     # ==========================================
