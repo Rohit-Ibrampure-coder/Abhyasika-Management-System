@@ -159,7 +159,6 @@ class Student(db.Model):
     mulyankan_selection = db.relationship(
         "StudentMulyankan",
         back_populates="student",
-        uselist=False,
         cascade="all, delete-orphan"
     )
 

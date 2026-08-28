@@ -185,33 +185,80 @@ def student_evaluation_home():
         )
 
         # --------------------------------------
-        # Evaluation Information
+        # Student IDs
         # --------------------------------------
 
-        for student in students:
+        student_ids = [
+            student.id
+            for student in students
+        ]
 
-            # Today's / selected-date evaluation
+        # ======================================
+        # Bulk Evaluation Query
+        # ======================================
 
-            student.today_evaluation = (
+        evaluations = []
+
+        if student_ids:
+
+            evaluations = (
                 StudentEvaluation.query
-                .filter_by(
-                    student_id=student.id,
-                    evaluation_date=evaluation_date
-                )
-                .first()
-            )
-
-            # Last evaluation
-
-            student.last_evaluation = (
-                StudentEvaluation.query
-                .filter_by(
-                    student_id=student.id
+                .filter(
+                    StudentEvaluation.student_id.in_(
+                        student_ids
+                    )
                 )
                 .order_by(
                     StudentEvaluation.evaluation_date.desc()
                 )
-                .first()
+                .all()
+            )
+
+        # ======================================
+        # Today's / Selected-Date Evaluations
+        # ======================================
+
+        today_evaluations = {
+
+            evaluation.student_id: evaluation
+
+            for evaluation in evaluations
+
+            if evaluation.evaluation_date
+            == evaluation_date
+
+        }
+
+        # ======================================
+        # Last Evaluation Per Student
+        # ======================================
+
+        last_evaluations = {}
+
+        for evaluation in evaluations:
+
+            if evaluation.student_id not in last_evaluations:
+
+                last_evaluations[
+                    evaluation.student_id
+                ] = evaluation
+
+        # ======================================
+        # Attach Evaluation Information
+        # ======================================
+
+        for student in students:
+
+            student.today_evaluation = (
+                today_evaluations.get(
+                    student.id
+                )
+            )
+
+            student.last_evaluation = (
+                last_evaluations.get(
+                    student.id
+                )
             )
 
     # ==========================================

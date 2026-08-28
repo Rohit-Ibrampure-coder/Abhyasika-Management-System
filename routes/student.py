@@ -417,8 +417,16 @@ def add_student():
 @login_required
 def view_students():
 
+    # ==========================================
+    # Access Control
+    # ==========================================
+
     if current_user.role not in ["admin", "teacher"]:
         abort(403)
+
+    # ==========================================
+    # Search & Filters
+    # ==========================================
 
     search = request.args.get(
         "search",
@@ -440,6 +448,25 @@ def view_students():
         ""
     )
 
+    # ==========================================
+    # Pagination
+    # ==========================================
+
+    page = request.args.get(
+        "page",
+        1,
+        type=int
+    )
+
+    if page < 1:
+        page = 1
+
+    PER_PAGE = 10
+
+    # ==========================================
+    # Base Student Query
+    # ==========================================
+
     if current_user.role == "admin":
 
         query = Student.query
@@ -454,7 +481,10 @@ def view_students():
             abhyasika_id=abhyasika_id
         )
 
-    # Search
+    # ==========================================
+    # Search Filter
+    # ==========================================
+
     if search:
 
         query = query.filter(
@@ -473,54 +503,112 @@ def view_students():
 
         )
 
+    # ==========================================
     # Status Filter
+    # ==========================================
+
     if status:
 
         query = query.filter_by(
             status=status
         )
 
+    # ==========================================
     # Standard Filter
+    # ==========================================
+
     if standard:
 
         query = query.filter_by(
             standard=standard
         )
 
-    # Abhyasika Filter (Admin Only)
+    # ==========================================
+    # Abhyasika Filter
+    # Admin Only
+    # ==========================================
+
     if current_user.role == "admin" and abhyasika:
 
         query = query.filter_by(
             abhyasika_id=abhyasika
         )
 
-    students = query.order_by(
-        Student.student_name
-    ).all()
+    # ==========================================
+    # Total Active Students
+    # ==========================================
 
-    student_count = len(
-        students
+    active_student_count = query.filter(
+        Student.status == "Active"
+    ).count()
+
+    # ==========================================
+    # Paginated Students
+    # ==========================================
+
+    pagination = (
+        query
+        .order_by(
+            Student.student_name
+        )
+        .paginate(
+            page=page,
+            per_page=PER_PAGE,
+            error_out=False
+        )
     )
+
+    students = pagination.items
+
+    student_count = pagination.total
+
+    # ==========================================
+    # Load Abhyasikas
+    # Admin Only
+    # ==========================================
 
     abhyasikas = None
 
     if current_user.role == "admin":
 
-        abhyasikas = Abhyasika.query.order_by(
-            Abhyasika.name
-        ).all()
+        abhyasikas = (
+            Abhyasika.query
+            .order_by(
+                Abhyasika.name
+            )
+            .all()
+        )
+
+    # ==========================================
+    # Render
+    # ==========================================
 
     return render_template(
+
         "student/view_students.html",
+
         students=students,
+
         student_count=student_count,
+
+        active_student_count=active_student_count,
+
+        pagination=pagination,
+
         search=search,
+
         status=status,
+
         standard=standard,
+
         abhyasika=abhyasika,
+
         abhyasikas=abhyasikas,
+
         standards=STANDARDS,
-        student_status=STUDENT_STATUS,
+
+        student_status=STUDENT_STATUS
+
     )
 
 @student_bp.route("/student/<int:student_id>")
