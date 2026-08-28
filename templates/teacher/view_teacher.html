@@ -206,6 +206,17 @@ Teacher Details
                     </a>
 
                     <a
+                        href="{{ url_for('teacher_management.reset_teacher_password', id=teacher.id) }}"
+                        class="btn btn-warning"
+                    >
+
+                        <i class="bi bi-key-fill"></i>
+
+                        Reset Password
+
+                    </a>
+
+                    <a
                         href="{{ url_for('teacher_management.delete_teacher', id=teacher.id) }}"
                         class="btn btn-danger"
                         onclick="return confirm('Delete this teacher?')"

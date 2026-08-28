@@ -6683,3 +6683,13 @@ REMARK CARD
     }
 
 }
+
+/* ==========================================
+   Password Reset Information Notice
+   Keep this notice visible permanently
+========================================== */
+
+.password-reset-notice {
+    opacity: 1 !important;
+    visibility: visible !important;
+}

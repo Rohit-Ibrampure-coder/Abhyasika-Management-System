@@ -494,6 +494,88 @@ def edit_teacher(id):
     )
 
 @teacher_management_bp.route(
+    "/admin/teacher/<int:id>/reset-password",
+    methods=["GET", "POST"]
+)
+@login_required
+def reset_teacher_password(id):
+
+    if current_user.role != "admin":
+        abort(403)
+
+    teacher = User.query.get_or_404(id)
+
+    # Only teacher accounts can be reset here
+    if teacher.role != "teacher":
+        abort(403)
+
+    if request.method == "POST":
+
+        password = request.form.get(
+            "password",
+            ""
+        )
+
+        confirm_password = request.form.get(
+            "confirm_password",
+            ""
+        )
+
+        # Password validation
+        if len(password) < 6:
+
+            flash(
+                "Password must be at least 6 characters.",
+                "danger"
+            )
+
+            return redirect(
+                url_for(
+                    "teacher_management.reset_teacher_password",
+                    id=teacher.id
+                )
+            )
+
+        # Confirm password
+        if password != confirm_password:
+
+            flash(
+                "Passwords do not match.",
+                "danger"
+            )
+
+            return redirect(
+                url_for(
+                    "teacher_management.reset_teacher_password",
+                    id=teacher.id
+                )
+            )
+
+        # Hash and save new password
+        teacher.password = generate_password_hash(
+            password
+        )
+
+        db.session.commit()
+
+        flash(
+            f'Password for teacher "{teacher.name}" was reset successfully.',
+            "success"
+        )
+
+        return redirect(
+            url_for(
+                "teacher_management.view_teacher",
+                id=teacher.id
+            )
+        )
+
+    return render_template(
+        "teacher/reset_teacher_password.html",
+        teacher=teacher
+    )
+
+@teacher_management_bp.route(
     "/admin/teacher/delete/<int:id>",
     methods=["GET", "POST"]
 )

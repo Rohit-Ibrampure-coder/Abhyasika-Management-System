@@ -41,10 +41,15 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     /* ==========================================
-       AUTO CLOSE ALERTS
+        AUTO CLOSE ALERTS
     ========================================== */
 
     document.querySelectorAll(".alert").forEach(function (alert) {
+
+        // Keep the password reset information notice visible
+        if (alert.classList.contains("password-reset-notice")) {
+            return;
+        }
 
         setTimeout(function () {
 
